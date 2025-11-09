@@ -1,0 +1,34 @@
+workflow:
+  name: AI Website Provisioning
+  description: Automates the end-to-end process of generating and deploying a website for a user
+  triggers:
+    - event: user_submission
+  steps:
+    - name: Generate Website Content
+      action: ai.generate_content
+      input: user_profile
+    - name: Check Domain Availability
+      action: domain.check_availability
+      input: user_domain
+    - name: Register Domain
+      action: domain.register
+      input: selected_domain
+    - name: Provision Hosting
+      action: hosting.create_droplet
+      input: user_plan
+    - name: Deploy Website
+      action: hosting.deploy_container
+      input: generated_content
+    - name: Setup Cloudflare
+      action: cloudflare.configure
+      input: selected_domain
+    - name: Enable Email Hosting
+      condition: user_selected_email
+      action: email.setup
+      input: selected_domain
+    - name: Schedule Marketing Posts
+      action: marketing.schedule_posts
+      input: user_profile
+    - name: Send Daily Report
+      action: reporting.send_summary
+      input: usage_metrics
