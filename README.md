@@ -31,4 +31,37 @@ This is a fully automated, AI-powered platform that enables professionals and sm
 ---
 
 ## Repo Structure
+/frontend # React UI 
+/backend # Node.js API 
+/ai-agent # Claude workflows 
+/infra # Docker, Terraform, Kubernetes 
+/docs # Markdown documentation
 
+
+---
+
+## Getting Started
+
+1. Clone the repo
+2. Set up environment variables for API keys (Cloudflare, DigitalOcean, Stripe, etc.)
+3. Run `docker-compose up` to start local development
+4. Use Claude workflows in `/ai-agent` to automate provisioning
+
+---
+
+## Automation Goals
+
+- Zero manual intervention
+- Claude agents handle:
+  - Website generation
+  - Infrastructure setup
+  - Marketing execution
+  - Reporting and alerts
+
+---
+
+## Reporting
+
+- Daily email summary
+- Telegram alerts via Bot API
+- Marketing vs sales dashboard
