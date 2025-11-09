@@ -1,0 +1,94 @@
+agent:
+  name: WebsiteProvisioner
+  description: Automates the creation, deployment, and marketing of AI-generated websites for users.
+
+workflow:
+  trigger: user_submission
+
+  steps:
+    - id: generate_content
+      name: Generate Website Content
+      action: ai.generate_content
+      input:
+        profile_data: "{{ user.profile }}"
+        template: "{{ user.template }}"
+        color_scheme: "{{ user.color_scheme }}"
+      output: website_content
+
+    - id: check_domain
+      name: Check Domain Availability
+      action: domain.check_availability
+      input:
+        domain_name: "{{ user.domain }}"
+      output: domain_status
+
+    - id: suggest_domain
+      name: Suggest Alternative Domain
+      condition: "{{ domain_status.available == false }}"
+      action: domain.suggest_alternatives
+      input:
+        base_name: "{{ user.domain }}"
+      output: domain_suggestions
+
+    - id: register_domain
+      name: Register Domain
+      condition: "{{ domain_status.available == true }}"
+      action: domain.register
+      input:
+        domain_name: "{{ user.domain }}"
+        registrar: "cloudflare"
+      output: registered_domain
+
+    - id: provision_hosting
+      name: Provision Hosting
+      action: hosting.create_droplet
+      input:
+        plan: "{{ user.plan }}"
+        domain: "{{ registered_domain }}"
+      output: droplet_info
+
+    - id: deploy_website
+      name: Deploy Website
+      action: hosting.deploy_container
+      input:
+        content: "{{ website_content }}"
+        droplet: "{{ droplet_info }}"
+      output: deployment_status
+
+    - id: setup_cloudflare
+      name: Setup Cloudflare
+      action: cloudflare.configure
+      input:
+        domain: "{{ registered_domain }}"
+        ssl: true
+        cdn: true
+      output: cloudflare_status
+
+    - id: setup_email
+      name: Setup Email Hosting
+      condition: "{{ user.email_hosting == true }}"
+      action: email.setup
+      input:
+        domain: "{{ registered_domain }}"
+      output: email_status
+
+    - id: schedule_marketing
+      name: Schedule Marketing Posts
+      action: marketing.schedule_posts
+      input:
+        profile: "{{ user.profile }}"
+        budget: "{{ user.marketing_budget }}"
+        channels: ["instagram", "facebook", "linkedin", "google_ads"]
+      output: marketing_schedule
+
+    - id: send_report
+      name: Send Daily Report
+      action: reporting.send_summary
+      input:
+        email: "{{ admin.email }}"
+        telegram: "{{ admin.telegram }}"
+        metrics:
+          - usage
+          - sales
+          - marketing_roi
+      output: report_status
