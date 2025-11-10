@@ -4,7 +4,11 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
 import authRoutes from './routes/auth.routes';
+import profileRoutes from './routes/profile.routes';
+import templateRoutes from './routes/template.routes';
+import uploadRoutes from './routes/upload.routes';
 
 dotenv.config();
 
@@ -26,6 +30,9 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(morgan('dev')); // Logging
 app.use('/api/', limiter); // Rate limiting for API routes
 
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({
@@ -45,6 +52,9 @@ app.get('/api', (req: Request, res: Response) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/profiles', profileRoutes);
+app.use('/api/templates', templateRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
