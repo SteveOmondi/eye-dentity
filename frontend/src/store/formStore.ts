@@ -11,9 +11,11 @@ export interface FormData {
   bio: string;
   services: string[];
 
-  // Step 3: Logo
+  // Step 3: Branding (Logo & Profile Photo)
   logoFile: File | null;
   logoUrl: string;
+  profilePhotoFile: File | null;
+  profilePhotoUrl: string;
 
   // Template Selection
   selectedTemplate: string | null;
@@ -42,6 +44,8 @@ const initialFormData: FormData = {
   services: [],
   logoFile: null,
   logoUrl: '',
+  profilePhotoFile: null,
+  profilePhotoUrl: '',
   selectedTemplate: null,
   selectedColorScheme: null,
 };

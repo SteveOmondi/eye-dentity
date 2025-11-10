@@ -10,6 +10,7 @@ const profileSchema = z.object({
   bio: z.string().optional(),
   phone: z.string().optional(),
   logoUrl: z.string().url().optional().or(z.literal('')),
+  profilePhotoUrl: z.string().url().optional().or(z.literal('')),
   services: z.array(z.string()).optional(),
   metadata: z.record(z.any()).optional(),
 });

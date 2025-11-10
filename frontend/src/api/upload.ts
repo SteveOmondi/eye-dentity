@@ -12,4 +12,16 @@ export const uploadApi = {
     });
     return response.data;
   },
+
+  uploadProfilePhoto: async (file: File) => {
+    const formData = new FormData();
+    formData.append('profilePhoto', file);
+
+    const response = await apiClient.post('/upload/profile-photo', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
 };

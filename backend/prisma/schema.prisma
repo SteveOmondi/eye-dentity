@@ -65,16 +65,17 @@ model User {
 }
 
 model Profile {
-  id         String   @id @default(cuid())
-  userId     String   @unique
-  profession String
-  bio        String?
-  phone      String?
-  logoUrl    String?
-  services   Json? // Array of services
-  metadata   Json? // Additional flexible data
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  profession      String
+  bio             String?
+  phone           String?
+  logoUrl         String? // Business/company logo
+  profilePhotoUrl String? // Professional headshot
+  services        Json? // Array of services
+  metadata        Json? // Additional flexible data
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
