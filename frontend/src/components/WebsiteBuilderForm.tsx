@@ -4,8 +4,11 @@ import { PersonalInfoStep } from './PersonalInfoStep';
 import { BioServicesStep } from './BioServicesStep';
 import { BrandingStep } from './BrandingStep';
 import { TemplateSelectionStep } from './TemplateSelectionStep';
+import { DomainSearchStep } from './DomainSearchStep';
+import { HostingPlanStep } from './HostingPlanStep';
+import { OrderSummary } from './OrderSummary';
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 7;
 
 export const WebsiteBuilderForm = () => {
   const { currentStep } = useFormStore();
@@ -20,6 +23,12 @@ export const WebsiteBuilderForm = () => {
         return <BrandingStep />;
       case 4:
         return <TemplateSelectionStep />;
+      case 5:
+        return <DomainSearchStep />;
+      case 6:
+        return <HostingPlanStep />;
+      case 7:
+        return <OrderSummary />;
       default:
         return <PersonalInfoStep />;
     }

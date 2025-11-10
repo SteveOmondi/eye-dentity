@@ -4,10 +4,13 @@ interface StepProgressProps {
 }
 
 const steps = [
-  { number: 1, title: 'Personal Info', description: 'Tell us about yourself' },
-  { number: 2, title: 'Bio & Services', description: 'Your story and offerings' },
-  { number: 3, title: 'Branding', description: 'Logo and profile photo' },
-  { number: 4, title: 'Template', description: 'Choose your design' },
+  { number: 1, title: 'Info', description: 'Your details' },
+  { number: 2, title: 'Bio', description: 'Your story' },
+  { number: 3, title: 'Branding', description: 'Visuals' },
+  { number: 4, title: 'Template', description: 'Design' },
+  { number: 5, title: 'Domain', description: 'Website URL' },
+  { number: 6, title: 'Hosting', description: 'Choose plan' },
+  { number: 7, title: 'Review', description: 'Finalize' },
 ];
 
 export const StepProgress = ({ currentStep, totalSteps }: StepProgressProps) => {

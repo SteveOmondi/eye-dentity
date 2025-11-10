@@ -17,7 +17,7 @@ export interface FormData {
   profilePhotoFile: File | null;
   profilePhotoUrl: string;
 
-  // Template Selection
+  // Step 4: Template Selection
   selectedTemplate: string | null;
   selectedColorScheme: {
     name: string;
@@ -25,6 +25,15 @@ export interface FormData {
     secondary: string;
     accent: string;
   } | null;
+
+  // Step 5: Domain Selection
+  domain: string;
+  domainAvailable: boolean;
+  domainPrice: number | null;
+
+  // Step 6: Hosting Plan
+  selectedPlan: string | null;
+  emailHosting: boolean;
 }
 
 interface FormState {
@@ -48,6 +57,11 @@ const initialFormData: FormData = {
   profilePhotoUrl: '',
   selectedTemplate: null,
   selectedColorScheme: null,
+  domain: '',
+  domainAvailable: false,
+  domainPrice: null,
+  selectedPlan: null,
+  emailHosting: false,
 };
 
 export const useFormStore = create<FormState>((set) => ({

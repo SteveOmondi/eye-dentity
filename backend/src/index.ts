@@ -9,6 +9,8 @@ import authRoutes from './routes/auth.routes';
 import profileRoutes from './routes/profile.routes';
 import templateRoutes from './routes/template.routes';
 import uploadRoutes from './routes/upload.routes';
+import domainRoutes from './routes/domain.routes';
+import hostingRoutes from './routes/hosting.routes';
 
 dotenv.config();
 
@@ -55,6 +57,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/domains', domainRoutes);
+app.use('/api/hosting', hostingRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
