@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useFormStore } from '../store/formStore';
 import { hostingApi, HostingPlan } from '../api/hosting';
+import { paymentApi } from '../api/payment';
+import { redirectToCheckout } from '../utils/stripe';
 
 export const OrderSummary = () => {
   const { formData, setCurrentStep } = useFormStore();
   const [selectedPlan, setSelectedPlan] = useState<HostingPlan | null>(null);
   const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (formData.selectedPlan) {
@@ -50,9 +54,53 @@ export const OrderSummary = () => {
     setCurrentStep(step);
   };
 
-  const handleProceedToPayment = () => {
-    // This would typically navigate to Stripe checkout or payment page
-    alert('Proceeding to payment... (Stripe integration in Week 3 Day 4)');
+  const handleProceedToPayment = async () => {
+    try {
+      setProcessing(true);
+      setError('');
+
+      // Validate required data
+      if (!formData.domain || !formData.domainPrice || !formData.selectedPlan || !selectedPlan) {
+        setError('Missing required order information');
+        return;
+      }
+
+      // Create checkout session
+      const response = await paymentApi.createCheckoutSession({
+        domain: formData.domain,
+        domainPrice: formData.domainPrice,
+        hostingPlan: formData.selectedPlan,
+        hostingPrice: selectedPlan.price,
+        emailHosting: formData.emailHosting,
+        emailHostingPrice: formData.emailHosting ? 5.99 : 0,
+        metadata: {
+          templateId: formData.selectedTemplate,
+          colorScheme: formData.selectedColorScheme,
+          profileData: {
+            name: formData.name,
+            email: formData.email,
+            profession: formData.profession,
+            phone: formData.phone,
+            bio: formData.bio,
+            services: formData.services,
+            logoUrl: formData.logoUrl,
+            profilePhotoUrl: formData.profilePhotoUrl,
+          },
+        },
+      });
+
+      // Redirect to Stripe Checkout
+      const { error: redirectError } = await redirectToCheckout(response.sessionId);
+
+      if (redirectError) {
+        setError(redirectError);
+      }
+    } catch (err: any) {
+      console.error('Payment initiation error:', err);
+      setError(err.response?.data?.error || 'Failed to initiate payment. Please try again.');
+    } finally {
+      setProcessing(false);
+    }
   };
 
   if (loading) {
@@ -71,6 +119,12 @@ export const OrderSummary = () => {
       <p className="text-gray-600 mb-8">
         Review your selections before proceeding to payment
       </p>
+
+      {error && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
 
       <div className="grid md:grid-cols-3 gap-8">
         {/* Order Details */}
@@ -259,9 +313,17 @@ export const OrderSummary = () => {
 
             <button
               onClick={handleProceedToPayment}
-              className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors mb-3"
+              disabled={processing}
+              className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors mb-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Proceed to Payment
+              {processing ? (
+                <>
+                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Processing...</span>
+                </>
+              ) : (
+                'Proceed to Payment'
+              )}
             </button>
 
             <button

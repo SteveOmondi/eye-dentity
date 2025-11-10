@@ -46,6 +46,14 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELED
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -60,6 +68,7 @@ model User {
   websites      Website[]
   subscriptions Subscription[]
   payments      Payment[]
+  orders        Order[]
 
   @@index([email])
 }
@@ -171,6 +180,33 @@ model Payment {
   @@index([userId])
   @@index([subscriptionId])
   @@index([status])
+}
+
+model Order {
+  id                    String      @id @default(cuid())
+  userId                String
+  domain                String
+  domainPrice           Float
+  hostingPlan           String // basic, pro, premium
+  hostingPrice          Float
+  emailHosting          Boolean     @default(false)
+  emailHostingPrice     Float       @default(0)
+  totalAmount           Float
+  currency              String      @default("usd")
+  status                OrderStatus @default(PENDING)
+  stripeSessionId       String?     @unique // Checkout session ID
+  stripePaymentIntentId String?     @unique // Payment intent ID
+  metadata              Json? // Store template, color scheme, etc.
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  completedAt           DateTime?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([stripeSessionId])
 }
 
 model MarketingCampaign {

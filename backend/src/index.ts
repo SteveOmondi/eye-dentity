@@ -11,6 +11,7 @@ import templateRoutes from './routes/template.routes';
 import uploadRoutes from './routes/upload.routes';
 import domainRoutes from './routes/domain.routes';
 import hostingRoutes from './routes/hosting.routes';
+import paymentRoutes from './routes/payment.routes';
 
 dotenv.config();
 
@@ -27,6 +28,10 @@ const limiter = rateLimit({
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors()); // CORS
+
+// IMPORTANT: Stripe webhook needs raw body - must be before express.json()
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
+
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(morgan('dev')); // Logging
@@ -59,6 +64,7 @@ app.use('/api/templates', templateRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/domains', domainRoutes);
 app.use('/api/hosting', hostingRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
