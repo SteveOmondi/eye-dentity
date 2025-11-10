@@ -1,0 +1,66 @@
+import express, { Express, Request, Response } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
+import authRoutes from './routes/auth.routes';
+
+dotenv.config();
+
+const app: Express = express();
+const PORT = process.env.PORT || 3000;
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+
+// Middleware
+app.use(helmet()); // Security headers
+app.use(cors()); // CORS
+app.use(express.json()); // Parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(morgan('dev')); // Logging
+app.use('/api/', limiter); // Rate limiting for API routes
+
+// Health check endpoint
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    service: 'eye-dentity-api'
+  });
+});
+
+// API routes
+app.get('/api', (req: Request, res: Response) => {
+  res.json({
+    message: 'Eye-Dentity API',
+    version: '1.0.0',
+    documentation: '/api/docs'
+  });
+});
+
+app.use('/api/auth', authRoutes);
+
+// 404 handler
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+// Error handler
+app.use((err: Error, req: Request, res: Response) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+});
+
+export default app;
