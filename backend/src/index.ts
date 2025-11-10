@@ -12,6 +12,8 @@ import uploadRoutes from './routes/upload.routes';
 import domainRoutes from './routes/domain.routes';
 import hostingRoutes from './routes/hosting.routes';
 import paymentRoutes from './routes/payment.routes';
+import websiteRoutes from './routes/website.routes';
+import adminRoutes from './routes/admin.routes';
 
 dotenv.config();
 
@@ -65,6 +67,8 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/domains', domainRoutes);
 app.use('/api/hosting', hostingRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/websites', websiteRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {

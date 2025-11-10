@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { stripe, STRIPE_CONFIG } from '../config/stripe';
 import { prisma } from '../lib/prisma';
+import { generateWebsite } from '../services/website-generator.service';
 import Stripe from 'stripe';
 
 /**
@@ -293,6 +294,16 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     return;
   }
 
+  // Get order details
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+  });
+
+  if (!order) {
+    console.error(`Order ${orderId} not found`);
+    return;
+  }
+
   // Update order status
   await prisma.order.update({
     where: { id: orderId },
@@ -305,7 +316,29 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
   console.log(`Order ${orderId} marked as completed`);
 
-  // TODO: Trigger website generation workflow
+  // Trigger website generation workflow
+  const metadata = order.metadata as any;
+  if (metadata?.profileData && metadata?.templateId && metadata?.colorScheme) {
+    console.log(`Triggering website generation for order ${orderId}...`);
+
+    generateWebsite({
+      userId: order.userId,
+      orderId: order.id,
+      profileData: metadata.profileData,
+      templateId: metadata.templateId,
+      colorScheme: metadata.colorScheme,
+      domain: order.domain,
+    })
+      .then((result) => {
+        console.log(`Website generation completed for order ${orderId}:`, result);
+      })
+      .catch((error) => {
+        console.error(`Website generation failed for order ${orderId}:`, error);
+      });
+  } else {
+    console.warn(`Order ${orderId} missing metadata for website generation`);
+  }
+
   // TODO: Send confirmation email
   // TODO: Create subscription record
 }
