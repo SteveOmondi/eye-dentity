@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { stripe, STRIPE_CONFIG } from '../config/stripe';
 import { prisma } from '../lib/prisma';
 import { generateWebsite } from '../services/website-generator.service';
+import { sendOrderConfirmationEmail, sendAdminOrderNotification } from '../services/email.service';
+import { sendOrderNotification } from '../services/telegram.service';
 import Stripe from 'stripe';
 
 /**
@@ -316,6 +318,42 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
   console.log(`Order ${orderId} marked as completed`);
 
+  // Get user details for notifications
+  const user = await prisma.user.findUnique({
+    where: { id: order.userId },
+  });
+
+  if (!user) {
+    console.error(`User not found for order ${orderId}`);
+    return;
+  }
+
+  // Send order confirmation email to customer
+  await sendOrderConfirmationEmail(user.email, user.name || 'Customer', {
+    orderId: order.id,
+    domain: order.domain,
+    hostingPlan: order.hostingPlan,
+    totalAmount: order.totalAmount,
+  });
+
+  // Send notifications to admin
+  await sendAdminOrderNotification({
+    orderId: order.id,
+    userEmail: user.email,
+    domain: order.domain,
+    hostingPlan: order.hostingPlan,
+    totalAmount: order.totalAmount,
+  });
+
+  await sendOrderNotification({
+    orderId: order.id,
+    userEmail: user.email,
+    userName: user.name,
+    domain: order.domain,
+    hostingPlan: order.hostingPlan,
+    totalAmount: order.totalAmount,
+  });
+
   // Trigger website generation workflow
   const metadata = order.metadata as any;
   if (metadata?.profileData && metadata?.templateId && metadata?.colorScheme) {
@@ -338,9 +376,6 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   } else {
     console.warn(`Order ${orderId} missing metadata for website generation`);
   }
-
-  // TODO: Send confirmation email
-  // TODO: Create subscription record
 }
 
 /**

@@ -2,6 +2,8 @@ import { prisma } from '../lib/prisma';
 import { generateWebsiteContent, ProfileData } from './ai.service';
 import { renderWebsite, ColorScheme } from './template.service';
 import { deployWebsite } from './deployment.service';
+import { sendWebsiteLiveEmail } from './email.service';
+import { sendWebsiteLiveNotification } from './telegram.service';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -109,6 +111,29 @@ export const generateWebsite = async (
 
       console.log(`Website deployment ${deploymentResult.success ? 'successful' : 'failed'} for ${domain}`);
 
+      // 9. Send notifications if deployment successful
+      if (deploymentResult.success && deploymentResult.deploymentUrl) {
+        // Get user details for notifications
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+        });
+
+        if (user) {
+          // Send email to customer
+          await sendWebsiteLiveEmail(user.email, user.name || 'Customer', {
+            domain,
+            deploymentUrl: deploymentResult.deploymentUrl,
+          });
+
+          // Send Telegram notification to admin
+          await sendWebsiteLiveNotification({
+            domain,
+            userEmail: user.email,
+            deploymentUrl: deploymentResult.deploymentUrl,
+          });
+        }
+      }
+
       return {
         websiteId: website.id,
         status: 'GENERATED',
@@ -140,7 +165,7 @@ export const generateWebsite = async (
  * Save website files to disk
  */
 async function saveWebsiteFiles(
-  websiteId: string,
+  _websiteId: string,
   renderedWebsite: any,
   domain: string
 ): Promise<string> {

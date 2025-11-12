@@ -1,7 +1,7 @@
 import { prisma } from '../lib/prisma';
 import fs from 'fs/promises';
 import path from 'path';
-import { execSync } from 'child_process';
+// import { execSync } from 'child_process'; // Reserved for future use
 
 export interface DeploymentConfig {
   websiteId: string;
@@ -169,7 +169,7 @@ export const checkDeploymentHealth = async (websiteId: string): Promise<boolean>
 /**
  * Get deployment logs
  */
-export const getDeploymentLogs = async (websiteId: string): Promise<string[]> => {
+export const getDeploymentLogs = async (_websiteId: string): Promise<string[]> => {
   // In production, this would fetch logs from deployment system
   // For now, return mock logs
   return [
