@@ -1,6 +1,7 @@
 import { prisma } from '../lib/prisma';
 import { generateWebsiteContent, ProfileData } from './ai.service';
 import { renderWebsite, ColorScheme } from './template.service';
+import { deployWebsite } from './deployment.service';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -80,17 +81,38 @@ export const generateWebsite = async (
         data: {
           content: generatedContent as any,
           status: 'GENERATED',
-          deploymentUrl: `/sites/${domain}`, // Local path for now
           updatedAt: new Date(),
         },
       });
 
       console.log(`Website generation completed for ${domain}`);
 
+      // 7. Get hosting plan from order (for deployment configuration)
+      let hostingPlan = 'basic';
+      if (orderId) {
+        const order = await prisma.order.findUnique({
+          where: { id: orderId },
+        });
+        if (order) {
+          hostingPlan = order.hostingPlan;
+        }
+      }
+
+      // 8. Deploy website
+      console.log('Step 5: Deploying website...');
+      const deploymentResult = await deployWebsite({
+        websiteId: website.id,
+        domain,
+        sourceDir: websiteDir,
+        hostingPlan: hostingPlan as 'basic' | 'pro' | 'premium',
+      });
+
+      console.log(`Website deployment ${deploymentResult.success ? 'successful' : 'failed'} for ${domain}`);
+
       return {
         websiteId: website.id,
         status: 'GENERATED',
-        deploymentUrl: `/sites/${domain}`,
+        deploymentUrl: deploymentResult.deploymentUrl || `/sites/${domain}`,
       };
     } catch (error: any) {
       // Update website status to ERROR
