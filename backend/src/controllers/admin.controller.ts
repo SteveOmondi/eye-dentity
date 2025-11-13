@@ -10,6 +10,17 @@ import {
   getTopWebsites,
   getRecentActivity,
 } from '../services/analytics.service';
+import {
+  getDashboardAnalytics,
+  getRevenueTrends,
+  getUserGrowthTrends,
+} from '../services/admin-analytics.service';
+import {
+  getCurrentStatus,
+  getHealthHistory,
+  getSystemInfo,
+  recordHealthMetrics,
+} from '../services/system-health.service';
 
 /**
  * Get dashboard statistics
@@ -538,5 +549,158 @@ export const getActivityFeed = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Get activity feed error:', error);
     res.status(500).json({ error: 'Failed to retrieve activity feed' });
+  }
+};
+
+/**
+ * Enhanced Admin Analytics (Week 12)
+ */
+
+/**
+ * Get comprehensive dashboard analytics
+ * GET /api/admin/analytics/dashboard
+ */
+export const getComprehensiveDashboard = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const { startDate, endDate } = req.query;
+
+    const start = startDate ? new Date(startDate as string) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const end = endDate ? new Date(endDate as string) : new Date();
+
+    const analytics = await getDashboardAnalytics({ start, end });
+
+    res.json(analytics);
+  } catch (error) {
+    console.error('Get comprehensive dashboard error:', error);
+    res.status(500).json({ error: 'Failed to retrieve dashboard analytics' });
+  }
+};
+
+/**
+ * Get revenue trends
+ * GET /api/admin/analytics/revenue-trends
+ */
+export const getRevenueTrendsController = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const days = parseInt(req.query.days as string) || 30;
+    const trends = await getRevenueTrends(days);
+
+    res.json({ trends });
+  } catch (error) {
+    console.error('Get revenue trends error:', error);
+    res.status(500).json({ error: 'Failed to retrieve revenue trends' });
+  }
+};
+
+/**
+ * Get user growth trends
+ * GET /api/admin/analytics/user-growth
+ */
+export const getUserGrowthTrendsController = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const days = parseInt(req.query.days as string) || 30;
+    const trends = await getUserGrowthTrends(days);
+
+    res.json({ trends });
+  } catch (error) {
+    console.error('Get user growth trends error:', error);
+    res.status(500).json({ error: 'Failed to retrieve user growth trends' });
+  }
+};
+
+/**
+ * System Health Monitoring (Week 12)
+ */
+
+/**
+ * Get current system status
+ * GET /api/admin/health/status
+ */
+export const getSystemStatus = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const status = await getCurrentStatus();
+    res.json(status);
+  } catch (error) {
+    console.error('Get system status error:', error);
+    res.status(500).json({ error: 'Failed to retrieve system status' });
+  }
+};
+
+/**
+ * Get health history
+ * GET /api/admin/health/history
+ */
+export const getSystemHealthHistory = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const hours = parseInt(req.query.hours as string) || 24;
+    const history = await getHealthHistory(hours);
+
+    res.json({ history });
+  } catch (error) {
+    console.error('Get system health history error:', error);
+    res.status(500).json({ error: 'Failed to retrieve health history' });
+  }
+};
+
+/**
+ * Get system information
+ * GET /api/admin/health/info
+ */
+export const getSystemInformation = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const info = getSystemInfo();
+    res.json(info);
+  } catch (error) {
+    console.error('Get system information error:', error);
+    res.status(500).json({ error: 'Failed to retrieve system information' });
+  }
+};
+
+/**
+ * Record health metrics manually (trigger health check)
+ * POST /api/admin/health/record
+ */
+export const recordSystemHealth = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    await recordHealthMetrics();
+    res.json({ message: 'Health metrics recorded successfully' });
+  } catch (error) {
+    console.error('Record health metrics error:', error);
+    res.status(500).json({ error: 'Failed to record health metrics' });
   }
 };

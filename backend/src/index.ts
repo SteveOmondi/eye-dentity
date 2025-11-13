@@ -16,6 +16,7 @@ import websiteRoutes from './routes/website.routes';
 import adminRoutes from './routes/admin.routes';
 import exportRoutes from './routes/export.routes';
 import marketingRoutes from './routes/marketing.routes';
+import marketplaceRoutes from './routes/marketplace.routes';
 
 dotenv.config();
 
@@ -73,6 +74,7 @@ app.use('/api/websites', websiteRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/marketing', marketingRoutes);
+app.use('/api/marketplace', marketplaceRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {

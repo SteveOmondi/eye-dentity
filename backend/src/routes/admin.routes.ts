@@ -14,6 +14,13 @@ import {
   getPlanAnalytics,
   getTopWebsitesAnalytics,
   getActivityFeed,
+  getComprehensiveDashboard,
+  getRevenueTrendsController,
+  getUserGrowthTrendsController,
+  getSystemStatus,
+  getSystemHealthHistory,
+  getSystemInformation,
+  recordSystemHealth,
 } from '../controllers/admin.controller';
 import { authenticate } from '../middleware/auth';
 
@@ -123,5 +130,62 @@ router.get('/analytics/top-websites', authenticate, getTopWebsitesAnalytics);
  * @access  Admin only
  */
 router.get('/analytics/activity', authenticate, getActivityFeed);
+
+/**
+ * Enhanced Analytics Endpoints (Week 12)
+ */
+
+/**
+ * @route   GET /api/admin/analytics/dashboard
+ * @desc    Get comprehensive dashboard analytics with all metrics
+ * @access  Admin only
+ */
+router.get('/analytics/dashboard', authenticate, getComprehensiveDashboard);
+
+/**
+ * @route   GET /api/admin/analytics/revenue-trends
+ * @desc    Get daily revenue trends
+ * @access  Admin only
+ */
+router.get('/analytics/revenue-trends', authenticate, getRevenueTrendsController);
+
+/**
+ * @route   GET /api/admin/analytics/user-growth
+ * @desc    Get user growth trends
+ * @access  Admin only
+ */
+router.get('/analytics/user-growth', authenticate, getUserGrowthTrendsController);
+
+/**
+ * System Health Monitoring Endpoints (Week 12)
+ */
+
+/**
+ * @route   GET /api/admin/health/status
+ * @desc    Get current system health status
+ * @access  Admin only
+ */
+router.get('/health/status', authenticate, getSystemStatus);
+
+/**
+ * @route   GET /api/admin/health/history
+ * @desc    Get system health history
+ * @access  Admin only
+ */
+router.get('/health/history', authenticate, getSystemHealthHistory);
+
+/**
+ * @route   GET /api/admin/health/info
+ * @desc    Get system information
+ * @access  Admin only
+ */
+router.get('/health/info', authenticate, getSystemInformation);
+
+/**
+ * @route   POST /api/admin/health/record
+ * @desc    Manually trigger health metrics recording
+ * @access  Admin only
+ */
+router.post('/health/record', authenticate, recordSystemHealth);
 
 export default router;

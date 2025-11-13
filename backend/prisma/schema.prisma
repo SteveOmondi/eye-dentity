@@ -70,6 +70,8 @@ model User {
   payments      Payment[]
   orders        Order[]
   adAccounts    AdAccount[]
+  bookings      Booking[]
+  reviews       Review[]
 
   @@index([email])
 }
@@ -311,4 +313,128 @@ model AdAccount {
   @@unique([userId, channel])
   @@index([userId])
   @@index([channel])
+}
+
+model ServiceCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique // photography, copywriting, seo, web_design, social_media
+  description String?
+  icon        String? // Icon identifier
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  providers ServiceProvider[]
+
+  @@index([name])
+}
+
+model ServiceProvider {
+  id          String   @id @default(cuid())
+  categoryId  String
+  name        String
+  email       String
+  phone       String?
+  description String
+  services    String[] // Specific services offered
+  pricing     Json? // Pricing structure
+  location    String?
+  website     String?
+  portfolio   String[] // URLs to portfolio items
+  verified    Boolean  @default(false)
+  featured    Boolean  @default(false)
+  rating      Float    @default(0) // Average rating
+  reviewCount Int      @default(0)
+  availability Json? // Available time slots
+  metadata    Json? // Additional provider data
+  status      String   @default("active") // active, inactive, suspended
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  category ServiceCategory @relation(fields: [categoryId], references: [id])
+  bookings Booking[]
+  reviews  Review[]
+
+  @@index([categoryId])
+  @@index([verified])
+  @@index([featured])
+  @@index([status])
+}
+
+model Booking {
+  id               String   @id @default(cuid())
+  userId           String
+  providerId       String
+  serviceType      String // Specific service being booked
+  scheduledAt      DateTime
+  duration         Int // Duration in minutes
+  status           String   @default("pending") // pending, confirmed, completed, cancelled
+  price            Float
+  paymentStatus    String   @default("pending") // pending, paid, refunded
+  stripePaymentId  String? // Stripe payment intent ID
+  notes            String? // User notes for the provider
+  cancellationNote String? // Reason for cancellation
+  metadata         Json? // Additional booking data
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  completedAt      DateTime?
+  cancelledAt      DateTime?
+
+  // Relations
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider ServiceProvider @relation(fields: [providerId], references: [id])
+  review   Review?
+
+  @@index([userId])
+  @@index([providerId])
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  bookingId  String   @unique
+  userId     String
+  providerId String
+  rating     Int // 1-5 stars
+  comment    String?
+  response   String? // Provider response
+  helpful    Int      @default(0) // Helpful count
+  verified   Boolean  @default(true) // Verified purchase
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  booking  Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  user     User            @relation(fields: [userId], references: [id])
+  provider ServiceProvider @relation(fields: [providerId], references: [id])
+
+  @@index([userId])
+  @@index([providerId])
+  @@index([rating])
+  @@index([createdAt])
+}
+
+model SystemHealth {
+  id               String   @id @default(cuid())
+  timestamp        DateTime @unique @default(now())
+  cpuUsage         Float? // CPU usage percentage
+  memoryUsage      Float? // Memory usage percentage
+  diskUsage        Float? // Disk usage percentage
+  apiResponseTime  Float? // Average API response time (ms)
+  errorRate        Float? // Error rate percentage
+  activeUsers      Int      @default(0)
+  activeWebsites   Int      @default(0)
+  queuedJobs       Int      @default(0) // Background jobs in queue
+  failedJobs       Int      @default(0)
+  databaseStatus   String   @default("healthy") // healthy, degraded, down
+  redisStatus      String   @default("healthy")
+  storageStatus    String   @default("healthy")
+  overallStatus    String   @default("healthy") // healthy, degraded, down
+  alerts           Json? // Active alerts
+  createdAt        DateTime @default(now())
+
+  @@index([timestamp])
+  @@index([overallStatus])
 }
