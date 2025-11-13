@@ -29,6 +29,7 @@
     "@prisma/client": "^6.0.1",
     "@sendgrid/mail": "^8.1.6",
     "@types/multer": "^2.0.0",
+    "archiver": "^7.0.1",
     "axios": "^1.13.2",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -41,10 +42,12 @@
     "multer": "^2.0.2",
     "node-telegram-bot-api": "^0.66.0",
     "openai": "^6.8.1",
+    "pdfkit": "^0.17.2",
     "stripe": "^19.3.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/archiver": "^7.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
@@ -53,6 +56,7 @@
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.10.1",
     "@types/node-telegram-bot-api": "^0.64.12",
+    "@types/pdfkit": "^0.17.3",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
     "eslint": "^9.15.0",

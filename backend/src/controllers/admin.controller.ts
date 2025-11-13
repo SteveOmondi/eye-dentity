@@ -1,5 +1,15 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
+import {
+  getPlatformMetrics,
+  getUserGrowthMetrics,
+  getRevenueMetrics,
+  getWebsiteMetrics,
+  getGeographicDistribution,
+  getHostingPlanDistribution,
+  getTopWebsites,
+  getRecentActivity,
+} from '../services/analytics.service';
 
 /**
  * Get dashboard statistics
@@ -363,5 +373,170 @@ export const updateUserRole = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'User not found' });
     }
     res.status(500).json({ error: 'Failed to update user role' });
+  }
+};
+
+/**
+ * Get enhanced platform metrics (Week 8 - Enhanced Analytics)
+ * GET /api/admin/analytics/platform
+ */
+export const getPlatformAnalytics = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const days = parseInt(req.query.days as string) || 30;
+    const metrics = await getPlatformMetrics(days);
+
+    res.json(metrics);
+  } catch (error) {
+    console.error('Get platform analytics error:', error);
+    res.status(500).json({ error: 'Failed to retrieve platform analytics' });
+  }
+};
+
+/**
+ * Get user growth metrics
+ * GET /api/admin/analytics/users
+ */
+export const getUserAnalytics = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const days = parseInt(req.query.days as string) || 30;
+    const metrics = await getUserGrowthMetrics(days);
+
+    res.json(metrics);
+  } catch (error) {
+    console.error('Get user analytics error:', error);
+    res.status(500).json({ error: 'Failed to retrieve user analytics' });
+  }
+};
+
+/**
+ * Get revenue analytics
+ * GET /api/admin/analytics/revenue
+ */
+export const getRevenueAnalytics = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const days = parseInt(req.query.days as string) || 30;
+    const metrics = await getRevenueMetrics(days);
+
+    res.json(metrics);
+  } catch (error) {
+    console.error('Get revenue analytics error:', error);
+    res.status(500).json({ error: 'Failed to retrieve revenue analytics' });
+  }
+};
+
+/**
+ * Get website analytics
+ * GET /api/admin/analytics/websites
+ */
+export const getWebsiteAnalytics = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const metrics = await getWebsiteMetrics();
+
+    res.json(metrics);
+  } catch (error) {
+    console.error('Get website analytics error:', error);
+    res.status(500).json({ error: 'Failed to retrieve website analytics' });
+  }
+};
+
+/**
+ * Get geographic distribution
+ * GET /api/admin/analytics/geography
+ */
+export const getGeographyAnalytics = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const distribution = await getGeographicDistribution();
+
+    res.json({ distribution });
+  } catch (error) {
+    console.error('Get geography analytics error:', error);
+    res.status(500).json({ error: 'Failed to retrieve geographic distribution' });
+  }
+};
+
+/**
+ * Get hosting plan distribution
+ * GET /api/admin/analytics/plans
+ */
+export const getPlanAnalytics = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const distribution = await getHostingPlanDistribution();
+
+    res.json({ plans: distribution });
+  } catch (error) {
+    console.error('Get plan analytics error:', error);
+    res.status(500).json({ error: 'Failed to retrieve plan distribution' });
+  }
+};
+
+/**
+ * Get top performing websites
+ * GET /api/admin/analytics/top-websites
+ */
+export const getTopWebsitesAnalytics = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const limit = parseInt(req.query.limit as string) || 10;
+    const websites = await getTopWebsites(limit);
+
+    res.json({ websites });
+  } catch (error) {
+    console.error('Get top websites error:', error);
+    res.status(500).json({ error: 'Failed to retrieve top websites' });
+  }
+};
+
+/**
+ * Get recent activity feed
+ * GET /api/admin/analytics/activity
+ */
+export const getActivityFeed = async (req: Request, res: Response) => {
+  try {
+    // Verify admin role
+    if (req.user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const limit = parseInt(req.query.limit as string) || 20;
+    const activities = await getRecentActivity(limit);
+
+    res.json({ activities });
+  } catch (error) {
+    console.error('Get activity feed error:', error);
+    res.status(500).json({ error: 'Failed to retrieve activity feed' });
   }
 };

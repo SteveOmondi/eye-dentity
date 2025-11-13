@@ -14,6 +14,7 @@ import hostingRoutes from './routes/hosting.routes';
 import paymentRoutes from './routes/payment.routes';
 import websiteRoutes from './routes/website.routes';
 import adminRoutes from './routes/admin.routes';
+import exportRoutes from './routes/export.routes';
 
 dotenv.config();
 
@@ -69,6 +70,7 @@ app.use('/api/hosting', hostingRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/websites', websiteRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/export', exportRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
