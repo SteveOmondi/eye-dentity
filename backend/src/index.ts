@@ -15,6 +15,7 @@ import paymentRoutes from './routes/payment.routes';
 import websiteRoutes from './routes/website.routes';
 import adminRoutes from './routes/admin.routes';
 import exportRoutes from './routes/export.routes';
+import marketingRoutes from './routes/marketing.routes';
 
 dotenv.config();
 
@@ -71,6 +72,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/websites', websiteRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/marketing', marketingRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
