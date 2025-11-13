@@ -9,25 +9,45 @@ import {
   getStoredAdAccount,
   isTokenExpired,
   createCampaign,
-  getCampaignMetrics,
   updateCampaignStatus,
   generateMetaPixelCode,
 } from '../services/meta.service';
 import {
+  getLinkedInAuthUrl,
+  exchangeCodeForToken as exchangeLinkedInCode,
+  getLinkedInOrganizations,
+  saveLinkedInAccount,
+} from '../services/linkedin.service';
+import {
+  getGoogleAdsAuthUrl,
+  exchangeCodeForToken as exchangeGoogleCode,
+  getGoogleAdsAccounts,
+  saveGoogleAdsAccount,
+  generateKeywordSuggestions,
+} from '../services/google-ads.service';
+import {
+  launchMultiChannelCampaign,
+  getCrossChannelPerformance,
+  autoReallocateBudget as crossChannelReallocate,
+  pauseUnderperformingCampaigns,
+} from '../services/cross-channel-manager.service';
+import {
   generateSocialPost,
   generateContentCalendar,
-  generateHashtags,
-  generateABVariations,
-  generateAdCopy,
 } from '../services/ai-marketing.service';
 import {
   getBudgetStatus,
   enforceBudgetLimits,
-  reallocateBudget,
   getBudgetRecommendations,
   setCampaignBudget,
   getSpendingForecast,
 } from '../services/budget-management.service';
+import {
+  generateMetaTags,
+  generateSchemaMarkup,
+  generateLocationContent,
+  analyzeSEO,
+} from '../services/seo.service';
 
 /**
  * Get Meta OAuth authorization URL
@@ -560,5 +580,541 @@ export const getMetaPixel = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Get Meta pixel error:', error);
     res.status(500).json({ error: 'Failed to generate Meta pixel code' });
+  }
+};
+
+/**
+ * LinkedIn Integration
+ */
+
+/**
+ * Get LinkedIn OAuth authorization URL
+ * GET /api/marketing/linkedin/auth-url
+ */
+export const getLinkedInAuthorizationUrl = async (_req: Request, res: Response) => {
+  try {
+    const state = Math.random().toString(36).substring(7);
+    const authUrl = getLinkedInAuthUrl(state);
+
+    res.json({ authUrl, state });
+  } catch (error) {
+    console.error('Get LinkedIn auth URL error:', error);
+    res.status(500).json({ error: 'Failed to generate authorization URL' });
+  }
+};
+
+/**
+ * Handle LinkedIn OAuth callback
+ * POST /api/marketing/linkedin/callback
+ */
+export const handleLinkedInCallback = async (req: Request, res: Response) => {
+  try {
+    const { code, userId } = req.body;
+
+    if (!code || !userId) {
+      return res.status(400).json({ error: 'Code and userId are required' });
+    }
+
+    // Exchange code for access token
+    const tokenData = await exchangeLinkedInCode(code);
+
+    // Get LinkedIn organizations
+    const organizations = await getLinkedInOrganizations(tokenData.accessToken);
+
+    if (organizations.length === 0) {
+      return res.status(400).json({ error: 'No LinkedIn organizations found' });
+    }
+
+    // Save the first organization (or let user choose)
+    await saveLinkedInAccount(
+      userId,
+      organizations[0].id,
+      organizations[0].name,
+      tokenData.accessToken,
+      tokenData.expiresIn
+    );
+
+    res.json({
+      message: 'LinkedIn account connected successfully',
+      organization: organizations[0],
+    });
+  } catch (error) {
+    console.error('LinkedIn callback error:', error);
+    res.status(500).json({ error: 'Failed to connect LinkedIn account' });
+  }
+};
+
+/**
+ * Google Ads Integration
+ */
+
+/**
+ * Get Google Ads OAuth authorization URL
+ * GET /api/marketing/google-ads/auth-url
+ */
+export const getGoogleAdsAuthorizationUrl = async (_req: Request, res: Response) => {
+  try {
+    const state = Math.random().toString(36).substring(7);
+    const authUrl = getGoogleAdsAuthUrl(state);
+
+    res.json({ authUrl, state });
+  } catch (error) {
+    console.error('Get Google Ads auth URL error:', error);
+    res.status(500).json({ error: 'Failed to generate authorization URL' });
+  }
+};
+
+/**
+ * Handle Google Ads OAuth callback
+ * POST /api/marketing/google-ads/callback
+ */
+export const handleGoogleAdsCallback = async (req: Request, res: Response) => {
+  try {
+    const { code, userId } = req.body;
+
+    if (!code || !userId) {
+      return res.status(400).json({ error: 'Code and userId are required' });
+    }
+
+    // Exchange code for access token
+    const tokenData = await exchangeGoogleCode(code);
+
+    // Get Google Ads accounts
+    const accounts = await getGoogleAdsAccounts(tokenData.accessToken);
+
+    if (accounts.length === 0) {
+      return res.status(400).json({ error: 'No Google Ads accounts found' });
+    }
+
+    // Save the first account (or let user choose)
+    await saveGoogleAdsAccount(
+      userId,
+      accounts[0].id,
+      accounts[0].name,
+      tokenData.accessToken,
+      tokenData.refreshToken,
+      tokenData.expiresIn
+    );
+
+    res.json({
+      message: 'Google Ads account connected successfully',
+      account: accounts[0],
+    });
+  } catch (error) {
+    console.error('Google Ads callback error:', error);
+    res.status(500).json({ error: 'Failed to connect Google Ads account' });
+  }
+};
+
+/**
+ * Get keyword suggestions for Google Ads
+ * POST /api/marketing/google-ads/keywords
+ */
+export const getKeywordSuggestions = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { websiteId } = req.body;
+
+    if (!websiteId) {
+      return res.status(400).json({ error: 'websiteId is required' });
+    }
+
+    // Get website and profile
+    const website = await prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        userId,
+      },
+      include: {
+        user: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    if (!website || !website.user.profile) {
+      return res.status(404).json({ error: 'Website or profile not found' });
+    }
+
+    const profile = website.user.profile;
+    const keywords = await generateKeywordSuggestions(
+      profile.profession,
+      profile.profession,
+      (profile.location as string) || ''
+    );
+
+    res.json(keywords);
+  } catch (error) {
+    console.error('Get keyword suggestions error:', error);
+    res.status(500).json({ error: 'Failed to generate keyword suggestions' });
+  }
+};
+
+/**
+ * Cross-Channel Campaign Management
+ */
+
+/**
+ * Launch multi-channel campaign
+ * POST /api/marketing/cross-channel/launch
+ */
+export const launchMultiChannelCampaignController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const {
+      websiteId,
+      name,
+      objective,
+      totalBudget,
+      channels,
+      duration,
+      targeting,
+      budgetAllocation,
+    } = req.body;
+
+    // Validate input
+    if (!websiteId || !name || !totalBudget || !channels || !duration) {
+      return res.status(400).json({
+        error: 'websiteId, name, totalBudget, channels, and duration are required',
+      });
+    }
+
+    // Verify user owns the website
+    const website = await prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        userId,
+      },
+    });
+
+    if (!website) {
+      return res.status(404).json({ error: 'Website not found' });
+    }
+
+    // Launch multi-channel campaign
+    const result = await launchMultiChannelCampaign({
+      websiteId,
+      userId,
+      name,
+      objective: objective || 'REACH',
+      totalBudget: parseFloat(totalBudget),
+      channels,
+      duration: {
+        start: new Date(duration.start),
+        end: new Date(duration.end),
+      },
+      targeting,
+      budgetAllocation,
+    });
+
+    res.status(201).json({
+      message: 'Multi-channel campaign launched',
+      ...result,
+    });
+  } catch (error) {
+    console.error('Launch multi-channel campaign error:', error);
+    res.status(500).json({ error: 'Failed to launch campaign' });
+  }
+};
+
+/**
+ * Get cross-channel performance
+ * GET /api/marketing/cross-channel/performance/:websiteId
+ */
+export const getCrossChannelPerformanceController = async (req: Request, res: Response) => {
+  try {
+    const { websiteId } = req.params;
+    const userId = req.user?.userId;
+
+    // Verify ownership
+    const website = await prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        userId,
+      },
+    });
+
+    if (!website) {
+      return res.status(404).json({ error: 'Website not found' });
+    }
+
+    // Default to last 30 days
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - 30);
+
+    const performance = await getCrossChannelPerformance(websiteId, userId!, {
+      start,
+      end,
+    });
+
+    res.json(performance);
+  } catch (error) {
+    console.error('Get cross-channel performance error:', error);
+    res.status(500).json({ error: 'Failed to retrieve performance data' });
+  }
+};
+
+/**
+ * Trigger budget reallocation
+ * POST /api/marketing/cross-channel/reallocate/:websiteId
+ */
+export const autoReallocateBudgetController = async (req: Request, res: Response) => {
+  try {
+    const { websiteId } = req.params;
+    const userId = req.user?.userId;
+
+    // Verify ownership
+    const website = await prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        userId,
+      },
+    });
+
+    if (!website) {
+      return res.status(404).json({ error: 'Website not found' });
+    }
+
+    const result = await crossChannelReallocate(websiteId, userId!);
+
+    res.json(result);
+  } catch (error) {
+    console.error('Auto reallocate budget error:', error);
+    res.status(500).json({ error: 'Failed to reallocate budget' });
+  }
+};
+
+/**
+ * Pause underperforming campaigns
+ * POST /api/marketing/cross-channel/pause-underperforming/:websiteId
+ */
+export const pauseUnderperformingController = async (req: Request, res: Response) => {
+  try {
+    const { websiteId } = req.params;
+    const userId = req.user?.userId;
+
+    // Verify ownership
+    const website = await prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        userId,
+      },
+    });
+
+    if (!website) {
+      return res.status(404).json({ error: 'Website not found' });
+    }
+
+    const result = await pauseUnderperformingCampaigns(websiteId, userId!);
+
+    res.json(result);
+  } catch (error) {
+    console.error('Pause underperforming campaigns error:', error);
+    res.status(500).json({ error: 'Failed to pause campaigns' });
+  }
+};
+
+/**
+ * SEO Optimization
+ */
+
+/**
+ * Get SEO meta tags
+ * POST /api/marketing/seo/meta-tags
+ */
+export const getSEOMetaTags = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { websiteId } = req.body;
+
+    if (!websiteId) {
+      return res.status(400).json({ error: 'websiteId is required' });
+    }
+
+    // Get website and profile
+    const website = await prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        userId,
+      },
+      include: {
+        user: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    if (!website || !website.user.profile) {
+      return res.status(404).json({ error: 'Website or profile not found' });
+    }
+
+    const profile = website.user.profile;
+    const metaTags = generateMetaTags({
+      businessName: website.domain,
+      profession: profile.profession,
+      location: (profile.location as string) || '',
+      services: (profile.services as string[]) || [],
+      industry: profile.profession,
+    });
+
+    res.json({ metaTags });
+  } catch (error) {
+    console.error('Get SEO meta tags error:', error);
+    res.status(500).json({ error: 'Failed to generate meta tags' });
+  }
+};
+
+/**
+ * Get Schema.org markup
+ * POST /api/marketing/seo/schema
+ */
+export const getSchemaMarkup = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { websiteId } = req.body;
+
+    if (!websiteId) {
+      return res.status(400).json({ error: 'websiteId is required' });
+    }
+
+    // Get website and profile
+    const website = await prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        userId,
+      },
+      include: {
+        user: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    if (!website || !website.user.profile) {
+      return res.status(404).json({ error: 'Website or profile not found' });
+    }
+
+    const profile = website.user.profile;
+    const schemas = generateSchemaMarkup({
+      businessName: website.domain,
+      profession: profile.profession,
+      location: (profile.location as string) || '',
+      services: (profile.services as string[]) || [],
+      industry: profile.profession,
+    });
+
+    res.json({ schemas });
+  } catch (error) {
+    console.error('Get schema markup error:', error);
+    res.status(500).json({ error: 'Failed to generate schema markup' });
+  }
+};
+
+/**
+ * Get location-specific content
+ * POST /api/marketing/seo/location-content
+ */
+export const getLocationContent = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { websiteId } = req.body;
+
+    if (!websiteId) {
+      return res.status(400).json({ error: 'websiteId is required' });
+    }
+
+    // Get website and profile
+    const website = await prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        userId,
+      },
+      include: {
+        user: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    if (!website || !website.user.profile) {
+      return res.status(404).json({ error: 'Website or profile not found' });
+    }
+
+    const profile = website.user.profile;
+    const content = generateLocationContent({
+      businessName: website.domain,
+      profession: profile.profession,
+      location: (profile.location as string) || '',
+      services: (profile.services as string[]) || [],
+      industry: profile.profession,
+    });
+
+    res.json(content);
+  } catch (error) {
+    console.error('Get location content error:', error);
+    res.status(500).json({ error: 'Failed to generate location content' });
+  }
+};
+
+/**
+ * Analyze website SEO
+ * GET /api/marketing/seo/analyze/:websiteId
+ */
+export const analyzeSEOController = async (req: Request, res: Response) => {
+  try {
+    const { websiteId } = req.params;
+    const userId = req.user?.userId;
+
+    // Verify ownership
+    const website = await prisma.website.findFirst({
+      where: {
+        id: websiteId,
+        userId,
+      },
+      include: {
+        user: {
+          include: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    if (!website || !website.user.profile) {
+      return res.status(404).json({ error: 'Website or profile not found' });
+    }
+
+    const profile = website.user.profile;
+
+    // For now, use mock content since we don't have actual website content
+    // In production, this would fetch the actual website HTML
+    const websiteContent = `${website.domain} ${profile.profession} ${profile.location || ''}`;
+
+    // Generate target keywords from profile
+    const targetKeywords = [
+      profile.profession,
+      `${profile.profession} ${profile.location || ''}`,
+      ...(profile.services as string[] || []).slice(0, 3),
+    ];
+
+    const analysis = await analyzeSEO(websiteContent, targetKeywords);
+
+    res.json(analysis);
+  } catch (error) {
+    console.error('Analyze SEO error:', error);
+    res.status(500).json({ error: 'Failed to analyze SEO' });
   }
 };
