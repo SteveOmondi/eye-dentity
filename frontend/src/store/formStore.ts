@@ -1,0 +1,76 @@
+import { create } from 'zustand';
+
+export interface FormData {
+  // Step 1: Personal Info
+  name: string;
+  email: string;
+  profession: string;
+  phone: string;
+
+  // Step 2: Bio & Services
+  bio: string;
+  services: string[];
+
+  // Step 3: Branding (Logo & Profile Photo)
+  logoFile: File | null;
+  logoUrl: string;
+  profilePhotoFile: File | null;
+  profilePhotoUrl: string;
+
+  // Step 4: Template Selection
+  selectedTemplate: string | null;
+  selectedColorScheme: {
+    name: string;
+    primary: string;
+    secondary: string;
+    accent: string;
+  } | null;
+
+  // Step 5: Domain Selection
+  domain: string;
+  domainAvailable: boolean;
+  domainPrice: number | null;
+
+  // Step 6: Hosting Plan
+  selectedPlan: string | null;
+  emailHosting: boolean;
+}
+
+interface FormState {
+  currentStep: number;
+  formData: FormData;
+  setCurrentStep: (step: number) => void;
+  updateFormData: (data: Partial<FormData>) => void;
+  resetForm: () => void;
+}
+
+const initialFormData: FormData = {
+  name: '',
+  email: '',
+  profession: '',
+  phone: '',
+  bio: '',
+  services: [],
+  logoFile: null,
+  logoUrl: '',
+  profilePhotoFile: null,
+  profilePhotoUrl: '',
+  selectedTemplate: null,
+  selectedColorScheme: null,
+  domain: '',
+  domainAvailable: false,
+  domainPrice: null,
+  selectedPlan: null,
+  emailHosting: false,
+};
+
+export const useFormStore = create<FormState>((set) => ({
+  currentStep: 1,
+  formData: initialFormData,
+  setCurrentStep: (step) => set({ currentStep: step }),
+  updateFormData: (data) =>
+    set((state) => ({
+      formData: { ...state.formData, ...data },
+    })),
+  resetForm: () => set({ currentStep: 1, formData: initialFormData }),
+}));

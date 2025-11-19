@@ -1,0 +1,440 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+  PAUSED
+}
+
+enum WebsiteStatus {
+  PENDING
+  GENERATING
+  GENERATED
+  DEPLOYING
+  LIVE
+  ERROR
+  SUSPENDED
+}
+
+enum PlanType {
+  BASIC
+  PRO
+  PREMIUM
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  profile       Profile?
+  websites      Website[]
+  subscriptions Subscription[]
+  payments      Payment[]
+  orders        Order[]
+  adAccounts    AdAccount[]
+  bookings      Booking[]
+  reviews       Review[]
+
+  @@index([email])
+}
+
+model Profile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  profession      String
+  bio             String?
+  phone           String?
+  logoUrl         String? // Business/company logo
+  profilePhotoUrl String? // Professional headshot
+  services        Json? // Array of services
+  metadata        Json? // Additional flexible data
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Template {
+  id            String   @id @default(cuid())
+  name          String
+  category      String // e.g., "professional", "creative", "healthcare"
+  description   String?
+  previewUrl    String?
+  htmlStructure Json // HTML structure template
+  cssStyles     Json // CSS styles
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  websites Website[]
+
+  @@index([category])
+}
+
+model Website {
+  id           String        @id @default(cuid())
+  userId       String
+  templateId   String
+  domain       String        @unique
+  subdomain    String?
+  colorScheme  Json // Color palette
+  content      Json? // Generated website content
+  status       WebsiteStatus @default(PENDING)
+  deploymentUrl String?
+  dropletId    String? // DigitalOcean droplet ID
+  dropletIp    String? // Droplet IP address
+  emailHosting Boolean       @default(false)
+  errorMessage String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  publishedAt  DateTime?
+
+  // Relations
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template       Template          @relation(fields: [templateId], references: [id])
+  marketingCampaigns MarketingCampaign[]
+
+  @@index([userId])
+  @@index([domain])
+  @@index([status])
+}
+
+model Subscription {
+  id              String             @id @default(cuid())
+  userId          String
+  plan            PlanType
+  status          SubscriptionStatus @default(TRIALING)
+  stripeCustomerId String?
+  stripeSubscriptionId String?       @unique
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean        @default(false)
+  trialEndsAt     DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@index([userId])
+  @@index([stripeCustomerId])
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  userId         String
+  subscriptionId String
+  amount         Float
+  currency       String        @default("usd")
+  status         PaymentStatus @default(PENDING)
+  stripePaymentId String?      @unique
+  stripeInvoiceId String?
+  metadata       Json?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([subscriptionId])
+  @@index([status])
+}
+
+model Order {
+  id                    String      @id @default(cuid())
+  userId                String
+  domain                String
+  domainPrice           Float
+  hostingPlan           String // basic, pro, premium
+  hostingPrice          Float
+  emailHosting          Boolean     @default(false)
+  emailHostingPrice     Float       @default(0)
+  totalAmount           Float
+  currency              String      @default("usd")
+  status                OrderStatus @default(PENDING)
+  stripeSessionId       String?     @unique // Checkout session ID
+  stripePaymentIntentId String?     @unique // Payment intent ID
+  metadata              Json? // Store template, color scheme, etc.
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  completedAt           DateTime?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([stripeSessionId])
+}
+
+model MarketingCampaign {
+  id         String   @id @default(cuid())
+  websiteId  String
+  channel    String // e.g., "instagram", "facebook", "linkedin", "google_ads"
+  budget     Float // Weekly budget
+  status     String   @default("active") // active, paused, completed
+  startDate  DateTime
+  endDate    DateTime?
+  metadata   Json? // Campaign-specific data
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  website Website         @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  posts   MarketingPost[]
+  metrics MarketingMetric[]
+
+  @@index([websiteId])
+  @@index([channel])
+}
+
+model MarketingPost {
+  id          String   @id @default(cuid())
+  campaignId  String
+  content     String
+  imageUrl    String?
+  platform    String // instagram, facebook, linkedin
+  scheduledAt DateTime
+  publishedAt DateTime?
+  status      String   @default("scheduled") // scheduled, published, failed
+  externalId  String? // Platform-specific post ID
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  campaign MarketingCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  metrics  MarketingMetric[]
+
+  @@index([campaignId])
+  @@index([scheduledAt])
+}
+
+model MarketingMetric {
+  id          String   @id @default(cuid())
+  campaignId  String
+  postId      String?
+  date        DateTime @default(now())
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  conversions Int      @default(0)
+  spend       Float    @default(0)
+  ctr         Float? // Click-through rate
+  cpc         Float? // Cost per click
+  roas        Float? // Return on ad spend
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  campaign MarketingCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  post     MarketingPost?    @relation(fields: [postId], references: [id], onDelete: SetNull)
+
+  @@index([campaignId])
+  @@index([date])
+}
+
+model DailyReport {
+  id             String   @id @default(cuid())
+  date           DateTime @unique @default(now())
+  totalUsers     Int      @default(0)
+  newSignups     Int      @default(0)
+  activeWebsites Int      @default(0)
+  revenue        Float    @default(0)
+  marketingSpend Float    @default(0)
+  metrics        Json? // Additional metrics
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([date])
+}
+
+model AdAccount {
+  id           String   @id @default(cuid())
+  userId       String
+  channel      String // "meta", "linkedin", "google_ads"
+  accountId    String // Platform-specific account ID
+  accountName  String?
+  accessToken  String? // Encrypted access token
+  refreshToken String? // Encrypted refresh token
+  expiresAt    DateTime?
+  status       String   @default("active") // active, expired, disconnected
+  metadata     Json? // Platform-specific data
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, channel])
+  @@index([userId])
+  @@index([channel])
+}
+
+model ServiceCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique // photography, copywriting, seo, web_design, social_media
+  description String?
+  icon        String? // Icon identifier
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  providers ServiceProvider[]
+
+  @@index([name])
+}
+
+model ServiceProvider {
+  id          String   @id @default(cuid())
+  categoryId  String
+  name        String
+  email       String
+  phone       String?
+  description String
+  services    String[] // Specific services offered
+  pricing     Json? // Pricing structure
+  location    String?
+  website     String?
+  portfolio   String[] // URLs to portfolio items
+  verified    Boolean  @default(false)
+  featured    Boolean  @default(false)
+  rating      Float    @default(0) // Average rating
+  reviewCount Int      @default(0)
+  availability Json? // Available time slots
+  metadata    Json? // Additional provider data
+  status      String   @default("active") // active, inactive, suspended
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  category ServiceCategory @relation(fields: [categoryId], references: [id])
+  bookings Booking[]
+  reviews  Review[]
+
+  @@index([categoryId])
+  @@index([verified])
+  @@index([featured])
+  @@index([status])
+}
+
+model Booking {
+  id               String   @id @default(cuid())
+  userId           String
+  providerId       String
+  serviceType      String // Specific service being booked
+  scheduledAt      DateTime
+  duration         Int // Duration in minutes
+  status           String   @default("pending") // pending, confirmed, completed, cancelled
+  price            Float
+  paymentStatus    String   @default("pending") // pending, paid, refunded
+  stripePaymentId  String? // Stripe payment intent ID
+  notes            String? // User notes for the provider
+  cancellationNote String? // Reason for cancellation
+  metadata         Json? // Additional booking data
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  completedAt      DateTime?
+  cancelledAt      DateTime?
+
+  // Relations
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider ServiceProvider @relation(fields: [providerId], references: [id])
+  review   Review?
+
+  @@index([userId])
+  @@index([providerId])
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  bookingId  String   @unique
+  userId     String
+  providerId String
+  rating     Int // 1-5 stars
+  comment    String?
+  response   String? // Provider response
+  helpful    Int      @default(0) // Helpful count
+  verified   Boolean  @default(true) // Verified purchase
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  booking  Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  user     User            @relation(fields: [userId], references: [id])
+  provider ServiceProvider @relation(fields: [providerId], references: [id])
+
+  @@index([userId])
+  @@index([providerId])
+  @@index([rating])
+  @@index([createdAt])
+}
+
+model SystemHealth {
+  id               String   @id @default(cuid())
+  timestamp        DateTime @unique @default(now())
+  cpuUsage         Float? // CPU usage percentage
+  memoryUsage      Float? // Memory usage percentage
+  diskUsage        Float? // Disk usage percentage
+  apiResponseTime  Float? // Average API response time (ms)
+  errorRate        Float? // Error rate percentage
+  activeUsers      Int      @default(0)
+  activeWebsites   Int      @default(0)
+  queuedJobs       Int      @default(0) // Background jobs in queue
+  failedJobs       Int      @default(0)
+  databaseStatus   String   @default("healthy") // healthy, degraded, down
+  redisStatus      String   @default("healthy")
+  storageStatus    String   @default("healthy")
+  overallStatus    String   @default("healthy") // healthy, degraded, down
+  alerts           Json? // Active alerts
+  createdAt        DateTime @default(now())
+
+  @@index([timestamp])
+  @@index([overallStatus])
+}
