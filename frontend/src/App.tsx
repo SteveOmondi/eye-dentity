@@ -9,6 +9,7 @@ import { AdminWebsites } from './pages/admin/AdminWebsites';
 import { AdminOrders } from './pages/admin/AdminOrders';
 
 function App() {
+  console.log('App component rendering');
   return (
     <Router>
       <Routes>
