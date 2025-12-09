@@ -15,54 +15,64 @@ cd eye-dentity
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 
-# Start development environment with Docker
-docker-compose up -d
+# Install dependencies
+cd backend && npm install
+cd ../frontend && npm install
 
-# Run database migrations
-docker exec -it eye-dentity-backend npx prisma migrate dev
+# Setup database
+cd ../backend
+npx prisma generate
+npx prisma migrate dev
+
+# Start development servers
+# Terminal 1 - Backend
+cd backend && npm run dev
+
+# Terminal 2 - Frontend
+cd frontend && npm run dev
 
 # Access the application
 # Frontend: http://localhost:5173
 # Backend API: http://localhost:3000
-# API Health: http://localhost:3000/health
 ```
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Development](#development)
-- [API Documentation](#api-documentation)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [License](#license)
+📖 **Detailed setup:** See [Quick Start Guide](docs/QUICK_START.md)
 
 ## ✨ Features
 
-### Core Features (Phase 1 - MVP)
-- 🔐 **User Authentication** - Secure JWT-based authentication
-- 📝 **Structured Data Input** - Profession-specific forms
-- 🎨 **Template Selection** - Multiple website templates with customization
-- 🔍 **Domain Search** - Real-time availability checking
-- 💳 **Payment Integration** - Stripe subscription management
-- 🤖 **AI Website Generation** - Claude/GPT-4 powered content creation
-- 📊 **Admin Dashboard** - User and website management
+### 🎨 Dual-Mode Profile Builder
+- **Form Mode**: Traditional step-by-step form
+- **Chat Mode**: AI-powered conversational interface
+- User-provided API keys for privacy
 
-### Automation Features (Phase 2)
-- ☁️ **Automated Hosting** - DigitalOcean provisioning
-- 🌐 **Domain Registration** - Cloudflare API integration
-- 🔒 **SSL/CDN Setup** - Automatic HTTPS and CDN configuration
-- 📧 **Email Hosting** - Optional professional email setup
-- 📈 **Daily Reports** - Email and Telegram notifications
+### 🤖 AI-Powered Content Generation
+- Support for Claude, OpenAI, and Gemini
+- Profession-specific content optimization
+- SEO-optimized copy
+- 10+ profession templates
 
-### Marketing Features (Phase 3)
-- 📱 **Social Media Marketing** - Meta (Facebook/Instagram), LinkedIn
-- 🎯 **Google Ads Integration** - Automated campaign management
-- 💰 **Budget Management** - Weekly budget enforcement
-- 📊 **Analytics Dashboard** - ROI tracking and performance metrics
-- 🔍 **Advanced SEO** - Location-based and industry-specific optimization
+### 🎭 Professional Templates
+- Modern, responsive designs
+- 6 color scheme variations per template
+- Mobile-first approach
+- Fast loading performance
+
+### 💳 Payment Processing
+- **Paystack integration** optimized for Kenya & Africa:
+  - 💳 Credit/Debit Cards (Visa, Mastercard)
+  - 📱 **M-Pesa** (most popular in Kenya!)
+  - 🏦 Bank transfers
+  - 💰 Mobile money
+  - 📞 USSD codes
+- Subscription management
+- Secure webhook handling
+- Lower fees for local transactions
+
+### 🌐 Automated Deployment (Coming Soon)
+- DigitalOcean provisioning
+- Domain registration
+- SSL/CDN setup
+- Email hosting
 
 ## 🛠️ Tech Stack
 
@@ -71,7 +81,6 @@ docker exec -it eye-dentity-backend npx prisma migrate dev
 - **Styling:** Tailwind CSS
 - **Build Tool:** Vite
 - **State Management:** Zustand
-- **HTTP Client:** Axios
 - **Routing:** React Router
 
 ### Backend
@@ -79,318 +88,132 @@ docker exec -it eye-dentity-backend npx prisma migrate dev
 - **Framework:** Express.js with TypeScript
 - **Database:** PostgreSQL 16
 - **ORM:** Prisma
-- **Cache:** Redis
-- **Authentication:** JWT + bcryptjs
-- **Validation:** Zod
+- **Authentication:** JWT
+- **Payments:** Stripe
 
 ### AI & Services
-- **AI Content:** Claude (Anthropic) + OpenAI GPT-4
-- **Hosting:** DigitalOcean (Droplets & Kubernetes)
-- **Domain/CDN:** Cloudflare
-- **Payments:** Stripe
-- **Email:** SendGrid
-- **Notifications:** Telegram Bot API
-
-### DevOps
-- **Containerization:** Docker + Docker Compose
-- **Orchestration:** Kubernetes (production)
-- **CI/CD:** GitHub Actions
-- **Monitoring:** Prometheus + Grafana (planned)
-- **Logging:** ELK Stack (planned)
+- **AI Content:** Claude (Anthropic) + OpenAI GPT-4 + Gemini
+- **Payments:** Paystack (with M-Pesa for Kenya)
+- **Hosting:** DigitalOcean (planned)
+- **Domain/CDN:** Cloudflare (planned)
 
 ## 📁 Project Structure
 
 ```
 eye-dentity/
-├── frontend/              # React frontend application
+├── backend/              # Node.js API
 │   ├── src/
-│   │   ├── components/   # React components
-│   │   ├── pages/        # Page components
-│   │   ├── hooks/        # Custom hooks
-│   │   ├── store/        # Zustand store
-│   │   ├── utils/        # Utility functions
-│   │   └── index.css     # Tailwind styles
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── Dockerfile.dev
-│
-├── backend/              # Node.js backend API
-│   ├── src/
+│   │   ├── config/       # Configuration (AI prompts, Stripe)
 │   │   ├── controllers/  # Request handlers
-│   │   ├── middleware/   # Express middleware
-│   │   ├── routes/       # API routes
 │   │   ├── services/     # Business logic
-│   │   ├── utils/        # Utility functions
-│   │   └── index.ts      # Entry point
-│   ├── prisma/
-│   │   └── schema.prisma # Database schema
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── Dockerfile.dev
+│   │   │   ├── content-generator.service.ts
+│   │   │   ├── template-renderer.service.ts
+│   │   │   └── ...
+│   │   └── routes/       # API routes
+│   ├── prisma/           # Database schema
+│   └── scripts/          # Utility scripts
 │
-├── ai-agents/            # AI workflow configurations
-│   ├── actions/          # AI actions
-│   └── *.yaml            # Workflow definitions
-│
-├── infra/                # Infrastructure as code
-│   └── docker/           # Docker configurations
-│
-├── shared/               # Shared code
-│   ├── types/            # TypeScript types
-│   └── utils/            # Shared utilities
+├── frontend/             # React application
+│   └── src/
+│       ├── components/   # React components
+│       ├── pages/        # Page components
+│       └── api/          # API client
 │
 ├── templates/            # Website templates
+│   └── professional/     # Professional template
+│       ├── index.html
+│       ├── styles.css
+│       └── color-schemes.json
 │
-├── docs/                 # Documentation
-│   ├── PRD.md
-│   ├── IMPLEMENTATION_PLAN.md
-│   ├── QUICK_START_GUIDE.md
-│   └── ...
-│
-├── docker-compose.yml    # Development environment
-├── .github/              # GitHub Actions workflows
-└── README.md             # This file
+└── docs/                 # Documentation
+    ├── API_REFERENCE.md
+    ├── USER_GUIDE.md
+    ├── STRIPE_SETUP.md
+    └── ...
 ```
 
-## 💻 Installation
+## 📚 Documentation
 
-### Prerequisites
+### For Developers
+- 🚀 [Quick Start Guide](docs/QUICK_START.md) - Get running in 5 minutes
+- 📖 [API Reference](docs/API_REFERENCE.md) - Complete API documentation
+- 🧪 [Testing Guide](docs/TESTING_GUIDE.md) - How to test everything
+- 💳 [Paystack Setup](docs/PAYSTACK_SETUP.md) - Payment integration guide (Kenya & Africa)
 
-- **Node.js** 20+ and npm
-- **Docker** and Docker Compose
-- **Git**
+### For Users
+- 📘 [User Guide](docs/USER_GUIDE.md) - Complete user walkthrough
+- 🗺️ [Onboarding Flow](docs/ONBOARDING_FLOW.md) - Visual user journey
 
-### Local Development (Without Docker)
+### For Business
+- 📋 [Implementation Plan](docs/IMPLEMENTATION_PLAN.md) - Technical roadmap
+- 📊 [Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md) - Current status
+- 📄 [PRD](docs/PRD.md) - Product requirements
+
+## 🎯 Current Status
+
+### ✅ Completed (95%)
+- [x] Website generation system
+- [x] AI content generation (Claude, OpenAI, Gemini)
+- [x] Template rendering engine
+- [x] Professional template with 6 color schemes
+- [x] Stripe payment integration
+- [x] Google Pay & Apple Pay support
+- [x] Admin dashboard
+- [x] User authentication
+- [x] Comprehensive documentation
+
+### 🚧 In Progress
+- [ ] Live payment testing
+- [ ] Staging environment setup
+- [ ] Automated deployment
+
+### 📋 Planned (Phase 2)
+- [ ] DigitalOcean automation
+- [ ] Domain registration
+- [ ] Email hosting
+- [ ] Marketing automation
+
+## 🧪 Testing
+
+### Test AI Content Generation
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/SteveOmondi/eye-dentity.git
-cd eye-dentity
-
-# 2. Install backend dependencies
 cd backend
-cp .env.example .env
-npm install
-npx prisma generate
-
-# 3. Install frontend dependencies
-cd ../frontend
-cp .env.example .env
-npm install
-
-# 4. Setup database (requires PostgreSQL running)
-cd ../backend
-npx prisma migrate dev
-
-# 5. Start backend (in one terminal)
-npm run dev
-
-# 6. Start frontend (in another terminal)
-cd ../frontend
-npm run dev
+npx tsx scripts/test-content-generation.ts --profile lawyer
 ```
 
-### Docker Development (Recommended)
+### Test Payment Flow
 
-```bash
-# 1. Clone repository
-git clone https://github.com/SteveOmondi/eye-dentity.git
-cd eye-dentity
+1. Set Stripe test keys in `.env`
+2. Start backend and frontend
+3. Complete order flow
+4. Use test card: `4242 4242 4242 4242`
 
-# 2. Copy environment files
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-
-# 3. Start all services
-docker-compose up -d
-
-# 4. Run database migrations
-docker exec -it eye-dentity-backend npx prisma migrate dev
-
-# 5. Access the application
-# Frontend: http://localhost:5173
-# Backend: http://localhost:3000
-# PostgreSQL: localhost:5432
-# Redis: localhost:6379
-```
-
-## 🔧 Development
-
-### Available Scripts
-
-**Backend:**
-```bash
-npm run dev          # Start development server with hot reload
-npm run build        # Build for production
-npm run start        # Start production server
-npm run prisma:migrate  # Run database migrations
-npm run prisma:studio   # Open Prisma Studio
-npm run test         # Run tests (coming soon)
-npm run lint         # Run ESLint
-```
-
-**Frontend:**
-```bash
-npm run dev          # Start Vite dev server
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run lint         # Run ESLint
-```
-
-### Database Management
-
-```bash
-# Generate Prisma Client
-npx prisma generate
-
-# Create a migration
-npx prisma migrate dev --name migration_name
-
-# Reset database (WARNING: deletes all data)
-npx prisma migrate reset
-
-# Open Prisma Studio (database GUI)
-npx prisma studio
-```
-
-### Docker Commands
-
-```bash
-# Start all services
-docker-compose up -d
-
-# Stop all services
-docker-compose down
-
-# View logs
-docker-compose logs -f
-
-# Rebuild containers
-docker-compose up -d --build
-
-# Execute command in backend container
-docker exec -it eye-dentity-backend <command>
-
-# Access PostgreSQL
-docker exec -it eye-dentity-postgres psql -U eye_dentity -d eye_dentity
-```
-
-## 📚 API Documentation
-
-### Authentication Endpoints
-
-#### Register User
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "securePassword123",
-  "name": "John Doe"
-}
-```
-
-#### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "securePassword123"
-}
-```
-
-#### Get Current User
-```http
-GET /api/auth/me
-Authorization: Bearer <token>
-```
-
-### Health Check
-```http
-GET /health
-
-Response:
-{
-  "status": "ok",
-  "timestamp": "2025-11-09T10:00:00.000Z",
-  "service": "eye-dentity-api"
-}
-```
-
-_More endpoints will be added as features are implemented._
+See [Testing Guide](docs/TESTING_GUIDE.md) for details.
 
 ## 🚢 Deployment
 
-### Production Build
-
+### Development
 ```bash
-# Build backend
-cd backend
-npm run build
-
-# Build frontend
-cd frontend
-npm run build
+docker-compose up -d
 ```
 
-### Environment Variables (Production)
+### Production
+See [Deployment Guide](DEPLOYMENT.md)
 
-Ensure all environment variables are properly configured:
+## 💳 Payment Methods Supported
 
-**Backend:**
-- `NODE_ENV=production`
-- `DATABASE_URL` - Production PostgreSQL URL
-- `JWT_SECRET` - Strong secret key
-- `STRIPE_SECRET_KEY` - Production Stripe key
-- `CLOUDFLARE_API_KEY` - Cloudflare credentials
-- `DIGITALOCEAN_API_TOKEN` - DigitalOcean token
-- And all other API keys from `.env.example`
+- 💳 **Credit/Debit Cards** (Visa, Mastercard, local & international)
+- 📱 **M-Pesa** (Kenya's #1 payment method!)
+- 🏦 **Bank Transfers** (instant verification)
+- 💰 **Mobile Money** (Airtel Money, etc.)
+- 📞 **USSD** (for feature phones)
 
-**Frontend:**
-- `VITE_API_URL` - Production API URL
-- `VITE_STRIPE_PUBLISHABLE_KEY` - Stripe public key
-
-## 📅 Development Roadmap
-
-### ✅ Week 1: Project Setup (COMPLETED)
-- [x] Repository structure
-- [x] Frontend (React + Vite + Tailwind)
-- [x] Backend (Node.js + Express + TypeScript)
-- [x] Database schema (Prisma)
-- [x] Authentication system
-- [x] Docker Compose setup
-- [x] GitHub Actions CI/CD
-
-### 🚧 Week 2: User Input & Templates (IN PROGRESS)
-- [ ] Multi-step user input form
-- [ ] Template system (3 templates)
-- [ ] Template selection UI
-- [ ] Profile data API
-- [ ] Logo upload functionality
-
-### 📋 Weeks 3-12
-See [IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) for the complete roadmap.
+**Optimized for Kenya and African markets!**
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-### Coding Standards
-
-- **TypeScript:** Strict mode enabled
-- **Linting:** ESLint with TypeScript rules
-- **Formatting:** Prettier (coming soon)
-- **Commits:** Conventional Commits format
-- **Tests:** Jest (coming in Week 4)
+We welcome contributions! Please see our contributing guidelines.
 
 ## 📝 License
 
@@ -402,12 +225,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Issues:** [GitHub Issues](https://github.com/SteveOmondi/eye-dentity/issues)
 - **Discussions:** [GitHub Discussions](https://github.com/SteveOmondi/eye-dentity/discussions)
 
-## 🙏 Acknowledgments
-
-- Built with [Claude](https://anthropic.com) AI assistance
-- Inspired by the need for accessible website creation
-- Thanks to all contributors
-
 ---
 
 **Made with ❤️ by the Eye-Dentity Team**
+
+**Powered by:** Paystack, Claude AI, React, Node.js, PostgreSQL

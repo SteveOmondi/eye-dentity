@@ -5,10 +5,12 @@ import { upload } from '../middleware/upload';
 
 const router = Router();
 
-// Upload logo - protected route
-router.post('/logo', authenticate, upload.single('logo'), uploadLogo);
+// Upload logo - allow anonymous uploads for website builder
+// In production, you might want to add rate limiting instead
+router.post('/logo', upload.single('logo'), uploadLogo);
 
-// Upload profile photo - protected route
-router.post('/profile-photo', authenticate, upload.single('profilePhoto'), uploadProfilePhoto);
+// Upload profile photo - allow anonymous uploads for website builder  
+// In production, you might want to add rate limiting instead
+router.post('/profile-photo', upload.single('profilePhoto'), uploadProfilePhoto);
 
 export default router;

@@ -17,6 +17,8 @@ import adminRoutes from './routes/admin.routes';
 import exportRoutes from './routes/export.routes';
 import marketingRoutes from './routes/marketing.routes';
 import marketplaceRoutes from './routes/marketplace.routes';
+import chatRoutes from './routes/chat.routes';
+import settingsRoutes from './routes/settings.routes';
 
 dotenv.config();
 
@@ -75,6 +77,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/marketing', marketingRoutes);
 app.use('/api/marketplace', marketplaceRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {

@@ -1,54 +1,49 @@
 import { Router } from 'express';
+import { authenticate } from '../middleware/auth';
 import {
-  createCheckoutSession,
-  getCheckoutSession,
+  initializePayment,
+  verifyPayment,
+  handlePaystackWebhook,
   getOrder,
   getUserOrders,
-  handleStripeWebhook,
-} from '../controllers/payment.controller';
-import { authenticate } from '../middleware/auth';
+} from '../controllers/paystack-payment.controller';
 import express from 'express';
 
 const router = Router();
 
 /**
- * @route   POST /api/payments/checkout
- * @desc    Create Stripe checkout session
- * @access  Private
+ * Initialize payment (create order and get payment URL)
+ * POST /api/payments/initialize
  */
-router.post('/checkout', authenticate, createCheckoutSession);
+router.post('/initialize', authenticate, initializePayment);
 
 /**
- * @route   GET /api/payments/session/:sessionId
- * @desc    Get checkout session details
- * @access  Private
+ * Verify payment after user completes payment
+ * GET /api/payments/verify/:reference
  */
-router.get('/session/:sessionId', authenticate, getCheckoutSession);
+router.get('/verify/:reference', verifyPayment);
 
 /**
- * @route   GET /api/payments/orders/:orderId
- * @desc    Get order by ID
- * @access  Private
- */
-router.get('/orders/:orderId', authenticate, getOrder);
-
-/**
- * @route   GET /api/payments/orders
- * @desc    Get all orders for authenticated user
- * @access  Private
- */
-router.get('/orders', authenticate, getUserOrders);
-
-/**
- * @route   POST /api/payments/webhook
- * @desc    Stripe webhook endpoint
- * @access  Public (verified by Stripe signature)
- * @note    This endpoint requires raw body, not JSON parsed
+ * Paystack webhook endpoint
+ * POST /api/payments/webhook
+ * Note: This endpoint should NOT use authenticate middleware
  */
 router.post(
   '/webhook',
-  express.raw({ type: 'application/json' }),
-  handleStripeWebhook
+  express.raw({ type: 'application/json' }), // Paystack sends raw JSON
+  handlePaystackWebhook
 );
+
+/**
+ * Get order by ID
+ * GET /api/payments/order/:orderId
+ */
+router.get('/order/:orderId', authenticate, getOrder);
+
+/**
+ * Get all orders for authenticated user
+ * GET /api/payments/orders
+ */
+router.get('/orders', authenticate, getUserOrders);
 
 export default router;

@@ -1,0 +1,72 @@
+[
+    {
+        "name": "Sarah Johnson",
+        "profession": "Lawyer",
+        "bio": "Experienced attorney specializing in corporate law and business litigation. Over 15 years of experience helping businesses navigate complex legal challenges.",
+        "services": [
+            "Corporate Law",
+            "Business Litigation",
+            "Contract Review",
+            "Mergers & Acquisitions"
+        ],
+        "email": "sarah.johnson@lawfirm.com",
+        "phone": "+1 (555) 123-4567",
+        "location": "New York, NY"
+    },
+    {
+        "name": "Dr. Michael Chen",
+        "profession": "Doctor",
+        "bio": "Board-certified family physician dedicated to providing comprehensive healthcare for patients of all ages. Passionate about preventive medicine and patient education.",
+        "services": [
+            "Primary Care",
+            "Preventive Medicine",
+            "Chronic Disease Management",
+            "Annual Physicals"
+        ],
+        "email": "dr.chen@healthclinic.com",
+        "phone": "+1 (555) 234-5678",
+        "location": "San Francisco, CA"
+    },
+    {
+        "name": "Emily Rodriguez",
+        "profession": "Designer",
+        "bio": "Creative graphic designer with a passion for brand identity and visual storytelling. I help businesses create memorable visual experiences that resonate with their audience.",
+        "services": [
+            "Brand Identity Design",
+            "Logo Design",
+            "Marketing Materials",
+            "Web Design"
+        ],
+        "email": "emily@creativestudio.com",
+        "phone": "+1 (555) 345-6789",
+        "location": "Austin, TX"
+    },
+    {
+        "name": "James Thompson",
+        "profession": "Consultant",
+        "bio": "Strategic business consultant helping companies optimize operations and drive growth. Specialized in digital transformation and process improvement.",
+        "services": [
+            "Business Strategy",
+            "Digital Transformation",
+            "Process Optimization",
+            "Change Management"
+        ],
+        "email": "james@consultinggroup.com",
+        "phone": "+1 (555) 456-7890",
+        "location": "Chicago, IL"
+    },
+    {
+        "name": "Dr. Lisa Martinez",
+        "profession": "Therapist",
+        "bio": "Licensed clinical psychologist specializing in anxiety, depression, and relationship counseling. I provide a safe, supportive environment for healing and personal growth.",
+        "services": [
+            "Individual Therapy",
+            "Couples Counseling",
+            "Anxiety Treatment",
+            "Depression Treatment"
+        ],
+        "email": "dr.martinez@therapycenter.com",
+        "phone": "+1 (555) 567-8901",
+        "location": "Seattle, WA"
+    }
+]

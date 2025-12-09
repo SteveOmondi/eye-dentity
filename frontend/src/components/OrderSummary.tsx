@@ -29,25 +29,38 @@ export const OrderSummary = () => {
     }
   };
 
-  const calculateTotal = () => {
-    let total = 0;
+  const calculatePaystackFee = (subtotal: number) => {
+    // Paystack fee: 1.5% + KES 25 for local payments (M-Pesa, Kenyan cards)
+    const feePercentage = 0.015; // 1.5%
+    const fixedFee = 25; // KES 25
+    return Math.round((subtotal * feePercentage + fixedFee) * 100) / 100;
+  };
+
+  const calculateSubtotal = () => {
+    let subtotal = 0;
 
     // Domain price (first year)
     if (formData.domainPrice) {
-      total += formData.domainPrice;
+      subtotal += formData.domainPrice;
     }
 
     // Hosting plan (monthly, showing first month)
     if (selectedPlan) {
-      total += selectedPlan.price;
+      subtotal += selectedPlan.price;
     }
 
     // Email hosting add-on (if applicable)
     if (formData.emailHosting) {
-      total += 5.99; // Example email hosting price
+      subtotal += 5.99; // Example email hosting price
     }
 
-    return total;
+    return subtotal;
+  };
+
+  const calculateTotal = () => {
+    const subtotal = calculateSubtotal();
+    const paystackFee = calculatePaystackFee(subtotal);
+    return subtotal + paystackFee;
   };
 
   const handleEdit = (step: number) => {
@@ -299,15 +312,33 @@ export const OrderSummary = () => {
               )}
             </div>
 
+            <div className="border-t pt-3 mb-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Subtotal</span>
+                <span className="font-medium">
+                  ${calculateSubtotal().toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm mt-2">
+                <span className="text-gray-600 flex items-center gap-1">
+                  Payment Processing Fee
+                  <span className="text-xs text-gray-400">(M-Pesa/Cards)</span>
+                </span>
+                <span className="font-medium text-gray-700">
+                  ${calculatePaystackFee(calculateSubtotal()).toFixed(2)}
+                </span>
+              </div>
+            </div>
+
             <div className="border-t pt-4 mb-6">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold">Due Today</span>
+                <span className="text-lg font-semibold">Total Due Today</span>
                 <span className="text-2xl font-bold text-blue-600">
                   ${calculateTotal().toFixed(2)}
                 </span>
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                Domain billed annually. Hosting billed monthly.
+                Domain billed annually. Hosting billed monthly. Payment processing fee included.
               </p>
             </div>
 
@@ -338,7 +369,10 @@ export const OrderSummary = () => {
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                 </svg>
-                <span>Secure payment powered by Stripe</span>
+                <span>Secure payment powered by Paystack</span>
+              </div>
+              <div className="mt-2 text-xs text-gray-500">
+                <span>💳 Cards • 📱 M-Pesa • 🏦 Bank Transfer</span>
               </div>
             </div>
           </div>

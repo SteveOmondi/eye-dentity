@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { useFormStore } from '../store/formStore';
 import { uploadApi } from '../api/upload';
 
-type UploadType = 'logo' | 'profilePhoto';
+
 
 export const BrandingStep = () => {
   const { formData, updateFormData, setCurrentStep } = useFormStore();
@@ -19,7 +19,7 @@ export const BrandingStep = () => {
   const [photoError, setPhotoError] = useState('');
   const photoInputRef = useRef<HTMLInputElement>(null);
 
-  const validateFile = (file: File, type: UploadType): string | null => {
+  const validateFile = (file: File): string | null => {
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
@@ -38,7 +38,7 @@ export const BrandingStep = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const error = validateFile(file, 'logo');
+    const error = validateFile(file);
     if (error) {
       setLogoError(error);
       return;
@@ -73,7 +73,7 @@ export const BrandingStep = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const error = validateFile(file, 'profilePhoto');
+    const error = validateFile(file);
     if (error) {
       setPhotoError(error);
       return;

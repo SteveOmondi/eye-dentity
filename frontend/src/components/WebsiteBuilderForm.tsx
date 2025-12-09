@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useFormStore } from '../store/formStore';
 import { StepProgress } from './StepProgress';
 import { PersonalInfoStep } from './PersonalInfoStep';
@@ -7,11 +8,37 @@ import { TemplateSelectionStep } from './TemplateSelectionStep';
 import { DomainSearchStep } from './DomainSearchStep';
 import { HostingPlanStep } from './HostingPlanStep';
 import { OrderSummary } from './OrderSummary';
+import { BuilderModeSelector } from './BuilderModeSelector';
+import { ChatProfileBuilder } from './ChatProfileBuilder';
+import { ApiKeySettings } from './ApiKeySettings';
 
 const TOTAL_STEPS = 7;
 
 export const WebsiteBuilderForm = () => {
-  const { currentStep } = useFormStore();
+  const { currentStep, setCurrentStep } = useFormStore();
+  const [builderMode, setBuilderMode] = useState<'form' | 'chat' | null>(null);
+  const [showApiKeySettings, setShowApiKeySettings] = useState(false);
+
+  // Show mode selector if mode not chosen
+  if (builderMode === null) {
+    return <BuilderModeSelector onModeSelect={setBuilderMode} />;
+  }
+
+  // Show chat builder if chat mode selected and in early steps
+  if (builderMode === 'chat' && currentStep <= 2) {
+    return (
+      <>
+        <ChatProfileBuilder
+          onComplete={() => setCurrentStep(3)} // Move to branding step after chat
+          onSwitchToForm={() => setBuilderMode('form')}
+        />
+        <ApiKeySettings
+          isOpen={showApiKeySettings}
+          onClose={() => setShowApiKeySettings(false)}
+        />
+      </>
+    );
+  }
 
   const renderStep = () => {
     switch (currentStep) {
@@ -49,46 +76,57 @@ export const WebsiteBuilderForm = () => {
                 <p className="text-sm text-gray-500">AI Website Builder</p>
               </div>
             </div>
+            <div className="flex items-center gap-4">
+              {/* Mode Badge */}
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                {builderMode === 'chat' ? '💬 Chat Mode' : '📝 Form Mode'}
+              </div>
 
-            {/* Exit/Save Draft Button */}
-            <button className="text-gray-600 hover:text-gray-900 text-sm font-medium">
-              Save & Exit
-            </button>
+              {/* Switch Mode Button */}
+              {currentStep <= 2 && (
+                <button
+                  onClick={() => setBuilderMode(builderMode === 'chat' ? 'form' : 'chat')}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Switch to {builderMode === 'chat' ? 'Form' : 'Chat'}
+                </button>
+              )}
+
+              {/* API Key Settings */}
+              {builderMode === 'chat' && (
+                <button
+                  onClick={() => setShowApiKeySettings(true)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
+                  API Keys
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Step Progress Indicator */}
-      <StepProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
-
       {/* Main Content */}
-      <main className="py-8">
-        <div className="max-w-7xl mx-auto">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Step Progress */}
+        <div className="mb-8">
+          <StepProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
+        </div>
+
+        {/* Step Content */}
+        <div className="bg-white rounded-lg shadow-sm p-8">
           {renderStep()}
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-600">
-              © 2025 Eye-Dentity. All rights reserved.
-            </p>
-            <div className="flex gap-4 text-sm">
-              <a href="#" className="text-gray-600 hover:text-gray-900">
-                Help
-              </a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">
-                Privacy
-              </a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">
-                Terms
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* API Key Settings Modal */}
+      <ApiKeySettings
+        isOpen={showApiKeySettings}
+        onClose={() => setShowApiKeySettings(false)}
+      />
     </div>
   );
 };

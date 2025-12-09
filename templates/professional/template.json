@@ -1,0 +1,19 @@
+{
+    "name": "Professional Template",
+    "category": "professional",
+    "description": "Clean, modern template perfect for lawyers, consultants, doctors, and other professionals",
+    "version": "1.0.0",
+    "features": [
+        "Responsive design",
+        "SEO optimized",
+        "6 color schemes",
+        "Accessibility compliant",
+        "Fast loading"
+    ],
+    "sections": [
+        "hero",
+        "about",
+        "services",
+        "contact"
+    ]
+}

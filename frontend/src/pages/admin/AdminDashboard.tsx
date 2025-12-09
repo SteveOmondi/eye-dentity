@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { adminApi, AdminDashboardData } from '../../api/admin';
+import { adminApi, type AdminDashboardData } from '../../api/admin';
 import { Link } from 'react-router-dom';
 
 export const AdminDashboard = () => {
@@ -174,11 +174,10 @@ export const AdminDashboard = () => {
                   <p className="text-xs text-gray-500 truncate">{user.email}</p>
                 </div>
                 <span
-                  className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    user.role === 'ADMIN'
+                  className={`px-2 py-1 text-xs font-semibold rounded-full ${user.role === 'ADMIN'
                       ? 'bg-purple-100 text-purple-700'
                       : 'bg-gray-100 text-gray-700'
-                  }`}
+                    }`}
                 >
                   {user.role}
                 </span>
@@ -209,13 +208,12 @@ export const AdminDashboard = () => {
                     {order.domain}
                   </p>
                   <span
-                    className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      order.status === 'COMPLETED'
+                    className={`px-2 py-1 text-xs font-semibold rounded-full ${order.status === 'COMPLETED'
                         ? 'bg-green-100 text-green-700'
                         : order.status === 'PENDING'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-gray-100 text-gray-700'
-                    }`}
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}
                   >
                     {order.status}
                   </span>

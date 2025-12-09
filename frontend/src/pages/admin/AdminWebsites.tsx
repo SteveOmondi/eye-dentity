@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { adminApi, Website } from '../../api/admin';
+import { adminApi, type Website } from '../../api/admin';
 
 export const AdminWebsites = () => {
   const [websites, setWebsites] = useState<Website[]>([]);

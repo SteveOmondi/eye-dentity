@@ -115,11 +115,10 @@ export const TemplateSelectionStep = () => {
           <button
             key={cat.value}
             onClick={() => setSelectedFilter(cat.value)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
-              selectedFilter === cat.value
+            className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${selectedFilter === cat.value
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+              }`}
           >
             {cat.label}
           </button>
@@ -174,7 +173,7 @@ export const TemplateSelectionStep = () => {
               />
             </svg>
             <span className="font-medium">
-              Great choice! {selectedTemplate.name} with {formData.selectedColorScheme.name} color scheme
+              Great choice! {selectedTemplate!.name} with {formData.selectedColorScheme.name} color scheme
             </span>
           </div>
         </div>

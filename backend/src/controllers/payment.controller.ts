@@ -92,16 +92,30 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       });
     }
 
-    // Create Stripe Checkout Session
+    // Create Stripe Checkout Session with multiple payment methods
     const session = await stripe.checkout.sessions.create({
       customer_email: req.user?.email,
       line_items: lineItems,
       mode: 'payment',
+      payment_method_types: ['card'], // Stripe automatically enables digital wallets
+      payment_method_options: {
+        card: {
+          request_three_d_secure: 'automatic', // Enhanced security
+        },
+      },
+      // Enable Google Pay, Apple Pay, and Link automatically
+      // These are enabled by default in Stripe Checkout when available
       success_url: `${STRIPE_CONFIG.successUrl}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: STRIPE_CONFIG.cancelUrl,
       metadata: {
         orderId: order.id,
         userId,
+        domain: domain,
+        hostingPlan: hostingPlan,
+      },
+      // Enable automatic tax calculation (optional)
+      automatic_tax: {
+        enabled: false, // Set to true when you configure tax settings in Stripe
       },
     });
 

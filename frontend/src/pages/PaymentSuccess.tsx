@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { paymentApi, CheckoutSession } from '../api/payment';
+import { paymentApi, type CheckoutSession } from '../api/payment';
 
 export const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();

@@ -1,11 +1,21 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-// import './index.css'
+import './index.css'
 import App from './App.tsx'
 
-console.log('Main.tsx executing');
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+console.log('Main.tsx: Starting execution');
+const rootElement = document.getElementById('root');
+console.log('Main.tsx: Root element found:', rootElement);
+
+if (rootElement) {
+  const root = createRoot(rootElement);
+  console.log('Main.tsx: Root created, rendering App...');
+  root.render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+  console.log('Main.tsx: Render called');
+} else {
+  console.error('Main.tsx: Root element NOT found!');
+}

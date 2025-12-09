@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useFormStore } from '../store/formStore';
-import { hostingApi, HostingPlan } from '../api/hosting';
+import { hostingApi, type HostingPlan } from '../api/hosting';
 
 export const HostingPlanStep = () => {
   const { formData, updateFormData, setCurrentStep } = useFormStore();
@@ -79,11 +79,10 @@ export const HostingPlanStep = () => {
             <div
               key={plan.id}
               onClick={() => handleSelectPlan(plan.id)}
-              className={`relative rounded-xl border-2 cursor-pointer transition-all ${
-                isSelected
+              className={`relative rounded-xl border-2 cursor-pointer transition-all ${isSelected
                   ? 'border-blue-500 ring-4 ring-blue-100 shadow-xl'
                   : 'border-gray-200 hover:border-blue-300 hover:shadow-lg'
-              }`}
+                }`}
             >
               {/* Popular Badge */}
               {isPopular && (
@@ -164,11 +163,10 @@ export const HostingPlanStep = () => {
                     e.stopPropagation();
                     handleSelectPlan(plan.id);
                   }}
-                  className={`w-full mt-6 py-3 rounded-lg font-semibold transition-colors ${
-                    isSelected
+                  className={`w-full mt-6 py-3 rounded-lg font-semibold transition-colors ${isSelected
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   {isSelected ? 'Selected' : 'Select Plan'}
                 </button>

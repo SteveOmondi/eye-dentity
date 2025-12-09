@@ -72,6 +72,8 @@ model User {
   adAccounts    AdAccount[]
   bookings      Booking[]
   reviews       Review[]
+  chatSessions  ChatSession[]
+  apiKeys       ApiKey[]
 
   @@index([email])
 }
@@ -438,3 +440,51 @@ model SystemHealth {
   @@index([timestamp])
   @@index([overallStatus])
 }
+
+model ChatSession {
+  id            String   @id @default(cuid())
+  userId        String?
+  sessionToken  String   @unique @default(cuid()) // For anonymous sessions
+  messages      Json     @default("[]") // Array of chat messages
+  collectedData Json     @default("{}") // Extracted profile data
+  provider      String   @default("claude") // LLM provider: claude, openai, gemini
+  mode          String   @default("chat") // chat or form
+  isComplete    Boolean  @default(false)
+  completionProgress Int @default(0) // 0-100
+  currentTopic  String?  // Current conversation topic
+  metadata      Json?    // Additional session data
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  completedAt   DateTime?
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([isComplete])
+  @@index([createdAt])
+}
+
+model ApiKey {
+  id           String   @id @default(cuid())
+  userId       String
+  provider     String   // 'claude', 'openai', 'gemini'
+  encryptedKey String   // AES-256 encrypted API key
+  keyHash      String   // Hash for quick validation
+  isActive     Boolean  @default(true)
+  lastUsed     DateTime?
+  usageCount   Int      @default(0)
+  metadata     Json?    // Additional key metadata
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@index([userId])
+  @@index([provider])
+  @@index([isActive])
+}
+

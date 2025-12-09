@@ -2,9 +2,10 @@ import { Request, Response } from 'express';
 
 export const uploadLogo = async (req: Request, res: Response) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    // Allow anonymous uploads for website builder flow
+    // if (!req.user) {
+    //   return res.status(401).json({ error: 'Unauthorized' });
+    // }
 
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -28,11 +29,13 @@ export const uploadLogo = async (req: Request, res: Response) => {
   }
 };
 
+
 export const uploadProfilePhoto = async (req: Request, res: Response) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    // Allow anonymous uploads for website builder flow
+    // if (!req.user) {
+    //   return res.status(401).json({ error: 'Unauthorized' });
+    // }
 
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });

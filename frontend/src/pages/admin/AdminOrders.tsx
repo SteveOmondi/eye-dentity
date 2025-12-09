@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { adminApi, Order } from '../../api/admin';
+import { adminApi, type Order } from '../../api/admin';
 
 export const AdminOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);

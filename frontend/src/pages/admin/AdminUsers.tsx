@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { adminApi, User } from '../../api/admin';
+import { adminApi, type User } from '../../api/admin';
 
 export const AdminUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -180,11 +180,10 @@ export const AdminUsers = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
-                      className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                        user.role === 'ADMIN'
+                      className={`px-3 py-1 text-xs font-semibold rounded-full ${user.role === 'ADMIN'
                           ? 'bg-purple-100 text-purple-700'
                           : 'bg-gray-100 text-gray-700'
-                      }`}
+                        }`}
                     >
                       {user.role}
                     </span>
