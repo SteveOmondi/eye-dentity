@@ -1,0 +1,13 @@
+Fonts used in this design:
+
+Font: Oswald
+Author: Vernon Adams
+Url: http://www.fontsquirrel.com/fonts/oswald
+
+Font: Raleway
+Author: The League of Moveable Type
+Url: http://www.fontsquirrel.com/fonts/raleway
+
+Font: Glacial Indifference
+Author: Hanken Design Co.
+Url: http://www.fontsquirrel.com/fonts/glacial-indifference

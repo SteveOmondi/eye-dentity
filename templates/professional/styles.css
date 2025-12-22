@@ -9,6 +9,12 @@
     --color-background: #ffffff;
     --color-text: #1f2937;
     --color-text-light: #6b7280;
+
+    /* Design System Defaults (Overridden by JS) */
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --radius-card: 12px;
+    --radius-btn: 8px;
 }
 
 /* Animations */
@@ -125,8 +131,8 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: var(--color-text);
+    font-family: var(--font-body);
+    container: var(--color-text);
     background-color: var(--color-background);
     line-height: 1.6;
     font-size: 16px;
@@ -229,7 +235,117 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Hero Section */
+/* === Dynamic Layout Engine === */
+
+/* Layout: Split Screen (Side-by-Side Hero) */
+.layout-split .hero {
+    background: var(--color-background);
+    /* Remove bg image from container, use on right side */
+    padding: 0;
+    align-items: stretch;
+}
+
+.layout-split .hero .container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    gap: 0;
+    grid-template-columns: 1fr 1fr;
+}
+
+.layout-split .hero-content {
+    padding: 6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--color-background);
+    z-index: 2;
+}
+
+.layout-split .hero::after {
+    /* The Image Side */
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: var(--hero-bg) center/cover no-repeat, var(--color-primary);
+    /* Fallback color */
+    z-index: 1;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.layout-split .hero::before {
+    display: none;
+    /* Remove radial gradient */
+}
+
+/* Layout: Asymmetric (Offset Grid) */
+.layout-asymmetric .hero {
+    text-align: left;
+    background: var(--color-background);
+}
+
+.layout-asymmetric .hero .container {
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: end;
+    padding-bottom: 4rem;
+}
+
+.layout-asymmetric .hero-headline {
+    font-size: 5rem;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+}
+
+.layout-asymmetric .hero::before {
+    /* Creative Blob/Shape */
+    background: var(--color-primary);
+    width: 400px;
+    height: 400px;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    opacity: 0.2;
+    /* Increased from 0.1 for visibility */
+    filter: blur(40px);
+    top: 20%;
+    right: 10%;
+    animation: blobMorph 10s infinite alternate;
+}
+
+@keyframes blobMorph {
+    0% {
+        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    }
+
+    100% {
+        border-radius: 50% 50% 20% 80% / 25% 80% 20% 75%;
+    }
+}
+
+/* Shape & Font Injection */
+h1,
+h2,
+h3,
+.brand-name {
+    font-family: var(--font-heading);
+}
+
+.btn {
+    border-radius: var(--radius-btn);
+}
+
+.service-card,
+.profile-photo,
+input,
+textarea {
+    border-radius: var(--radius-card);
+}
+
+/* --- End Dynamic Engine --- */
+
+/* Hero Section (Standard Fallback) */
 .hero {
     padding: 120px 0 80px;
     background: linear-gradient(135deg, var(--color-background) 0%, rgba(255, 255, 255, 0.9) 100%), var(--hero-bg) center/cover no-repeat;

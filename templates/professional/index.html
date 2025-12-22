@@ -38,7 +38,9 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
+        {{#if showParticles}}
         <canvas id="particles-canvas"></canvas>
+        {{/if}}
         <div class="container" style="position: relative; z-index: 1;">
             <div class="hero-content">
                 <h1 class="hero-headline {{anim.hero_headline}}">{{homepage.headline}}</h1>
@@ -189,6 +191,7 @@
         });
 
         // Particle System
+        { { #if showParticles } }
         class ParticleSystem {
             constructor() {
                 this.canvas = document.getElementById('particles-canvas');
@@ -297,6 +300,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             new ParticleSystem();
         });
+        { {/if } }
     </script>
 </body>
 

@@ -8,41 +8,42 @@ async function testRender() {
     try {
         console.log('🚀 Starting Backend E2E Test: AI Content + Template Rendering');
 
-        // 1. Select Profile
-        const profile = testProfiles[0]; // Lawyer
-        console.log(`\n👤 Using Profile: ${profile.name} (${profile.profession})`);
+        // Test with 2 profiles to see layout variety
+        const profilesToTest = [testProfiles[0], testProfiles[1]]; // Lawyer, Doctor (or index 1)
 
-        // 2. Generate Content (Parallel)
-        console.log('\n🤖 Step 1: Generating Content with Gemini...');
-        const startTime = Date.now();
-        const content = await contentGeneratorService.generateWebsiteContent(profile, 'gemini');
-        const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-        console.log(`✅ Content generated in ${duration}s`);
+        for (const profile of profilesToTest) {
+            if (!profile) continue;
 
-        // 3. Render Template
-        console.log('\n🎨 Step 2: Rendering Template...');
-        const html = await templateRendererService.renderWebsite({
-            templateId: 'professional',
-            content,
-            colorScheme: 'navy',
-            profileData: {
-                name: profile.name,
-                profession: profile.profession,
-                email: profile.email,
-                phone: profile.phone,
-            },
-        });
-        console.log('✅ Template rendered successfully');
+            console.log(`\n\n--------------------------------------------------`);
+            console.log(`👤 Using Profile: ${profile.name} (${profile.profession})`);
 
-        // 4. Save Output
-        const outputDir = path.join(__dirname, '../test-output');
-        await fs.mkdir(outputDir, { recursive: true });
+            // 2. Generate Content
+            console.log('🤖 Generating Content...');
 
-        const filename = `e2e-render-${profile.profession.toLowerCase()}-${Date.now()}.html`;
-        const filepath = path.join(outputDir, filename);
+            const content = await contentGeneratorService.generateWebsiteContent(profile, 'gemini');
 
-        await fs.writeFile(filepath, html, 'utf-8');
-        console.log(`\n💾 Website saved to: ${filepath}`);
+            // 3. Render Template
+            console.log('🎨 Rendering Template (Check logs for Design System choices)...');
+            const html = await templateRendererService.renderWebsite({
+                templateId: 'professional',
+                content,
+                colorScheme: 'navy',
+                profileData: {
+                    name: profile.name,
+                    profession: profile.profession,
+                    email: profile.email,
+                    phone: profile.phone,
+                },
+            });
+
+            // 4. Save Output
+            const outputDir = path.join(__dirname, '../test-output');
+            await fs.mkdir(outputDir, { recursive: true });
+            const filename = `e2e-render-${profile.profession.toLowerCase().replace(' ', '-')}-${Date.now()}.html`;
+            const filepath = path.join(outputDir, filename);
+            await fs.writeFile(filepath, html, 'utf-8');
+            console.log(`💾 Website saved: ${filename}`);
+        }
 
     } catch (error) {
         console.error('\n❌ E2E Test Failed:', error);

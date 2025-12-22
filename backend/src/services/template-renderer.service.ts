@@ -36,7 +36,24 @@ export interface RenderOptions {
         phone?: string;
         logoUrl?: string;
         profilePhotoUrl?: string;
+        showParticles?: boolean;
     };
+}
+
+// Design System Interfaces
+// Design System Interfaces
+export interface DesignSystem {
+    layout: 'standard' | 'split' | 'asymmetric';
+    fonts: {
+        heading: string;
+        body: string;
+        url: string;
+    };
+    shapes: {
+        radius: string;
+        style: 'sharp' | 'soft' | 'pill';
+    };
+    theme: 'light' | 'dark' | 'navy'; // New: Force background variation
 }
 
 export class TemplateRendererService {
@@ -95,7 +112,10 @@ export class TemplateRendererService {
             const colors = template.colorSchemes[options.colorScheme] || template.colorSchemes['default'];
 
             // Apply theme (colors + animations + images)
-            const { css: styledCSS, html: styledHTML } = this.applyTheme(template.cssStyles, template.htmlStructure, colors, options.profileData.profession);
+            const { css: styledCSS, html: styledHTML, showParticles } = this.applyTheme(template.cssStyles, template.htmlStructure, colors, options.profileData.profession);
+
+            // Update profile data with design choices
+            options.profileData.showParticles = showParticles;
 
             // Inject content into HTML
             let html = this.injectContent(styledHTML, options.content, options.profileData);
@@ -116,9 +136,9 @@ export class TemplateRendererService {
     /**
      * Apply theme (colors, images, animations) to CSS and HTML
      */
-    private applyTheme(css: string, html: string, colors: ColorScheme, profession: string): { css: string, html: string } {
-        // 1. Generate Stock Image URL
-        const stockImage = `url('https://loremflickr.com/1200/800/${encodeURIComponent(profession)},business')`;
+    private applyTheme(css: string, html: string, colors: ColorScheme, profession: string): { css: string, html: string, showParticles: boolean } {
+        // 1. Generate Stock Image URL with Cache Buster
+        const stockImage = `url('https://loremflickr.com/1200/800/${encodeURIComponent(profession).replace(/%20/g, ',')},business?lock=${Math.floor(Math.random() * 1000)}')`;
 
         // 2. Select Animation Scheme
         const animationSchemes = [
@@ -142,6 +162,11 @@ export class TemplateRendererService {
             }
         ];
 
+        // 3. Generate Design System
+        const design = this.generateDesignSystem(profession);
+        console.log(`Selected Design: Layout=${design.layout}, Theme=${design.theme}, Fonts=${design.fonts.heading.split(',')[0]}, Shape=${design.shapes.style}`);
+
+
         // Randomly select one
         const scheme = animationSchemes[Math.floor(Math.random() * animationSchemes.length)];
         console.log(`Selected Animation Scheme: ${scheme.name}`);
@@ -156,12 +181,27 @@ export class TemplateRendererService {
     --color-text: ${colors.text};
     --color-text-light: ${colors.textLight};
     --hero-bg: ${stockImage};
+    --font-heading: ${design.fonts.heading};
+    --font-body: ${design.fonts.body};
+    --radius-card: ${design.shapes.radius};
+    --radius-btn: ${design.shapes.style === 'pill' ? '999px' : design.shapes.radius};
+    
+    /* Theme Overrides */
+    --color-background: ${design.theme === 'dark' ? '#111827' : design.theme === 'navy' ? '#0f172a' : '#ffffff'};
+    --color-text: ${design.theme === 'light' ? '#1f2937' : '#f3f4f6'};
+    --color-text-light: ${design.theme === 'light' ? '#6b7280' : '#9ca3af'};
 }
 `;
-        const styledCSS = rootOverride + css;
+        // FIX: Inject overrides AFTER the original CSS so they take precedence
+        const styledCSS = css + rootOverride;
 
-        // 4. Inject Animations into HTML
+        // 5. Inject Design Classes & Fonts
         let styledHTML = html;
+
+        // Inject layout class and fonts into body/head
+        styledHTML = styledHTML.replace('<body>', `<body class="layout-${design.layout} shape-${design.shapes.style}">`);
+        styledHTML = styledHTML.replace('</head>', `<link href="${design.fonts.url}" rel="stylesheet">\n</head>`);
+
         styledHTML = styledHTML.replace(/\{\{anim\.hero_headline\}\}/g, scheme.hero_headline);
         styledHTML = styledHTML.replace(/\{\{anim\.hero_text\}\}/g, scheme.hero_text);
         styledHTML = styledHTML.replace(/\{\{anim\.hero_cta\}\}/g, scheme.hero_cta);
@@ -169,7 +209,10 @@ export class TemplateRendererService {
         // Default fallbacks for other placeholders if added later
         styledHTML = styledHTML.replace(/\{\{anim\.[^}]+\}\}/g, 'animate-fade-in');
 
-        return { css: styledCSS, html: styledHTML };
+        // 6. Handle Particles (Only show for standard layout)
+        const showParticles = design.layout === 'standard';
+
+        return { css: styledCSS, html: styledHTML, showParticles };
     }
 
     /**
@@ -315,6 +358,54 @@ export class TemplateRendererService {
         const css = this.applyColorScheme(template.cssStyles, colors);
 
         return { css };
+    }
+    /**
+     * Generate a random Design System configuration
+     */
+    private generateDesignSystem(profession: string): DesignSystem {
+        const layouts: DesignSystem['layout'][] = ['standard', 'split', 'asymmetric'];
+        const shapes: DesignSystem['shapes'][] = [
+            { style: 'sharp', radius: '0px' },
+            { style: 'soft', radius: '12px' },
+            { style: 'pill', radius: '24px' }
+        ];
+
+        const fontPairings = [
+            {
+                heading: "'Playfair Display', serif",
+                body: "'Lato', sans-serif",
+                url: "https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@400;700&display=swap"
+            },
+            {
+                heading: "'Space Grotesk', sans-serif",
+                body: "'Inter', sans-serif",
+                url: "https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap"
+            },
+            {
+                heading: "'Oswald', sans-serif",
+                body: "'Open Sans', sans-serif",
+                url: "https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Oswald:wght@500;700&display=swap"
+            },
+            {
+                heading: "'Merriweather', serif",
+                body: "'Merriweather Sans', sans-serif",
+                url: "https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Merriweather+Sans:wght@400;700&display=swap"
+            }
+        ];
+
+        // Random selections
+        const layout = layouts[Math.floor(Math.random() * layouts.length)];
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        const fonts = fontPairings[Math.floor(Math.random() * fontPairings.length)];
+        const themes: DesignSystem['theme'][] = ['light', 'dark', 'navy'];
+        const theme = themes[Math.floor(Math.random() * themes.length)];
+
+        return {
+            layout,
+            fonts,
+            shapes: shape,
+            theme
+        };
     }
 }
 
