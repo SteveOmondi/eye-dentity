@@ -38,12 +38,13 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
-        <div class="container">
+        <canvas id="particles-canvas"></canvas>
+        <div class="container" style="position: relative; z-index: 1;">
             <div class="hero-content">
-                <h1 class="hero-headline">{{homepage.headline}}</h1>
-                <p class="hero-subheadline">{{homepage.subheadline}}</p>
-                <p class="hero-introduction">{{homepage.introduction}}</p>
-                <div class="hero-cta">
+                <h1 class="hero-headline animate-slide-up">{{homepage.headline}}</h1>
+                <p class="hero-subheadline animate-slide-up delay-100">{{homepage.subheadline}}</p>
+                <p class="hero-introduction animate-slide-up delay-200">{{homepage.introduction}}</p>
+                <div class="hero-cta animate-slide-up delay-300">
                     <a href="#contact" class="btn btn-primary">Get Started</a>
                     <a href="#services" class="btn btn-secondary">Learn More</a>
                 </div>
@@ -185,6 +186,116 @@
             } else {
                 navbar.classList.remove('scrolled');
             }
+        });
+
+        // Particle System
+        class ParticleSystem {
+            constructor() {
+                this.canvas = document.getElementById('particles-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.resize();
+
+                // Config
+                this.particleCount = 60;
+                this.connectionDistance = 150;
+                this.mouseDistance = 200;
+
+                // Mouse state
+                this.mouse = { x: null, y: null };
+
+                this.init();
+                this.animate();
+
+                window.addEventListener('resize', () => this.resize());
+                document.addEventListener('mousemove', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    this.mouse.x = e.clientX - rect.left;
+                    this.mouse.y = e.clientY - rect.top;
+                });
+            }
+
+            resize() {
+                this.canvas.width = this.canvas.parentElement.offsetWidth;
+                this.canvas.height = this.canvas.parentElement.offsetHeight;
+            }
+
+            init() {
+                // Get primary color from CSS var
+                const style = getComputedStyle(document.documentElement);
+                this.color = style.getPropertyValue('--color-primary').trim() || '#2563eb';
+
+                for (let i = 0; i < this.particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        size: Math.random() * 2 + 1
+                    });
+                }
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Update and draw particles
+                this.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // Bounce off walls
+                    if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+
+                    // Draw particle
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fillStyle = this.color;
+                    this.ctx.globalAlpha = 0.5;
+                    this.ctx.fill();
+
+                    // Connect to mouse
+                    if (this.mouse.x) {
+                        const dx = this.mouse.x - p.x;
+                        const dy = this.mouse.y - p.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < this.mouseDistance) {
+                            // Move slightly towards mouse
+                            p.x += dx * 0.01;
+                            p.y += dy * 0.01;
+                        }
+                    }
+                });
+
+                // Connect particles
+                this.particles.forEach((p1, i) => {
+                    for (let j = i + 1; j < this.particles.length; j++) {
+                        const p2 = this.particles[j];
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < this.connectionDistance) {
+                            this.ctx.beginPath();
+                            this.ctx.strokeStyle = this.color;
+                            this.ctx.globalAlpha = 1 - (distance / this.connectionDistance);
+                            this.ctx.lineWidth = 0.5;
+                            this.ctx.moveTo(p1.x, p1.y);
+                            this.ctx.lineTo(p2.x, p2.y);
+                            this.ctx.stroke();
+                        }
+                    }
+                });
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialize particles when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new ParticleSystem();
         });
     </script>
 </body>

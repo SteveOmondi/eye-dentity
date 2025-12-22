@@ -1,6 +1,10 @@
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getApiKey } from './api-key.service';
+
+// Cache for Gemini clients to avoid recreating them
+const geminiClientCache: Record<string, GoogleGenerativeAI> = {};
 
 export type LLMProvider = 'claude' | 'openai' | 'gemini';
 
@@ -45,16 +49,20 @@ export async function sendMessage(
         throw new Error(`No API key available for provider: ${provider}`);
     }
 
-    switch (provider) {
-        case 'claude':
-            return await sendMessageToClaude(messages, systemPrompt, apiKey);
-        case 'openai':
-            return await sendMessageToOpenAI(messages, systemPrompt, apiKey);
-        case 'gemini':
-            throw new Error('Gemini provider not yet implemented');
-        default:
-            throw new Error(`Unsupported provider: ${provider}`);
+    if (provider !== 'gemini') {
+        throw new Error(`Provider ${provider} is currently disabled. Only 'gemini' is allowed.`);
     }
+
+    // switch (provider) {
+    //     case 'claude':
+    //         return await sendMessageToClaude(messages, systemPrompt, apiKey);
+    //     case 'openai':
+    //         return await sendMessageToOpenAI(messages, systemPrompt, apiKey);
+    //     case 'gemini':
+    return await sendMessageToGemini(messages, systemPrompt, apiKey);
+    //     default:
+    //         throw new Error(`Unsupported provider: ${provider}`);
+    // }
 }
 
 /**
@@ -112,6 +120,58 @@ async function sendMessageToOpenAI(
     });
 
     return response.choices[0]?.message?.content || '';
+}
+
+/**
+ * Send message to Gemini
+ */
+async function sendMessageToGemini(
+    messages: Message[],
+    systemPrompt: string,
+    apiKey: string
+): Promise<string> {
+    // console.log('sendMessageToGemini called. Key valid:', !!apiKey, 'Len:', apiKey?.length);
+
+    // Reuse existing client if available
+    let genAI = geminiClientCache[apiKey];
+    if (!genAI) {
+        genAI = new GoogleGenerativeAI(apiKey);
+        geminiClientCache[apiKey] = genAI;
+    }
+
+    const model = genAI.getGenerativeModel({
+        model: 'gemini-2.5-flash',
+        systemInstruction: systemPrompt
+    });
+
+    // Convert messages to Gemini format (excluding the last one if it exists)
+    let history = messages.length > 0
+        ? messages.slice(0, -1).map(m => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: m.content }],
+        }))
+        : [];
+
+    // Ensure history starts with a user message (Gemini requirement)
+    if (history.length > 0 && history[0].role === 'model') {
+        history = [
+            { role: 'user', parts: [{ text: 'Start conversation' }] },
+            ...history
+        ];
+    }
+
+    const chat = model.startChat({
+        history: history,
+    });
+
+    let messageToSend = 'Start conversation';
+    if (messages.length > 0) {
+        messageToSend = messages[messages.length - 1].content;
+    }
+
+    const result = await chat.sendMessage(messageToSend);
+    const response = await result.response;
+    return response.text();
 }
 
 /**

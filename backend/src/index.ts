@@ -1,8 +1,10 @@
+import './config/env'; // Must be first
 import express, { Express, Request, Response } from 'express';
+
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
+// dotenv config is handled in ./config/env
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import authRoutes from './routes/auth.routes';
@@ -19,8 +21,6 @@ import marketingRoutes from './routes/marketing.routes';
 import marketplaceRoutes from './routes/marketplace.routes';
 import chatRoutes from './routes/chat.routes';
 import settingsRoutes from './routes/settings.routes';
-
-dotenv.config();
 
 const app: Express = express();
 const PORT = process.env.PORT || 3000;
@@ -46,6 +46,8 @@ app.use('/api/', limiter); // Rate limiting for API routes
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Serve template preview images
+app.use('/templates', express.static(path.join(__dirname, '../public/templates')));
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
@@ -53,6 +55,19 @@ app.get('/health', (req: Request, res: Response) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     service: 'eye-dentity-api'
+  });
+});
+
+// Root route
+app.get('/', (req: Request, res: Response) => {
+  res.json({
+    message: 'Eye-Dentity API Server',
+    status: 'running',
+    endpoints: {
+      health: '/health',
+      api: '/api',
+      docs: '/api/docs'
+    }
   });
 });
 

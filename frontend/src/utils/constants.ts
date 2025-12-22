@@ -18,3 +18,14 @@ export const PROFESSIONS = [
   { value: 'content-creator', label: 'Content Creator', category: 'creative' },
   { value: 'interior-designer', label: 'Interior Designer', category: 'creative' },
 ];
+
+export const STEPS = [
+  { number: 1, title: 'Info', description: 'Personal details' },
+  { number: 2, title: 'Bio', description: 'Your story' },
+  { number: 3, title: 'Branding', description: 'Visual identity' },
+  { number: 4, title: 'Template', description: 'Website design' },
+  { number: 5, title: 'Domain', description: 'Your web address' },
+  { number: 6, title: 'Hosting', description: 'Select a plan' },
+  { number: 7, title: 'Review', description: 'Final summary' },
+];
+

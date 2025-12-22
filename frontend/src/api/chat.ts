@@ -1,4 +1,4 @@
-import apiClient from './client';
+import { apiClient } from './client';
 
 export interface Message {
     role: 'user' | 'assistant' | 'system';
@@ -21,7 +21,7 @@ export type LLMProvider = 'claude' | 'openai' | 'gemini';
  * Start a new chat session
  */
 export const startChatSession = async (
-    provider: LLMProvider = 'claude'
+    provider: LLMProvider = 'gemini'
 ): Promise<ChatSession> => {
     const response = await apiClient.post('/chat/start', { provider });
     return response.data.session;

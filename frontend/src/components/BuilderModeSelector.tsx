@@ -13,29 +13,34 @@ export const BuilderModeSelector = ({ onModeSelect }: BuilderModeSelectorProps) 
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6">
-            <div className="max-w-4xl w-full">
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                        Build Your Professional Website
+        <div className="min-h-screen bg-[#0d0d0d] bg-mesh-gradient flex items-center justify-center p-6 relative overflow-hidden">
+            {/* Background Decorative Elements */}
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(157,80,187,0.05)_0%,transparent_50%)]" />
+
+            <div className="max-w-5xl w-full relative z-10 animate-fade-up">
+                <div className="text-center mb-16">
+                    <h1 className="text-5xl font-black text-white mb-4 uppercase tracking-tighter">
+                        Select Your <span className="text-wizard-accent">Protocol</span>
                     </h1>
-                    <p className="text-xl text-gray-600">
-                        Choose how you'd like to get started
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.3em]">
+                        Choose your configuration interface
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 gap-8">
                     {/* Chat Mode */}
                     <div
                         onClick={() => handleSelect('chat')}
-                        className={`bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 ${selectedMode === 'chat'
-                                ? 'border-blue-500 scale-105'
-                                : 'border-transparent hover:border-blue-200'
+                        className={`glass-card rounded-[3rem] p-10 transition-all duration-500 cursor-pointer border relative group overflow-hidden ${selectedMode === 'chat'
+                            ? 'border-wizard-accent/50 scale-[1.02] shadow-[0_0_50px_rgba(196,240,66,0.1)]'
+                            : 'border-white/5 hover:border-wizard-accent/30 hover:scale-[1.01]'
                             }`}
                     >
-                        <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl mb-6 mx-auto">
+                        <div className="absolute -top-12 -right-12 w-32 h-32 bg-wizard-accent/10 blur-[60px] group-hover:bg-wizard-accent/20 transition-all" />
+
+                        <div className="flex items-center justify-center w-20 h-20 bg-wizard-accent/10 border border-wizard-accent/30 rounded-2xl mb-8 group-hover:shadow-[0_0_20px_rgba(196,240,66,0.2)] transition-all">
                             <svg
-                                className="w-8 h-8 text-white"
+                                className="w-10 h-10 text-wizard-accent"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -43,49 +48,40 @@ export const BuilderModeSelector = ({ onModeSelect }: BuilderModeSelectorProps) 
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    strokeWidth={2}
+                                    strokeWidth={2.5}
                                     d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                                 />
                             </svg>
                         </div>
 
-                        <h3 className="text-2xl font-bold text-gray-900 mb-3 text-center">
-                            AI Chat Mode
+                        <h3 className="text-3xl font-black text-white mb-4 uppercase tracking-tight">
+                            AI Forge
                         </h3>
-                        <p className="text-gray-600 mb-6 text-center">
-                            Have a natural conversation with our AI assistant
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest leading-relaxed mb-8">
+                            Initiate a high-bandwidth neural handshake for automated structure generation.
                         </p>
 
-                        <ul className="space-y-3 mb-6">
-                            <li className="flex items-start gap-2">
-                                <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="text-sm text-gray-700">Natural conversation flow</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="text-sm text-gray-700">AI asks relevant questions</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="text-sm text-gray-700">Faster and more engaging</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="text-sm text-gray-700">Smart data extraction</span>
-                            </li>
+                        <ul className="space-y-4 mb-10">
+                            {[
+                                'Natural Language Synthesis',
+                                'Heuristic Parameter Discovery',
+                                'Hyper-Accelerated Workflow',
+                                'Smart Metadata Extraction'
+                            ].map((item, i) => (
+                                <li key={i} className="flex items-center gap-3 group/item">
+                                    <div className="w-5 h-5 bg-wizard-accent/10 border border-wizard-accent/20 rounded-lg flex items-center justify-center text-wizard-accent group-hover/item:bg-wizard-accent group-hover/item:text-black transition-all">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] group-hover/item:text-white transition-colors">{item}</span>
+                                </li>
+                            ))}
                         </ul>
 
-                        <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-3 text-center">
-                            <span className="text-sm font-medium text-purple-700">
-                                ⭐ Recommended for most users
+                        <div className="bg-wizard-accent/10 border border-wizard-accent/20 rounded-2xl p-4 text-center">
+                            <span className="text-[10px] font-black text-wizard-accent uppercase tracking-widest">
+                                ⭐ Primary Protocol Recommended
                             </span>
                         </div>
                     </div>
@@ -93,14 +89,16 @@ export const BuilderModeSelector = ({ onModeSelect }: BuilderModeSelectorProps) 
                     {/* Form Mode */}
                     <div
                         onClick={() => handleSelect('form')}
-                        className={`bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 ${selectedMode === 'form'
-                                ? 'border-blue-500 scale-105'
-                                : 'border-transparent hover:border-blue-200'
+                        className={`glass-card rounded-[3rem] p-10 transition-all duration-500 cursor-pointer border relative group overflow-hidden ${selectedMode === 'form'
+                            ? 'border-wizard-purple/50 scale-[1.02] shadow-[0_0_50px_rgba(157,80,187,0.1)]'
+                            : 'border-white/5 hover:border-wizard-purple/30 hover:scale-[1.01]'
                             }`}
                     >
-                        <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl mb-6 mx-auto">
+                        <div className="absolute -top-12 -right-12 w-32 h-32 bg-wizard-purple/10 blur-[60px] group-hover:bg-wizard-purple/20 transition-all" />
+
+                        <div className="flex items-center justify-center w-20 h-20 bg-wizard-purple/10 border border-wizard-purple/30 rounded-2xl mb-8 group-hover:shadow-[0_0_20px_rgba(157,80,187,0.2)] transition-all">
                             <svg
-                                className="w-8 h-8 text-white"
+                                className="w-10 h-10 text-wizard-purple"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -108,57 +106,52 @@ export const BuilderModeSelector = ({ onModeSelect }: BuilderModeSelectorProps) 
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    strokeWidth={2}
+                                    strokeWidth={2.5}
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                                 />
                             </svg>
                         </div>
 
-                        <h3 className="text-2xl font-bold text-gray-900 mb-3 text-center">
-                            Traditional Form
+                        <h3 className="text-3xl font-black text-white mb-4 uppercase tracking-tight">
+                            Core Grid
                         </h3>
-                        <p className="text-gray-600 mb-6 text-center">
-                            Fill out structured forms at your own pace
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest leading-relaxed mb-8">
+                            Execute structured data entry for maximum component granularity and control.
                         </p>
 
-                        <ul className="space-y-3 mb-6">
-                            <li className="flex items-start gap-2">
-                                <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="text-sm text-gray-700">Familiar form interface</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="text-sm text-gray-700">Complete control over input</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="text-sm text-gray-700">See all fields upfront</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="text-sm text-gray-700">Save and resume anytime</span>
-                            </li>
+                        <ul className="space-y-4 mb-10">
+                            {[
+                                'Deterministic Input Fields',
+                                'Granular State Management',
+                                'Linear Configuration Flow',
+                                'Persistent Session Tracking'
+                            ].map((item, i) => (
+                                <li key={i} className="flex items-center gap-3 group/item">
+                                    <div className="w-5 h-5 bg-wizard-purple/10 border border-wizard-purple/20 rounded-lg flex items-center justify-center text-wizard-purple group-hover/item:bg-wizard-purple group-hover/item:text-white transition-all">
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] group-hover/item:text-white transition-colors">{item}</span>
+                                </li>
+                            ))}
                         </ul>
 
-                        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-3 text-center">
-                            <span className="text-sm font-medium text-indigo-700">
-                                Perfect for detailed control
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
+                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                                Standard Manual Execution
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <p className="text-center text-gray-500 mt-8 text-sm">
-                    Don't worry! You can switch between modes at any time.
-                </p>
+                <div className="mt-16 flex items-center justify-center gap-4 text-gray-600">
+                    <div className="h-px w-12 bg-white/5" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em]">
+                        Protocols are swappable during configuration
+                    </p>
+                    <div className="h-px w-12 bg-white/5" />
+                </div>
             </div>
         </div>
     );

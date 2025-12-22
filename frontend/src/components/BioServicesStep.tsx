@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useFormStore } from '../store/formStore';
 
 export const BioServicesStep = () => {
-  const { formData, updateFormData, setCurrentStep } = useFormStore();
+  const { formData, updateFormData } = useFormStore();
   const [newService, setNewService] = useState('');
   const [newSpecialization, setNewSpecialization] = useState('');
   const [newServiceArea, setNewServiceArea] = useState('');
@@ -52,152 +52,147 @@ export const BioServicesStep = () => {
     });
   };
 
-  const handleNext = () => {
-    setCurrentStep(3);
-  };
-
-  const handleBack = () => {
-    setCurrentStep(1);
-  };
-
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6">Tell Your Story</h2>
-      <p className="text-gray-600 mb-8">
-        Share your professional background, expertise, and the value you provide to clients.
-      </p>
+    <div className="p-0 animate-fade-up">
+      <div className="mb-12">
+        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Narrative <span className="text-wizard-accent">& Assets</span></h2>
+        <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed">
+          Construct your professional narrative and define the core services of your digital entity.
+        </p>
+      </div>
 
-      <div className="space-y-6">
+      <div className="space-y-12">
         {/* Bio Textarea */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Professional Bio
+        <div className="space-y-4">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 ml-1">
+            Professional Chronicle
           </label>
-          <textarea
-            value={formData.bio}
-            onChange={(e) => updateFormData({ bio: e.target.value })}
-            rows={6}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-            placeholder="Tell us about your experience, qualifications, and what makes you unique..."
-          />
-          <p className="text-sm text-gray-500 mt-1">
-            {formData.bio.length} characters (Recommended: 150-300)
-          </p>
+          <div className="relative group">
+            <textarea
+              value={formData.bio}
+              onChange={(e) => updateFormData({ bio: e.target.value })}
+              rows={6}
+              className="w-full bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all resize-none font-medium leading-relaxed shadow-[0_0_30px_rgba(0,0,0,0.2)] hover:border-white/10"
+              placeholder="Initialize biography stream..."
+            />
+            <div className="absolute top-4 right-6 pointer-events-none opacity-20">
+              <svg className="w-5 h-5 text-wizard-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </div>
+          </div>
+          <div className="flex justify-between px-1">
+            <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest">
+              Standard: 150-300 characters
+            </p>
+            <p className={`text-[9px] uppercase tracking-widest font-black ${formData.bio.length > 300 ? 'text-red-500' : 'text-wizard-accent opacity-60'}`}>
+              {formData.bio.length} characters
+            </p>
+          </div>
         </div>
 
         {/* Mission Statement */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Mission Statement
+        <div className="space-y-4">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 ml-1">
+            Prime Directive
           </label>
-          <textarea
-            value={formData.missionStatement}
-            onChange={(e) => updateFormData({ missionStatement: e.target.value })}
-            rows={3}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-            placeholder="What drives your work? What's your commitment to clients?"
-          />
-          <p className="text-sm text-gray-500 mt-1">
-            Your professional mission or philosophy
+          <div className="relative">
+            <textarea
+              value={formData.missionStatement}
+              onChange={(e) => updateFormData({ missionStatement: e.target.value })}
+              rows={3}
+              className="w-full bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all resize-none font-medium shadow-[0_0_30px_rgba(0,0,0,0.2)] hover:border-white/10"
+              placeholder="Declare your core mission..."
+            />
+          </div>
+          <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest ml-1">
+            Structural philosophy of your enterprise
           </p>
         </div>
 
         {/* Services Section */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Services You Offer
+        <div className="space-y-6">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 ml-1">
+            Service Protocols
           </label>
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <input
               type="text"
               value={newService}
               onChange={(e) => setNewService(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addService();
-                }
-              }}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="e.g., Legal Consultation, Tax Planning, etc."
+              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addService())}
+              className="flex-1 bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all shadow-[0_0_30px_rgba(0,0,0,0.2)] hover:border-white/10"
+              placeholder="e.g. STRATEGIC CONSULTATION"
             />
             <button
               onClick={addService}
               type="button"
-              className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-10 py-5 bg-wizard-accent text-black font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-white hover:scale-105 transition-all shadow-[0_0_20px_rgba(196,240,66,0.2)]"
             >
-              Add
+              Link
             </button>
           </div>
 
-          {/* Services List */}
           {formData.services.length > 0 && (
-            <div className="mt-4 space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {formData.services.map((service, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between bg-gray-100 px-4 py-2 rounded-lg"
+                  className="flex items-center justify-between bg-white/[0.03] border border-white/5 px-6 py-4 rounded-2xl group hover:border-wizard-accent/30 transition-all"
                 >
-                  <span className="text-gray-700">{service}</span>
+                  <span className="text-white text-xs font-black uppercase tracking-tight">{service}</span>
                   <button
                     onClick={() => removeService(index)}
-                    className="text-red-500 hover:text-red-700 font-medium"
+                    className="text-gray-600 hover:text-red-500 transition-colors"
                   >
-                    Remove
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </div>
               ))}
             </div>
           )}
-
-          {formData.services.length === 0 && (
-            <p className="text-sm text-gray-500 mt-2">
-              No services added yet. Add at least one service to help clients understand what you offer.
-            </p>
-          )}
         </div>
 
         {/* Specializations */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Specializations
+        <div className="space-y-6">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 ml-1">
+            Neural Specializations
           </label>
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <input
               type="text"
               value={newSpecialization}
               onChange={(e) => setNewSpecialization(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addSpecialization();
-                }
-              }}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="e.g., Corporate Law, Estate Planning"
+              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSpecialization())}
+              className="flex-1 bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all shadow-[0_0_30px_rgba(0,0,0,0.2)] hover:border-white/10"
+              placeholder="e.g. CORPORATE STRATEGY"
             />
             <button
               onClick={addSpecialization}
               type="button"
-              className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-10 py-5 bg-wizard-accent/10 border border-wizard-accent/30 text-wizard-accent font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-wizard-accent hover:text-black transition-all"
             >
-              Add
+              Inject
             </button>
           </div>
 
           {formData.specializations.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               {formData.specializations.map((spec, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center gap-2 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm"
+                  className="inline-flex items-center gap-3 bg-wizard-accent/5 border border-wizard-accent/20 text-wizard-accent px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest group/item"
                 >
                   {spec}
                   <button
                     onClick={() => removeSpecialization(index)}
-                    className="text-purple-600 hover:text-purple-800 font-bold"
+                    className="text-wizard-accent/40 hover:text-white transition-colors"
                   >
-                    ×
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </span>
               ))}
@@ -206,46 +201,43 @@ export const BioServicesStep = () => {
         </div>
 
         {/* Service Areas */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Service Areas (Geographic)
+        <div className="space-y-6">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 ml-1">
+            Deployment Nodes (Location)
           </label>
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <input
               type="text"
               value={newServiceArea}
               onChange={(e) => setNewServiceArea(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addServiceArea();
-                }
-              }}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="e.g., New York, New Jersey, Connecticut"
+              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addServiceArea())}
+              className="flex-1 bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all shadow-[0_0_30px_rgba(0,0,0,0.2)] hover:border-white/10"
+              placeholder="e.g. GLOBAL, NEW YORK"
             />
             <button
               onClick={addServiceArea}
               type="button"
-              className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-10 py-5 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-white hover:text-black transition-all"
             >
-              Add
+              Deploy
             </button>
           </div>
 
           {formData.serviceAreas.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               {formData.serviceAreas.map((area, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
+                  className="inline-flex items-center gap-3 bg-white/5 border border-white/10 text-gray-400 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest group/item"
                 >
                   {area}
                   <button
                     onClick={() => removeServiceArea(index)}
-                    className="text-green-600 hover:text-green-800 font-bold"
+                    className="text-gray-600 hover:text-white transition-colors"
                   >
-                    ×
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </span>
               ))}
@@ -253,22 +245,7 @@ export const BioServicesStep = () => {
           )}
         </div>
       </div>
-
-      {/* Navigation Buttons */}
-      <div className="mt-8 flex justify-between">
-        <button
-          onClick={handleBack}
-          className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          ← Back
-        </button>
-        <button
-          onClick={handleNext}
-          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Next Step →
-        </button>
-      </div>
     </div>
   );
 };
+

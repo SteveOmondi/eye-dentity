@@ -67,12 +67,7 @@ export interface FormData {
 
   // Step 7: Template Selection
   selectedTemplate: string | null;
-  selectedColorScheme: {
-    name: string;
-    primary: string;
-    secondary: string;
-    accent: string;
-  } | null;
+  colorScheme: string;
 
   // Step 8: Domain Selection
   domain: string;
@@ -132,7 +127,7 @@ const initialFormData: FormData = {
 
   // Template
   selectedTemplate: null,
-  selectedColorScheme: null,
+  colorScheme: 'default',
 
   // Domain
   domain: '',

@@ -59,7 +59,7 @@ IMPORTANT:
  * Start a new chat session
  */
 export async function startChatSession(
-    provider: LLMProvider = 'claude',
+    provider: LLMProvider = 'gemini',
     userId?: string
 ): Promise<ChatSession> {
     const session = await prisma.chatSession.create({
@@ -118,6 +118,10 @@ export async function processMessage(
     sessionId: string,
     userMessage: string
 ): Promise<ChatSession> {
+    console.log('--- processMessage START ---');
+    console.log('SessionID:', sessionId);
+    console.log('UserMessage:', userMessage);
+
     const session = await prisma.chatSession.findUnique({
         where: { id: sessionId },
     });
@@ -126,8 +130,10 @@ export async function processMessage(
         throw new Error('Chat session not found');
     }
 
+    console.log('Session found, parsing messages...');
     const messages: Message[] = JSON.parse(session.messages as string);
     const collectedData: Record<string, any> = JSON.parse(session.collectedData as string);
+    console.log('Messages parsed. Count:', messages.length);
 
     // Add user message
     messages.push({
@@ -144,12 +150,14 @@ Current topic: ${session.currentTopic || 'unknown'}
 Continue the conversation naturally. Extract any new information from the user's response and ask the next relevant question.
 `;
 
+    console.log('Calling sendMessage...');
     const aiResponse = await sendMessage(
         session.provider as LLMProvider,
         messages,
         SYSTEM_PROMPT + '\n\n' + contextPrompt,
         session.userId || undefined
     );
+    console.log('sendMessage returned. Response length:', aiResponse?.length || 0);
 
     const parsedResponse = parseAIResponse(aiResponse);
 

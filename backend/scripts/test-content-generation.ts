@@ -17,7 +17,7 @@ interface TestOptions {
 async function parseArgs(): Promise<TestOptions> {
     const args = process.argv.slice(2);
     const options: TestOptions = {
-        provider: 'claude',
+        provider: 'gemini',
     };
 
     for (let i = 0; i < args.length; i++) {
@@ -119,14 +119,15 @@ async function main() {
     // Check for API keys
     const hasClaudeKey = !!process.env.ANTHROPIC_API_KEY;
     const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
+    const hasGeminiKey = !!process.env.GEMINI_API_KEY;
 
     console.log('API Keys Status:');
     console.log(`  Claude: ${hasClaudeKey ? '✅' : '❌ Missing ANTHROPIC_API_KEY'}`);
     console.log(`  OpenAI: ${hasOpenAIKey ? '✅' : '❌ Missing OPENAI_API_KEY'}`);
-    console.log(`  Gemini: ⚠️  Not yet implemented\n`);
+    console.log(`  Gemini: ${hasGeminiKey ? '✅' : '❌ Missing GEMINI_API_KEY'}\n`);
 
-    if (!hasClaudeKey && !hasOpenAIKey) {
-        console.error('❌ No API keys found. Please set ANTHROPIC_API_KEY or OPENAI_API_KEY in your .env file');
+    if (!hasClaudeKey && !hasOpenAIKey && !hasGeminiKey) {
+        console.error('❌ No API keys found. Please set ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY in your .env file');
         process.exit(1);
     }
 

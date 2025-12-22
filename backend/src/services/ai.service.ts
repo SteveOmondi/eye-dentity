@@ -1,14 +1,28 @@
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize AI clients
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
-});
+// Helper to get Anthropic client
+const getAnthropicClient = () => {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not configured');
+  return new Anthropic({ apiKey });
+};
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
-});
+// Helper to get OpenAI client
+const getOpenAIClient = () => {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error('OPENAI_API_KEY is not configured');
+  return new OpenAI({ apiKey });
+};
+
+// Helper to get Gemini client
+const getGeminiClient = () => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
+  return new GoogleGenerativeAI(apiKey);
+};
 
 export interface ProfileData {
   name: string;
@@ -60,7 +74,7 @@ export const generateContentWithClaude = async (
   const prompt = buildContentGenerationPrompt(profileData);
 
   try {
-    const message = await anthropic.messages.create({
+    const message = await getAnthropicClient().messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 4096,
       messages: [
@@ -93,7 +107,7 @@ export const generateContentWithOpenAI = async (
   const prompt = buildContentGenerationPrompt(profileData);
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAIClient().chat.completions.create({
       model: 'gpt-4',
       messages: [
         {
@@ -120,15 +134,38 @@ export const generateContentWithOpenAI = async (
 };
 
 /**
+ * Generate website content using Gemini
+ */
+export const generateContentWithGemini = async (
+  profileData: ProfileData
+): Promise<GeneratedContent> => {
+  const prompt = buildContentGenerationPrompt(profileData);
+
+  try {
+    const model = getGeminiClient().getGenerativeModel({ model: 'gemini-1.5-pro' });
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
+
+    const content = parseGeneratedContent(responseText);
+    return content;
+  } catch (error) {
+    console.error('Gemini content generation error:', error);
+    throw new Error('Failed to generate content with Gemini');
+  }
+};
+
+/**
  * Main content generation function
  * Uses Claude by default, falls back to OpenAI if Claude fails
  */
 export const generateWebsiteContent = async (
   profileData: ProfileData,
-  preferredProvider: 'claude' | 'openai' = 'claude'
+  preferredProvider: 'claude' | 'openai' | 'gemini' = 'gemini'
 ): Promise<GeneratedContent> => {
   try {
-    if (preferredProvider === 'claude') {
+    if (preferredProvider === 'gemini') {
+      return await generateContentWithGemini(profileData);
+    } else if (preferredProvider === 'claude') {
       return await generateContentWithClaude(profileData);
     } else {
       return await generateContentWithOpenAI(profileData);
@@ -136,16 +173,34 @@ export const generateWebsiteContent = async (
   } catch (error) {
     console.error(`Primary provider (${preferredProvider}) failed, trying fallback...`);
 
-    // Fallback to alternative provider
+    // Fallback logic
     try {
-      if (preferredProvider === 'claude') {
-        return await generateContentWithOpenAI(profileData);
-      } else {
+      if (preferredProvider === 'gemini') {
+        // Fallback for Gemini: try Claude
         return await generateContentWithClaude(profileData);
+      } else if (preferredProvider === 'claude') {
+        // Fallback for Claude: try Gemini
+        return await generateContentWithGemini(profileData);
+      } else {
+        // Fallback for OpenAI: try Gemini
+        return await generateContentWithGemini(profileData);
       }
     } catch (fallbackError) {
-      console.error('Both AI providers failed:', fallbackError);
-      throw new Error('Failed to generate website content with all providers');
+      console.error('Fallback AI provider failed, trying final alternative...');
+
+      try {
+        // Last resort
+        if (preferredProvider !== 'openai' && preferredProvider !== 'claude') {
+          return await generateContentWithOpenAI(profileData);
+        } else if (preferredProvider === 'openai') {
+          return await generateContentWithClaude(profileData);
+        } else {
+          return await generateContentWithOpenAI(profileData);
+        }
+      } catch (finalError) {
+        console.error('All AI providers failed:', finalError);
+        throw new Error('Failed to generate website content with all providers');
+      }
     }
   }
 };

@@ -42,7 +42,7 @@ export class TemplateRendererService {
     private templatesPath: string;
 
     constructor() {
-        this.templatesPath = path.join(__dirname, '../../templates');
+        this.templatesPath = path.join(__dirname, '../../../templates');
     }
 
     /**
@@ -116,17 +116,19 @@ export class TemplateRendererService {
      * Apply color scheme to CSS
      */
     private applyColorScheme(css: string, colors: ColorScheme): string {
-        let styledCSS = css;
-
-        // Replace CSS variables
-        styledCSS = styledCSS.replace(/--color-primary/g, colors.primary);
-        styledCSS = styledCSS.replace(/--color-secondary/g, colors.secondary);
-        styledCSS = styledCSS.replace(/--color-accent/g, colors.accent);
-        styledCSS = styledCSS.replace(/--color-background/g, colors.background);
-        styledCSS = styledCSS.replace(/--color-text/g, colors.text);
-        styledCSS = styledCSS.replace(/--color-text-light/g, colors.textLight);
-
-        return styledCSS;
+        // Create a :root block to override the default variables
+        const rootOverride = `
+:root {
+    --color-primary: ${colors.primary};
+    --color-secondary: ${colors.secondary};
+    --color-accent: ${colors.accent};
+    --color-background: ${colors.background};
+    --color-text: ${colors.text};
+    --color-text-light: ${colors.textLight};
+}
+`;
+        // Prepend the override to the CSS
+        return rootOverride + css;
     }
 
     /**
@@ -174,7 +176,33 @@ export class TemplateRendererService {
         injectedHTML = injectedHTML.replace(/\{\{contact\.content\}\}/g, this.formatParagraphs(content.contact.content));
         injectedHTML = injectedHTML.replace(/\{\{contact\.cta\}\}/g, content.contact.cta);
 
+        // Process conditionals
+        injectedHTML = this.processConditionals(injectedHTML, profileData);
+
         return injectedHTML;
+    }
+
+    /**
+     * Process conditional blocks {{#if var}}...{{else}}...{{/if}}
+     */
+    private processConditionals(html: string, data: any): string {
+        let processed = html;
+
+        // Regex to match {{#if key}}...{{/if}} blocks, handling optional {{else}}
+        // Captures: 1=key, 2=trueContent, 3=elseBlock (optional), 4=falseContent (optional)
+        const regex = /\{\{#if\s+(\w+)\}\}([\s\S]*?)(\{\{else\}\}([\s\S]*?))?\{\{\/if\}\}/g;
+
+        processed = processed.replace(regex, (match, key, trueContent, elseBlock, falseContent) => {
+            const value = data[key];
+
+            if (value) {
+                return trueContent;
+            } else {
+                return falseContent || '';
+            }
+        });
+
+        return processed;
     }
 
     /**

@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+import { apiClient } from './client';
 
 export interface CreateCheckoutRequest {
   domain: string;
@@ -58,16 +56,7 @@ export const paymentApi = {
    * Create a Stripe checkout session
    */
   createCheckoutSession: async (data: CreateCheckoutRequest): Promise<CheckoutSessionResponse> => {
-    const token = localStorage.getItem('token');
-    const response = await axios.post(
-      `${API_BASE_URL}/payments/checkout`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await apiClient.post('/payments/checkout', data);
     return response.data;
   },
 
@@ -75,15 +64,7 @@ export const paymentApi = {
    * Get checkout session details
    */
   getCheckoutSession: async (sessionId: string): Promise<CheckoutSession> => {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(
-      `${API_BASE_URL}/payments/session/${sessionId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await apiClient.get(`/payments/session/${sessionId}`);
     return response.data;
   },
 
@@ -91,15 +72,7 @@ export const paymentApi = {
    * Get order by ID
    */
   getOrder: async (orderId: string): Promise<{ order: Order }> => {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(
-      `${API_BASE_URL}/payments/orders/${orderId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await apiClient.get(`/payments/orders/${orderId}`);
     return response.data;
   },
 
@@ -107,15 +80,7 @@ export const paymentApi = {
    * Get all orders for authenticated user
    */
   getUserOrders: async (): Promise<{ orders: Order[] }> => {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(
-      `${API_BASE_URL}/payments/orders`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await apiClient.get('/payments/orders');
     return response.data;
   },
 };

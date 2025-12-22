@@ -1,6 +1,5 @@
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+import { apiClient } from './client';
+// import axios from 'axios';
 
 export interface DashboardStats {
   totalUsers: number;
@@ -111,12 +110,7 @@ export const adminApi = {
    * Get dashboard statistics
    */
   getDashboardStats: async (): Promise<AdminDashboardData> => {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${API_BASE_URL}/admin/stats`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await apiClient.get('/admin/stats');
     return response.data;
   },
 
@@ -124,12 +118,8 @@ export const adminApi = {
    * Get all users (paginated)
    */
   getUsers: async (page: number = 1, limit: number = 20): Promise<{ users: User[]; pagination: any }> => {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${API_BASE_URL}/admin/users`, {
+    const response = await apiClient.get('/admin/users', {
       params: { page, limit },
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     return response.data;
   },
@@ -138,12 +128,7 @@ export const adminApi = {
    * Get user by ID
    */
   getUserById: async (userId: string): Promise<{ user: User }> => {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${API_BASE_URL}/admin/users/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await apiClient.get(`/admin/users/${userId}`);
     return response.data;
   },
 
@@ -151,16 +136,7 @@ export const adminApi = {
    * Update user role
    */
   updateUserRole: async (userId: string, role: 'USER' | 'ADMIN'): Promise<{ message: string; user: User }> => {
-    const token = localStorage.getItem('token');
-    const response = await axios.put(
-      `${API_BASE_URL}/admin/users/${userId}/role`,
-      { role },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await apiClient.put(`/admin/users/${userId}/role`, { role });
     return response.data;
   },
 
@@ -168,16 +144,10 @@ export const adminApi = {
    * Get all websites (paginated, filterable)
    */
   getWebsites: async (page: number = 1, limit: number = 20, status?: string): Promise<{ websites: Website[]; pagination: any }> => {
-    const token = localStorage.getItem('token');
     const params: any = { page, limit };
     if (status) params.status = status;
 
-    const response = await axios.get(`${API_BASE_URL}/admin/websites`, {
-      params,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await apiClient.get('/admin/websites', { params });
     return response.data;
   },
 
@@ -185,16 +155,10 @@ export const adminApi = {
    * Get all orders (paginated, filterable)
    */
   getOrders: async (page: number = 1, limit: number = 20, status?: string): Promise<{ orders: Order[]; pagination: any }> => {
-    const token = localStorage.getItem('token');
     const params: any = { page, limit };
     if (status) params.status = status;
 
-    const response = await axios.get(`${API_BASE_URL}/admin/orders`, {
-      params,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await apiClient.get('/admin/orders', { params });
     return response.data;
   },
 };

@@ -6,7 +6,7 @@ import {
     deleteApiKey,
     testApiKey,
 } from '../services/api-key.service';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth';
 import type { LLMProvider } from '../services/llm-provider.service';
 
 const router = Router();

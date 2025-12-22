@@ -7,7 +7,7 @@ interface ApiKeySettingsProps {
 }
 
 export const ApiKeySettings = ({ isOpen, onClose }: ApiKeySettingsProps) => {
-    const [provider, setProvider] = useState<'claude' | 'openai' | 'gemini'>('claude');
+    const [provider, setProvider] = useState<'claude' | 'openai' | 'gemini'>('gemini');
     const [apiKey, setApiKey] = useState('');
     const [usePlatformKeys, setUsePlatformKeys] = useState(true);
     const [savedKeys, setSavedKeys] = useState<ApiKeyData[]>([]);
@@ -164,9 +164,9 @@ export const ApiKeySettings = ({ isOpen, onClose }: ApiKeySettingsProps) => {
                                         onChange={(e) => setProvider(e.target.value as any)}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
+                                        <option value="gemini">Gemini (Google)</option>
                                         <option value="claude">Claude (Anthropic)</option>
                                         <option value="openai">OpenAI (GPT-4)</option>
-                                        <option value="gemini">Gemini (Google) - Coming Soon</option>
                                     </select>
                                 </div>
 
@@ -179,7 +179,7 @@ export const ApiKeySettings = ({ isOpen, onClose }: ApiKeySettingsProps) => {
                                         type="password"
                                         value={apiKey}
                                         onChange={(e) => setApiKey(e.target.value)}
-                                        placeholder="sk-ant-... or sk-..."
+                                        placeholder="Enter your API key..."
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
                                     />
                                 </div>
@@ -188,8 +188,8 @@ export const ApiKeySettings = ({ isOpen, onClose }: ApiKeySettingsProps) => {
                                 {testResult && (
                                     <div
                                         className={`px-4 py-3 rounded-lg ${testResult.success
-                                                ? 'bg-green-50 text-green-700 border border-green-200'
-                                                : 'bg-red-50 text-red-700 border border-red-200'
+                                            ? 'bg-green-50 text-green-700 border border-green-200'
+                                            : 'bg-red-50 text-red-700 border border-red-200'
                                             }`}
                                     >
                                         {testResult.success ? '✓' : '✗'} {testResult.message}
@@ -214,7 +214,7 @@ export const ApiKeySettings = ({ isOpen, onClose }: ApiKeySettingsProps) => {
                                     </button>
                                     <button
                                         onClick={handleSaveKey}
-                                        disabled={isLoading || !apiKey.trim() || (testResult && !testResult.success)}
+                                        disabled={isLoading || !apiKey.trim() || (testResult ? !testResult.success : false)}
                                         className="flex-1 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                                     >
                                         {isLoading ? 'Saving...' : 'Save Key'}

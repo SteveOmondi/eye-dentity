@@ -9,11 +9,13 @@
  * - A/B testing variations
  */
 
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
-});
+const getGeminiClient = () => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
+  return new GoogleGenerativeAI(apiKey);
+};
 
 export interface MarketingContentRequest {
   profession: string;
@@ -49,7 +51,7 @@ export interface ContentCalendar {
  * Check if AI service is configured
  */
 export const isAIConfigured = (): boolean => {
-  return !!process.env.ANTHROPIC_API_KEY;
+  return !!process.env.GEMINI_API_KEY;
 };
 
 /**
@@ -65,19 +67,10 @@ export const generateSocialPost = async (
 
   try {
     const prompt = buildPostPrompt(request);
+    const model = getGeminiClient().getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
 
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1024,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    });
-
-    const response = message.content[0].type === 'text' ? message.content[0].text : '';
     return parsePostResponse(response, request.platform);
   } catch (error) {
     console.error('AI post generation error:', error);
@@ -99,19 +92,10 @@ export const generateContentCalendar = async (
 
   try {
     const prompt = buildCalendarPrompt(request, weeks);
+    const model = getGeminiClient().getGenerativeModel({ model: 'gemini-1.5-pro' });
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
 
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 4000,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    });
-
-    const response = message.content[0].type === 'text' ? message.content[0].text : '';
     return parseCalendarResponse(response, weeks);
   } catch (error) {
     console.error('AI calendar generation error:', error);
@@ -139,18 +123,10 @@ Post content: "${postContent}"
 
 Return ONLY the hashtags, one per line, starting with #. Make them specific, relevant, and a mix of popular and niche tags.`;
 
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 500,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    });
+    const model = getGeminiClient().getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
 
-    const response = message.content[0].type === 'text' ? message.content[0].text : '';
     return response
       .split('\n')
       .filter((line) => line.trim().startsWith('#'))
@@ -186,18 +162,10 @@ Each variation should:
 
 Return ONLY the variations, numbered 1-${variations}.`;
 
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1500,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    });
+    const model = getGeminiClient().getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
 
-    const response = message.content[0].type === 'text' ? message.content[0].text : '';
     return response
       .split(/\n\d+\.\s+/)
       .filter((v) => v.trim())
@@ -242,18 +210,10 @@ Generate:
 
 Format as JSON.`;
 
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 800,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    });
+    const model = getGeminiClient().getGenerativeModel({ model: 'gemini-1.5-pro' });
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
 
-    const response = message.content[0].type === 'text' ? message.content[0].text : '';
     return parseAdCopyResponse(response);
   } catch (error) {
     console.error('Ad copy generation error:', error);

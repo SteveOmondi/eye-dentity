@@ -3,8 +3,15 @@
  * Handles AI-powered content generation for websites
  */
 
-import { getCompleteWebsitePrompt, type PromptContext } from '../config/ai-prompts';
-import { LLMProviderService } from './llm-provider.service';
+import {
+    getHomepageHeroPrompt,
+    getAboutPagePrompt,
+    getServicesPagePrompt,
+    getContactPagePrompt,
+    getSEOMetadataPrompt,
+    type PromptContext
+} from '../config/ai-prompts';
+import { sendMessage } from './llm-provider.service';
 
 export interface WebsiteContent {
     homepage: {
@@ -49,22 +56,19 @@ export interface ProfileData {
 }
 
 export class ContentGeneratorService {
-    private llmProvider: LLMProviderService;
-
-    constructor() {
-        this.llmProvider = new LLMProviderService();
-    }
-
     /**
      * Generate complete website content using AI
      */
     async generateWebsiteContent(
         profileData: ProfileData,
-        provider: 'claude' | 'openai' | 'gemini' = 'claude',
+        provider: 'claude' | 'openai' | 'gemini' = 'gemini',
         apiKey?: string
     ): Promise<WebsiteContent> {
         try {
-            // Prepare context for prompt
+            console.log(`Starting parallel content generation for ${profileData.profession} using ${provider}`);
+            const startTime = Date.now();
+
+            // Prepare context
             const context: PromptContext = {
                 name: profileData.name,
                 profession: profileData.profession,
@@ -75,52 +79,39 @@ export class ContentGeneratorService {
                 location: profileData.location,
             };
 
-            // Generate prompt
-            const prompt = getCompleteWebsitePrompt(context);
+            // Generate all sections in parallel
+            const [homepage, about, services, contact, seo] = await Promise.all([
+                this.generateSection(provider, getHomepageHeroPrompt(context), apiKey, 'homepage'),
+                this.generateSection(provider, getAboutPagePrompt(context), apiKey, 'about'),
+                this.generateSection(provider, getServicesPagePrompt(context), apiKey, 'services'),
+                this.generateSection(provider, getContactPagePrompt(context), apiKey, 'contact'),
+                this.generateSection(provider, getSEOMetadataPrompt(context), apiKey, 'seo')
+            ]);
 
-            // Call LLM provider
-            const response = await this.llmProvider.generateContent(prompt, provider, apiKey);
+            const duration = Date.now() - startTime;
+            console.log(`Content generation completed in ${duration}ms`);
 
-            // Parse and validate response
-            const content = this.parseAndValidateContent(response);
-
-            return content;
-        } catch (error) {
-            console.error('Error generating website content:', error);
-            throw new Error('Failed to generate website content');
-        }
-    }
-
-    /**
-     * Parse and validate AI-generated content
-     */
-    private parseAndValidateContent(response: string): WebsiteContent {
-        try {
-            // Try to parse JSON from response
-            const content = JSON.parse(response);
+            // Construct final object
+            const content: WebsiteContent = {
+                homepage,
+                about,
+                services,
+                contact,
+                seo
+            };
 
             // Validate structure
             this.validateContentStructure(content);
 
-            return content as WebsiteContent;
+            return content;
         } catch (error) {
-            console.error('Error parsing AI response:', error);
-
-            // Try to extract JSON from markdown code blocks
-            const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/);
-            if (jsonMatch) {
-                try {
-                    const content = JSON.parse(jsonMatch[1]);
-                    this.validateContentStructure(content);
-                    return content as WebsiteContent;
-                } catch (e) {
-                    // Fall through to error
-                }
-            }
-
-            throw new Error('Invalid content format from AI');
+            console.error('Error generating website content:', error);
+            // Fallback is handled by the caller or we can throw
+            throw new Error('Failed to generate website content');
         }
     }
+
+
 
     /**
      * Validate content structure
@@ -240,6 +231,49 @@ export class ContentGeneratorService {
         }
 
         return baseContent;
+    }
+
+    /**
+     * Helper to generate a single section
+     */
+    private async generateSection(
+        provider: 'claude' | 'openai' | 'gemini',
+        prompt: string,
+        apiKey: string | undefined,
+        sectionName: string
+    ): Promise<any> {
+        try {
+            const messages = [{
+                role: 'user' as const,
+                content: prompt
+            }];
+
+            const response = await sendMessage(provider, messages, `You are a professional website content generator.`, apiKey);
+
+            // Try to parse JSON
+            try {
+                // First try direct parse
+                return JSON.parse(response);
+            } catch (e) {
+                // Try to find JSON in markdown
+                const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/);
+                if (jsonMatch) {
+                    return JSON.parse(jsonMatch[1]);
+                }
+
+                // Try to find JSON object boundaries
+                const start = response.indexOf('{');
+                const end = response.lastIndexOf('}');
+                if (start !== -1 && end !== -1 && end > start) {
+                    return JSON.parse(response.substring(start, end + 1));
+                }
+
+                throw e;
+            }
+        } catch (error) {
+            console.error(`Error generating section ${sectionName}:`, error);
+            throw error;
+        }
     }
 }
 

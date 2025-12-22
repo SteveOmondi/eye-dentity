@@ -7,7 +7,7 @@ import {
     deleteChatSession,
     getUserChatSessions,
 } from '../services/chat.service';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth';
 import type { LLMProvider } from '../services/llm-provider.service';
 
 const router = Router();
@@ -18,7 +18,7 @@ const router = Router();
  */
 router.post('/start', async (req: Request, res: Response) => {
     try {
-        const { provider = 'claude' } = req.body;
+        const { provider = 'gemini' } = req.body;
         const userId = (req as any).user?.id; // Optional: user might not be logged in
 
         const session = await startChatSession(provider as LLMProvider, userId);

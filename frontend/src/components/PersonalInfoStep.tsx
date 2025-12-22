@@ -3,44 +3,9 @@ import { useFormStore } from '../store/formStore';
 import { PROFESSIONS } from '../utils/constants';
 
 export const PersonalInfoStep = () => {
-  const { formData, updateFormData, setCurrentStep } = useFormStore();
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { formData, updateFormData } = useFormStore();
+  const [errors] = useState<Record<string, string>>({});
   const [newLanguage, setNewLanguage] = useState('');
-
-  const validate = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
-    }
-
-    if (!formData.profession) {
-      newErrors.profession = 'Please select a profession';
-    }
-
-    if (!formData.companyName.trim()) {
-      newErrors.companyName = 'Company/Business name is required';
-    }
-
-    if (!formData.tagline.trim()) {
-      newErrors.tagline = 'Professional tagline is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleNext = () => {
-    if (validate()) {
-      setCurrentStep(2);
-    }
-  };
 
   const addLanguage = () => {
     if (newLanguage.trim() && !formData.languages.includes(newLanguage.trim())) {
@@ -58,145 +23,140 @@ export const PersonalInfoStep = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6">Tell Us About Yourself</h2>
-      <p className="text-gray-600 mb-8">
-        Let's start with your professional information to create a stunning website that showcases your expertise.
-      </p>
+    <div className="p-0 animate-fade-up">
+      <div className="mb-12">
+        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Identity <span className="text-wizard-accent">Parameters</span></h2>
+        <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed">
+          Calibrate your core professional data to establish a high-fidelity digital presence.
+        </p>
+      </div>
 
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {/* Name Input */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Full Name *
+        <div className="space-y-3">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
+            Full Identity *
           </label>
           <input
             type="text"
             value={formData.name}
             onChange={(e) => updateFormData({ name: e.target.value })}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.name ? 'border-red-500' : 'border-gray-300'
+            className={`w-full bg-white/[0.02] border px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all ${errors.name ? 'border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-white/5 hover:border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.2)]'
               }`}
-            placeholder="John Doe"
+            placeholder="e.g. MARCUS AURELIUS"
           />
           {errors.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            <p className="text-red-500 text-[10px] font-black uppercase tracking-widest mt-2">{errors.name}</p>
           )}
         </div>
 
         {/* Company Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Company/Business Name *
+        <div className="space-y-3">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
+            Organization *
           </label>
           <input
             type="text"
             value={formData.companyName}
             onChange={(e) => updateFormData({ companyName: e.target.value })}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.companyName ? 'border-red-500' : 'border-gray-300'
+            className={`w-full bg-white/[0.02] border px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all ${errors.companyName ? 'border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-white/5 hover:border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.2)]'
               }`}
-            placeholder="Doe Law Firm"
+            placeholder="e.g. STOIC SOLUTIONS"
           />
           {errors.companyName && (
-            <p className="text-red-500 text-sm mt-1">{errors.companyName}</p>
+            <p className="text-red-500 text-[10px] font-black uppercase tracking-widest mt-2">{errors.companyName}</p>
           )}
         </div>
 
         {/* Professional Tagline */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Professional Tagline *
+        <div className="md:col-span-2 space-y-3">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
+            Core Proposition *
           </label>
           <input
             type="text"
             value={formData.tagline}
             onChange={(e) => updateFormData({ tagline: e.target.value })}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.tagline ? 'border-red-500' : 'border-gray-300'
+            className={`w-full bg-white/[0.02] border px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all ${errors.tagline ? 'border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-white/5 hover:border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.2)]'
               }`}
-            placeholder="Expert Tax Attorney with 15+ Years Experience"
+            placeholder="Expert Attorney with 15+ Years specialized in Intellectual Property"
           />
-          {errors.tagline && (
-            <p className="text-red-500 text-sm mt-1">{errors.tagline}</p>
-          )}
-          <p className="text-sm text-gray-500 mt-1">
-            A compelling one-liner that describes your expertise
-          </p>
+          <div className="flex justify-between items-center px-1">
+            <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest">
+              Brief mission statement of your expertise
+            </p>
+            {errors.tagline && <span className="text-red-500 text-[9px] font-black uppercase tracking-widest">{errors.tagline}</span>}
+          </div>
         </div>
 
         {/* Email Input */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Email Address *
+        <div className="space-y-3">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
+            Comm Link *
           </label>
           <input
             type="email"
             value={formData.email}
             onChange={(e) => updateFormData({ email: e.target.value })}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.email ? 'border-red-500' : 'border-gray-300'
+            className={`w-full bg-white/[0.02] border px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all ${errors.email ? 'border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-white/5 hover:border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.2)]'
               }`}
-            placeholder="john@example.com"
+            placeholder="ARCHITECT@EYE-DENTITY.COM"
           />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-          )}
         </div>
 
         {/* Phone Input */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Phone Number
+        <div className="space-y-3">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
+            Direct Line
           </label>
           <input
             type="tel"
             value={formData.phone}
             onChange={(e) => updateFormData({ phone: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="+1 (555) 123-4567"
+            className="w-full bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all shadow-[0_0_30px_rgba(0,0,0,0.2)]"
+            placeholder="+1 (555) 000-0000"
           />
         </div>
 
         {/* Profession Dropdown */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Profession *
+        <div className="space-y-3">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
+            Sector *
           </label>
-          <select
-            value={formData.profession}
-            onChange={(e) => updateFormData({ profession: e.target.value })}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.profession ? 'border-red-500' : 'border-gray-300'
-              }`}
-          >
-            <option value="">Select your profession</option>
-            <optgroup label="Professional">
-              {PROFESSIONS.filter((p) => p.category === 'professional').map((prof) => (
-                <option key={prof.value} value={prof.value}>
-                  {prof.label}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label="Healthcare">
-              {PROFESSIONS.filter((p) => p.category === 'healthcare').map((prof) => (
-                <option key={prof.value} value={prof.value}>
-                  {prof.label}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label="Creative">
-              {PROFESSIONS.filter((p) => p.category === 'creative').map((prof) => (
-                <option key={prof.value} value={prof.value}>
-                  {prof.label}
-                </option>
-              ))}
-            </optgroup>
-          </select>
-          {errors.profession && (
-            <p className="text-red-500 text-sm mt-1">{errors.profession}</p>
-          )}
+          <div className="relative group">
+            <select
+              value={formData.profession}
+              onChange={(e) => updateFormData({ profession: e.target.value })}
+              className={`w-full bg-[#141414] border px-6 py-5 rounded-2xl text-white appearance-none focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all cursor-pointer ${errors.profession ? 'border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-white/5 hover:border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.2)]'}`}
+            >
+              <option value="" className="bg-[#141414]">IDENTIFY SECTOR</option>
+              <optgroup label="PROFESSIONAL" className="bg-[#141414] text-wizard-accent font-black text-[10px] tracking-widest">
+                {PROFESSIONS.filter((p) => p.category === 'professional').map((prof) => (
+                  <option key={prof.value} value={prof.value} className="bg-[#141414] text-white">
+                    {prof.label.toUpperCase()}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="HEALTHCARE" className="bg-[#141414] text-wizard-accent font-black text-[10px] tracking-widest">
+                {PROFESSIONS.filter((p) => p.category === 'healthcare').map((prof) => (
+                  <option key={prof.value} value={prof.value} className="bg-[#141414] text-white">
+                    {prof.label.toUpperCase()}
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 group-hover:text-wizard-accent transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
         </div>
 
         {/* Years of Experience */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Years of Experience
+        <div className="space-y-3">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
+            Runtime (Years)
           </label>
           <input
             type="number"
@@ -204,34 +164,31 @@ export const PersonalInfoStep = () => {
             max="60"
             value={formData.yearsOfExperience || ''}
             onChange={(e) => updateFormData({ yearsOfExperience: e.target.value ? parseInt(e.target.value) : null })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all shadow-[0_0_30px_rgba(0,0,0,0.2)]"
             placeholder="15"
           />
         </div>
 
         {/* Location */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Location
+        <div className="space-y-3">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
+            Node Location
           </label>
           <input
             type="text"
             value={formData.location}
             onChange={(e) => updateFormData({ location: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="New York, NY"
+            className="w-full bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all shadow-[0_0_30px_rgba(0,0,0,0.2)]"
+            placeholder="e.g. NEW YORK, NY"
           />
-          <p className="text-sm text-gray-500 mt-1">
-            City, State/Country
-          </p>
         </div>
 
         {/* Languages */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Languages Spoken
+        <div className="space-y-3">
+          <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
+            Syntax / Languages
           </label>
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <input
               type="text"
               value={newLanguage}
@@ -242,48 +199,40 @@ export const PersonalInfoStep = () => {
                   addLanguage();
                 }
               }}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="e.g., English, Spanish"
+              className="flex-1 bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all shadow-[0_0_30px_rgba(0,0,0,0.2)]"
+              placeholder="e.g. ENGLISH, SPANISH"
             />
             <button
               onClick={addLanguage}
               type="button"
-              className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-10 py-5 bg-wizard-accent text-black font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-white hover:scale-105 transition-all shadow-[0_0_20px_rgba(196,240,66,0.3)]"
             >
-              Add
+              Sync
             </button>
           </div>
 
           {/* Languages List */}
           {formData.languages.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-6 flex flex-wrap gap-3">
               {formData.languages.map((language, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+                  className="inline-flex items-center gap-3 bg-wizard-accent/5 border border-wizard-accent/20 text-wizard-accent px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest group/item hover:bg-wizard-accent/10 transition-colors"
                 >
                   {language}
                   <button
                     onClick={() => removeLanguage(index)}
-                    className="text-blue-600 hover:text-blue-800 font-bold"
+                    className="text-wizard-accent/40 hover:text-white transition-colors"
                   >
-                    ×
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </span>
               ))}
             </div>
           )}
         </div>
-      </div>
-
-      {/* Navigation Buttons */}
-      <div className="mt-8 flex justify-end">
-        <button
-          onClick={handleNext}
-          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Next Step →
-        </button>
       </div>
     </div>
   );

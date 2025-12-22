@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { chatApi, type Message, type LLMProvider } from '../api/chat';
+import { chatApi, type Message } from '../api/chat';
 import { ChatMessage, TypingIndicator } from './ChatMessage';
 import { useFormStore } from '../store/formStore';
 
@@ -36,7 +36,7 @@ export const ChatProfileBuilder = ({
     useEffect(() => {
         const startChat = async () => {
             try {
-                const session = await chatApi.startChatSession('claude');
+                const session = await chatApi.startChatSession('gemini');
                 setSessionId(session.id);
                 setMessages(session.messages);
                 setProgress(session.progress);
@@ -96,35 +96,45 @@ export const ChatProfileBuilder = ({
     };
 
     return (
-        <div className="flex flex-col h-screen max-h-[800px] bg-white rounded-lg shadow-lg">
+        <div className="flex flex-col h-[75vh] min-h-[600px] glass-card border border-white/5 rounded-[3rem] overflow-hidden relative group animate-fade-up">
+            {/* Background Atmosphere */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-wizard-accent/5 blur-[100px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-60 h-60 bg-wizard-purple/5 blur-[80px] pointer-events-none" />
+
             {/* Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-4 rounded-t-lg">
+            <div className="relative z-10 px-10 py-8 border-b border-white/5 flex flex-col gap-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold">AI Profile Builder</h2>
-                        <p className="text-sm text-purple-100">
-                            Let's have a conversation to build your professional website
-                        </p>
+                    <div className="flex items-center gap-5">
+                        <div className="w-12 h-12 bg-wizard-accent/10 border border-wizard-accent/20 rounded-2xl flex items-center justify-center text-wizard-accent shadow-[0_0_20px_rgba(196,240,66,0.1)]">
+                            <span className="text-xl font-black">E</span>
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-black text-white uppercase tracking-tighter">Neural <span className="text-wizard-accent">Forge</span></h2>
+                            <p className="text-[8px] font-black text-gray-500 uppercase tracking-[0.4em]">Initialize Configuration Protocol</p>
+                        </div>
                     </div>
                     {onSwitchToForm && (
                         <button
                             onClick={onSwitchToForm}
-                            className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
+                            className="px-6 py-2.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 rounded-2xl text-[9px] font-black text-white uppercase tracking-[0.2em] transition-all"
                         >
-                            Switch to Form
+                            Switch to Grid
                         </button>
                     )}
                 </div>
 
                 {/* Progress Bar */}
-                <div className="mt-4">
-                    <div className="flex items-center justify-between text-sm mb-1">
-                        <span>Progress</span>
-                        <span>{progress}% Complete</span>
+                <div className="relative">
+                    <div className="flex items-center justify-between mb-3">
+                        <span className="text-[9px] font-black text-wizard-accent uppercase tracking-[0.3em]">Synapse Sync</span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">{progress}%</span>
+                            <div className="w-1.5 h-1.5 bg-wizard-accent rounded-full animate-pulse shadow-[0_0_10px_rgba(196,240,66,0.8)]" />
+                        </div>
                     </div>
-                    <div className="w-full bg-white/20 rounded-full h-2">
+                    <div className="w-full bg-white/[0.03] border border-white/5 rounded-full h-1.5 overflow-hidden">
                         <div
-                            className="bg-white h-2 rounded-full transition-all duration-500"
+                            className="bg-wizard-accent h-full rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(196,240,66,0.5)]"
                             style={{ width: `${progress}%` }}
                         />
                     </div>
@@ -132,46 +142,71 @@ export const ChatProfileBuilder = ({
             </div>
 
             {/* Messages Container */}
-            <div className="flex-1 overflow-y-auto px-6 py-4 bg-gray-50">
-                {messages.map((message, index) => (
-                    <ChatMessage
-                        key={index}
-                        message={message}
-                        isLatest={index === messages.length - 1}
-                    />
-                ))}
+            <div className="flex-1 overflow-y-auto px-10 py-10 custom-scrollbar relative z-10">
+                {messages.length === 0 && !error && (
+                    <div className="flex flex-col items-center justify-center h-full opacity-30 select-none">
+                        <div className="w-1 bg-wizard-accent/20 h-20 mb-6 rounded-full" />
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.5em]">Awaiting Link Integration</p>
+                    </div>
+                )}
+
+                <div className="space-y-2">
+                    {messages.map((message, index) => (
+                        <ChatMessage
+                            key={index}
+                            message={message}
+                            isLatest={index === messages.length - 1}
+                        />
+                    ))}
+                </div>
 
                 <TypingIndicator show={isTyping} />
 
                 {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-                        <p className="text-sm">{error}</p>
+                    <div className="mt-6 bg-red-500/10 border border-red-500/20 text-red-500 px-8 py-5 rounded-[2rem] text-[9px] font-black uppercase tracking-[0.2em] animate-pulse">
+                        Protocol Breach: {error}
                     </div>
                 )}
 
                 {isComplete && (
-                    <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
-                        <p className="text-sm font-medium">
-                            ✓ Profile information collected! Ready to proceed to template selection.
-                        </p>
+                    <div className="mt-8 bg-wizard-accent/10 border border-wizard-accent/30 text-wizard-accent px-8 py-6 rounded-[2.5rem] flex items-center gap-6 animate-fade-up">
+                        <div className="w-10 h-10 rounded-xl bg-wizard-accent flex items-center justify-center text-black">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] leading-relaxed">
+                                Synaptic Transmission Complete
+                            </p>
+                            <p className="text-[8px] font-bold text-wizard-accent/60 uppercase tracking-widest mt-1">
+                                Identity Forge stabilized. Initializing Branding Matrix.
+                            </p>
+                        </div>
                     </div>
                 )}
 
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Data Preview (Collapsible) */}
+            {/* Data Preview */}
             {Object.keys(collectedData).length > 0 && (
-                <div className="border-t border-gray-200 px-6 py-3 bg-gray-50">
+                <div className="px-10 py-5 border-t border-white/5 bg-white/[0.01] relative z-10 backdrop-blur-md">
                     <details className="group">
-                        <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
-                            📋 Collected Information ({Object.keys(collectedData).length} fields)
+                        <summary className="list-none cursor-pointer flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <span className="w-2 h-2 rounded-full bg-wizard-accent/40" />
+                                <span className="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Collected Datagrams</span>
+                            </div>
+                            <span className="text-[8px] font-black text-wizard-accent border border-wizard-accent/20 px-3 py-1 rounded-lg uppercase tracking-widest group-open:bg-wizard-accent group-open:text-black transition-all">
+                                {Object.keys(collectedData).length} Segments
+                            </span>
                         </summary>
-                        <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                        <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4 animate-fade-up max-h-40 overflow-y-auto custom-scrollbar pr-4">
                             {Object.entries(collectedData).map(([key, value]) => (
-                                <div key={key} className="bg-white px-3 py-2 rounded border border-gray-200">
-                                    <span className="font-medium text-gray-600">{key}:</span>{' '}
-                                    <span className="text-gray-800">
+                                <div key={key} className="bg-white/[0.02] border border-white/5 px-4 py-3 rounded-2xl">
+                                    <span className="text-[7px] font-black text-gray-600 uppercase tracking-[0.2em] block mb-1">{key}</span>
+                                    <span className="text-[10px] font-bold text-gray-300 uppercase tracking-tight line-clamp-2">
                                         {Array.isArray(value) ? value.join(', ') : String(value)}
                                     </span>
                                 </div>
@@ -182,40 +217,34 @@ export const ChatProfileBuilder = ({
             )}
 
             {/* Input Area */}
-            <div className="border-t border-gray-200 px-6 py-4 bg-white rounded-b-lg">
-                <div className="flex gap-2">
+            <div className="px-8 py-8 border-t border-white/5 bg-[#0d0d0d]/40 backdrop-blur-2xl relative z-10">
+                <div className="relative">
                     <textarea
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        placeholder="Type your message..."
+                        placeholder="Uplink transmission content..."
                         disabled={isTyping || isComplete}
-                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"
-                        rows={2}
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] px-8 py-6 text-[13px] text-white placeholder:text-gray-600 focus:outline-none focus:border-wizard-accent/40 focus:bg-wizard-accent/[0.02] transition-all resize-none disabled:opacity-50 disabled:cursor-not-allowed custom-scrollbar"
+                        rows={1}
                     />
-                    <button
-                        onClick={handleSendMessage}
-                        disabled={!inputMessage.trim() || isTyping || isComplete}
-                        className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                        {isTyping ? (
-                            <>
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                Sending...
-                            </>
-                        ) : (
-                            <>
-                                Send
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    <div className="absolute right-4 bottom-4 flex items-center gap-3">
+                        <p className="hidden sm:block text-[8px] font-black text-gray-700 uppercase tracking-[0.2em]">SHIFT+ENTER FOR LINE</p>
+                        <button
+                            onClick={handleSendMessage}
+                            disabled={!inputMessage.trim() || isTyping || isComplete}
+                            className="w-12 h-12 bg-wizard-accent/10 border border-wizard-accent/20 rounded-2xl flex items-center justify-center text-wizard-accent hover:bg-wizard-accent hover:text-black transition-all disabled:opacity-20 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(196,240,66,0.05)]"
+                        >
+                            {isTyping ? (
+                                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                                 </svg>
-                            </>
-                        )}
-                    </button>
+                            )}
+                        </button>
+                    </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                    Press Enter to send, Shift+Enter for new line
-                </p>
             </div>
         </div>
     );

@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarah Johnson - Corporate & Business Litigation Lawyer NYC</title>
+    <meta name="description" content="Professional website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --color-primary: #1e3a8a;
+    --color-secondary: #1e40af;
+    --color-accent: #3b82f6;
+    --color-background: #ffffff;
+    --color-text: #1f2937;
+    --color-text-light: #6b7280;
+}
+/* Professional Template Styles */
+
+/* CSS Variables (will be replaced by color scheme) */
+/* CSS Variables (defaults, overridden by renderer) */
+:root {
+    --color-primary: #2563eb;
+    --color-secondary: #1e40af;
+    --color-accent: #3b82f6;
+    --color-background: #ffffff;
+    --color-text: #1f2937;
+    --color-text-light: #6b7280;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 1s ease-out forwards;
+}
+
+.animate-slide-up {
+    opacity: 0;
+    animation: slideUp 0.8s ease-out forwards;
+}
+
+.animate-scale-in {
+    opacity: 0;
+    animation: scaleIn 0.8s ease-out forwards;
+}
+
+.delay-100 {
+    animation-delay: 0.1s;
+}
+
+.delay-200 {
+    animation-delay: 0.2s;
+}
+
+.delay-300 {
+    animation-delay: 0.3s;
+}
+
+/* Particles Canvas */
+#particles-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--color-text);
+    background-color: var(--color-background);
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Navigation */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.navbar.scrolled {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 20px;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 40px;
+    width: auto;
+}
+
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 500;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--color-primary);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-primary);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.mobile-menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.mobile-menu-toggle span {
+    width: 25px;
+    height: 3px;
+    background-color: var(--color-text);
+    transition: all 0.3s ease;
+}
+
+/* Hero Section */
+.hero {
+    padding: 120px 0 80px;
+    background: linear-gradient(135deg, var(--color-background) 0%, #f3f4f6 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: radial-gradient(circle at center, var(--color-primary) 0%, transparent 70%);
+    opacity: 0.05;
+    z-index: 0;
+}
+
+.hero .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.hero-headline {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+}
+
+.hero-subheadline {
+    font-size: 1.5rem;
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.hero-introduction {
+    font-size: 1.125rem;
+    color: var(--color-text-light);
+    margin-bottom: 2rem;
+    line-height: 1.8;
+}
+
+.hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.hero-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-photo {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+/* Sections */
+section {
+    padding: 80px 0;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.section-intro {
+    font-size: 1.125rem;
+    color: var(--color-text-light);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* About Section */
+.about {
+    background-color: white;
+}
+
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 1.125rem;
+    line-height: 1.8;
+}
+
+.about-content p {
+    margin-bottom: 1.5rem;
+}
+
+/* Services Section */
+.services {
+    background-color: #f9fafb;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.service-card {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.service-card h3 {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.service-card p {
+    color: var(--color-text-light);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.benefits-list {
+    list-style: none;
+    padding: 0;
+}
+
+.benefits-list li {
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+    color: var(--color-text);
+}
+
+.benefits-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--color-primary);
+    font-weight: bold;
+}
+
+/* Contact Section */
+.contact {
+    background-color: white;
+}
+
+.contact-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.contact-info {
+    font-size: 1.125rem;
+    line-height: 1.8;
+}
+
+.contact-info p {
+    margin-bottom: 1.5rem;
+}
+
+.contact-details {
+    margin-top: 2rem;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.contact-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--color-primary);
+}
+
+.contact-item a {
+    color: var(--color-text);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.contact-item a:hover {
+    color: var(--color-primary);
+}
+
+/* Contact Form */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--color-text);
+    color: white;
+    padding: 2rem 0;
+    text-align: center;
+}
+
+.footer-text {
+    margin-bottom: 0.5rem;
+}
+
+.footer-credit {
+    font-size: 0.875rem;
+    opacity: 0.8;
+}
+
+.footer-credit a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-menu {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        flex-direction: column;
+        background-color: white;
+        width: 100%;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: left 0.3s ease;
+    }
+
+    .nav-menu.active {
+        left: 0;
+    }
+
+    .mobile-menu-toggle {
+        display: flex;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .mobile-menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .mobile-menu-toggle.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+    }
+
+    .hero .container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .hero-headline {
+        font-size: 2.5rem;
+    }
+
+    .hero-subheadline {
+        font-size: 1.25rem;
+    }
+
+    .hero-image {
+        order: -1;
+    }
+
+    .contact-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-headline {
+        font-size: 2rem;
+    }
+
+    .hero-cta {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+}</style>
+<meta name="description" content="Sarah Johnson, a New York corporate law attorney, offers 15+ years of expertise in business litigation and legal counsel. Navigate complex legal challenges with an experienced NYC lawyer.">
+<meta name="keywords" content="corporate law New York, business litigation NYC, corporate attorney NY, business lawyer New York, commercial litigation NY, corporate legal counsel, New York lawyer">
+
+    <meta property="og:title" content="Sarah Johnson - Corporate & Business Litigation Lawyer NYC">
+    <meta property="og:description" content="Sarah Johnson, a New York corporate law attorney, offers 15+ years of expertise in business litigation and legal counsel. Navigate complex legal challenges with an experienced NYC lawyer.">
+    <meta property="og:type" content="website">
+    
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                
+                <span class="brand-name">Sarah Johnson</span>
+                
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <canvas id="particles-canvas"></canvas>
+        <div class="container" style="position: relative; z-index: 1;">
+            <div class="hero-content">
+                <h1 class="hero-headline animate-slide-up">Your Strategic Partner for Business Legal Success.</h1>
+                <p class="hero-subheadline animate-slide-up delay-100">Guiding businesses through complex corporate law, litigation, contracts, and M&A with clarity and results.</p>
+                <p class="hero-introduction animate-slide-up delay-200">As Sarah Johnson, I bring over 15 years of focused expertise in corporate law and business litigation. My commitment is to empower your business to confidently navigate complex legal challenges, securing your interests and fostering sustainable growth.</p>
+                <div class="hero-cta animate-slide-up delay-300">
+                    <a href="#contact" class="btn btn-primary">Get Started</a>
+                    <a href="#services" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">About Sarah Johnson</h2>
+            </div>
+            <div class="about-content">
+                <p>My journey into corporate law wasn't a sudden decision, but a gradual realization born from observing the challenges faced by businesses in my community. I saw family friends pour their hearts and souls into building their enterprises, only to encounter daunting legal hurdles that threatened to derail everything. From complex contracts to unforeseen disputes, these issues often left them feeling overwhelmed and vulnerable. It was during these formative years that I understood the profound impact a knowledgeable and empathetic legal advocate could have on a business's survival and success.</p>
+<p>This early exposure fueled my commitment to become that advocate. I didn't just want to practice law; I wanted to empower businesses, to be the steady hand that guides them through intricate legal landscapes, allowing them to focus on what they do best: innovating, growing, and creating opportunities.</p>
+<p>Today, with over 15 years of dedicated experience, I bring a deep understanding of corporate law and business litigation to every client I serve. My practice focuses on providing strategic legal solutions, from structuring complex transactions and drafting robust contracts to expertly representing businesses in high-stakes disputes. I've had the privilege of guiding countless companies, from emerging startups to established corporations, through their most critical legal challenges, always striving for outcomes that protect their interests and propel their growth. My passion stems from this genuine desire to see businesses thrive; there's immense satisfaction in helping an entrepreneur secure a crucial deal or successfully resolving a dispute that allows a company to move forward unburdened.</p>
+<p>What sets me apart isn't just my extensive legal acumen, but my approach. I believe in being a true partner to my clients, taking the time to deeply understand their business objectives, their industry, and their unique challenges. Rather than just offering legal advice, I provide strategic counsel tailored to their commercial realities, anticipating potential issues before they arise and crafting proactive solutions. You'll find a legal advisor who is not only meticulous and tenacious but also genuinely invested in your success, offering clarity and peace of mind in even the most complex situations.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Legal Services</h2>
+                <p class="section-intro">At Sarah Johnson Law, we are dedicated to providing comprehensive and strategic legal solutions tailored to the unique needs of businesses. With a deep understanding of corporate law and commercial litigation, we empower our clients to navigate complex legal landscapes with confidence, ensuring their interests are protected and their objectives achieved. Explore our core services designed to support your business's growth and stability.</p>
+            </div>
+            <div class="services-grid">
+                
+        <div class="service-card">
+          <h3>Corporate Law</h3>
+          <p>Our Corporate Law services provide essential legal guidance for businesses at every stage of their lifecycle. From initial business formation and structuring to ongoing compliance and governance, we ensure your company operates within the legal framework, mitigating risks and fostering sustainable growth.</p>
+          <ul class="benefits-list">
+            <li>**Strategic Business Formation:** Establish a strong legal foundation for your enterprise, choosing the optimal structure (e.g., LLC, Corporation) to minimize liability and optimize operations.</li>
+<li>**Robust Corporate Governance:** Develop and implement effective policies, bylaws, and shareholder agreements that ensure clear decision-making and protect stakeholder interests.</li>
+<li>**Regulatory Compliance:** Navigate complex industry regulations and maintain legal adherence, reducing the risk of penalties and legal disputes.</li>
+<li>**Smooth Daily Operations:** Gain peace of mind knowing your routine legal questions and operational challenges are handled by experienced counsel.</li>
+          </ul>
+        </div>
+      
+
+        <div class="service-card">
+          <h3>Business Litigation</h3>
+          <p>When disputes arise, our Business Litigation services provide strong advocacy and strategic representation to protect your company's interests. We are skilled in resolving complex commercial conflicts, from breach of contract claims to partnership disputes, striving for efficient and favorable outcomes through negotiation, mediation, or courtroom litigation.</p>
+          <ul class="benefits-list">
+            <li>**Aggressive Dispute Resolution:** Benefit from tenacious representation aimed at resolving commercial disputes efficiently and effectively, minimizing disruption to your business.</li>
+<li>**Financial Asset Protection:** Safeguard your company's assets and financial well-being against claims and liabilities through proactive legal strategies.</li>
+<li>**Strategic Legal Advocacy:** Receive expert guidance and a meticulously crafted litigation strategy tailored to the specific nuances of your case, whether in court or through alternative dispute resolution.</li>
+<li>**Minimized Business Interruption:** Our focus is on achieving resolutions that allow you to concentrate on your core business operations, rather than protracted legal battles.</li>
+          </ul>
+        </div>
+      
+
+        <div class="service-card">
+          <h3>Contract Review & Drafting</h3>
+          <p>Contracts are the backbone of every business relationship. Our Contract Review and Drafting services ensure your agreements are clear, legally sound, and strategically advantageous. We meticulously craft and analyze contracts to protect your rights, define obligations, and prevent future disputes, fostering secure and predictable business interactions.</p>
+          <ul class="benefits-list">
+            <li>**Reduced Legal Risk:** Identify and mitigate potential liabilities, ambiguities, and unfavorable clauses before you sign, protecting your interests.</li>
+<li>**Clarity & Enforceability:** Ensure all terms are unambiguous, legally sound, and fully enforceable, preventing misunderstandings and future litigation.</li>
+<li>**Stronger Negotiation Position:** Enter negotiations with confidence, supported by expertly drafted or reviewed contracts that reflect your strategic objectives.</li>
+<li>**Tailored Legal Agreements:** Receive customized contracts, including service agreements, vendor contracts, employment agreements, and non-disclosure agreements, built specifically for your business needs.</li>
+          </ul>
+        </div>
+      
+
+        <div class="service-card">
+          <h3>Mergers & Acquisitions (M&A)</h3>
+          <p>Executing a successful merger, acquisition, or divestiture requires meticulous planning and expert legal navigation. Our M&A services guide you through every phase of these complex transactions, from due diligence and negotiation to closing and integration. We ensure your M&A activities align with your strategic goals while minimizing risks and maximizing value.</p>
+          <ul class="benefits-list">
+            <li>**Strategic Growth Facilitation:** Achieve your expansion goals through expertly managed mergers, acquisitions, and divestitures, opening new markets and capabilities.</li>
+<li>**Comprehensive Due Diligence:** Rigorous legal analysis identifies potential risks, liabilities, and opportunities, providing a clear picture of the transaction.</li>
+<li>**Maximized Deal Value:** Skilled negotiation and structuring ensure favorable terms and optimal value for your investment or sale.</li>
+<li>**Streamlined Transaction Process:** Navigate the intricate M&A landscape with a clear, efficient process, from letter of intent through closing, minimizing delays and complications.</li>
+          </ul>
+        </div>
+      
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Get in Touch</h2>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <p>Navigating legal matters can feel overwhelming, but you don't have to face them alone. I'm Sarah Johnson, and I'm here to provide clear, compassionate legal guidance. Whether you have a specific question or need comprehensive representation, please don't hesitate to reach out.</p>
+<p>The best way to get started is by sending an email to sarah.johnson@lawfirm.com, outlining your situation. For urgent inquiries, you can also call me directly at +1 (555) 123-4567. I personally review all communications and aim to respond within 24-48 business hours. Following your initial contact, we'll schedule a confidential consultation to discuss your needs in detail and explore the best path forward. I look forward to connecting with you in New York, NY.</p>
+                    <div class="contact-details">
+                        
+                        <div class="contact-item">
+                            <svg class="contact-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <a href="mailto:sarah.johnson@lawfirm.com">sarah.johnson@lawfirm.com</a>
+                        </div>
+                        
+                        
+                        <div class="contact-item">
+                            <svg class="contact-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            <a href="tel:+1 (555) 123-4567">+1 (555) 123-4567</a>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="contact-form-wrapper">
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Contact Sarah Johnson</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">&copy; 2024 Sarah Johnson. All rights reserved.</p>
+            <p class="footer-credit">Website powered by <a href="https://eye-dentity.com"
+                    target="_blank">Eye-Dentity</a></p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Mobile menu toggle
+        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+
+        mobileMenuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            mobileMenuToggle.classList.toggle('active');
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    navMenu.classList.remove('active');
+                    mobileMenuToggle.classList.remove('active');
+                }
+            });
+        });
+
+        // Contact form handling
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            // Here you would send the form data to your backend
+            console.log('Form submitted:', data);
+            alert('Thank you for your message! I will get back to you soon.');
+            e.target.reset();
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Particle System
+        class ParticleSystem {
+            constructor() {
+                this.canvas = document.getElementById('particles-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.resize();
+
+                // Config
+                this.particleCount = 60;
+                this.connectionDistance = 150;
+                this.mouseDistance = 200;
+
+                // Mouse state
+                this.mouse = { x: null, y: null };
+
+                this.init();
+                this.animate();
+
+                window.addEventListener('resize', () => this.resize());
+                document.addEventListener('mousemove', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    this.mouse.x = e.clientX - rect.left;
+                    this.mouse.y = e.clientY - rect.top;
+                });
+            }
+
+            resize() {
+                this.canvas.width = this.canvas.parentElement.offsetWidth;
+                this.canvas.height = this.canvas.parentElement.offsetHeight;
+            }
+
+            init() {
+                // Get primary color from CSS var
+                const style = getComputedStyle(document.documentElement);
+                this.color = style.getPropertyValue('--color-primary').trim() || '#2563eb';
+
+                for (let i = 0; i < this.particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        size: Math.random() * 2 + 1
+                    });
+                }
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Update and draw particles
+                this.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // Bounce off walls
+                    if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+
+                    // Draw particle
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fillStyle = this.color;
+                    this.ctx.globalAlpha = 0.5;
+                    this.ctx.fill();
+
+                    // Connect to mouse
+                    if (this.mouse.x) {
+                        const dx = this.mouse.x - p.x;
+                        const dy = this.mouse.y - p.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < this.mouseDistance) {
+                            // Move slightly towards mouse
+                            p.x += dx * 0.01;
+                            p.y += dy * 0.01;
+                        }
+                    }
+                });
+
+                // Connect particles
+                this.particles.forEach((p1, i) => {
+                    for (let j = i + 1; j < this.particles.length; j++) {
+                        const p2 = this.particles[j];
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < this.connectionDistance) {
+                            this.ctx.beginPath();
+                            this.ctx.strokeStyle = this.color;
+                            this.ctx.globalAlpha = 1 - (distance / this.connectionDistance);
+                            this.ctx.lineWidth = 0.5;
+                            this.ctx.moveTo(p1.x, p1.y);
+                            this.ctx.lineTo(p2.x, p2.y);
+                            this.ctx.stroke();
+                        }
+                    }
+                });
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialize particles when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new ParticleSystem();
+        });
+    </script>
+</body>
+
+</html>

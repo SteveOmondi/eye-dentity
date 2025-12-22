@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useFormStore } from '../store/formStore';
-import { hostingApi, HostingPlan } from '../api/hosting';
+import { hostingApi, type HostingPlan } from '../api/hosting';
 import { paymentApi } from '../api/payment';
 import { redirectToCheckout } from '../utils/stripe';
 
@@ -30,30 +30,16 @@ export const OrderSummary = () => {
   };
 
   const calculatePaystackFee = (subtotal: number) => {
-    // Paystack fee: 1.5% + KES 25 for local payments (M-Pesa, Kenyan cards)
-    const feePercentage = 0.015; // 1.5%
-    const fixedFee = 25; // KES 25
+    const feePercentage = 0.015;
+    const fixedFee = 25;
     return Math.round((subtotal * feePercentage + fixedFee) * 100) / 100;
   };
 
   const calculateSubtotal = () => {
     let subtotal = 0;
-
-    // Domain price (first year)
-    if (formData.domainPrice) {
-      subtotal += formData.domainPrice;
-    }
-
-    // Hosting plan (monthly, showing first month)
-    if (selectedPlan) {
-      subtotal += selectedPlan.price;
-    }
-
-    // Email hosting add-on (if applicable)
-    if (formData.emailHosting) {
-      subtotal += 5.99; // Example email hosting price
-    }
-
+    if (formData.domainPrice) subtotal += formData.domainPrice;
+    if (selectedPlan) subtotal += selectedPlan.price;
+    if (formData.emailHosting) subtotal += 5.99;
     return subtotal;
   };
 
@@ -72,13 +58,11 @@ export const OrderSummary = () => {
       setProcessing(true);
       setError('');
 
-      // Validate required data
       if (!formData.domain || !formData.domainPrice || !formData.selectedPlan || !selectedPlan) {
         setError('Missing required order information');
         return;
       }
 
-      // Create checkout session
       const response = await paymentApi.createCheckoutSession({
         domain: formData.domain,
         domainPrice: formData.domainPrice,
@@ -87,7 +71,7 @@ export const OrderSummary = () => {
         emailHosting: formData.emailHosting,
         emailHostingPrice: formData.emailHosting ? 5.99 : 0,
         metadata: {
-          templateId: formData.selectedTemplate,
+          templateId: formData.selectedTemplate || undefined,
           colorScheme: formData.selectedColorScheme,
           profileData: {
             name: formData.name,
@@ -102,14 +86,9 @@ export const OrderSummary = () => {
         },
       });
 
-      // Redirect to Stripe Checkout
       const { error: redirectError } = await redirectToCheckout(response.sessionId);
-
-      if (redirectError) {
-        setError(redirectError);
-      }
+      if (redirectError) setError(redirectError);
     } catch (err: any) {
-      console.error('Payment initiation error:', err);
       setError(err.response?.data?.error || 'Failed to initiate payment. Please try again.');
     } finally {
       setProcessing(false);
@@ -118,261 +97,249 @@ export const OrderSummary = () => {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
+      <div className="flex flex-col items-center justify-center h-[60vh]">
+        <div className="w-12 h-12 border-2 border-wizard-accent border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-[10px] font-black uppercase tracking-widest text-wizard-accent animate-pulse">Generating Summary</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6">Review Your Order</h2>
-      <p className="text-gray-600 mb-8">
-        Review your selections before proceeding to payment
-      </p>
+    <div className="p-0 animate-fade-up">
+      <div className="mb-12">
+        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Final <span className="text-wizard-accent">Calibration</span></h2>
+        <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed">
+          Review your digital configuration before initiating the final deployment sequence.
+        </p>
+      </div>
 
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {error}
+        <div className="mb-10 bg-red-500/10 border border-red-500/20 text-red-500 px-6 py-5 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] animate-pulse">
+          Deployment Error: {error}
         </div>
       )}
 
-      <div className="grid md:grid-cols-3 gap-8">
-        {/* Order Details */}
-        <div className="md:col-span-2 space-y-6">
-          {/* Personal Information */}
-          <div className="bg-white border rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Personal Information
-              </h3>
-              <button
-                onClick={() => handleEdit(1)}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-              >
-                Edit
-              </button>
-            </div>
-            <div className="space-y-2 text-sm">
-              <div>
-                <span className="text-gray-600">Name:</span>{' '}
-                <span className="font-medium">{formData.name}</span>
-              </div>
-              <div>
-                <span className="text-gray-600">Email:</span>{' '}
-                <span className="font-medium">{formData.email}</span>
-              </div>
-              <div>
-                <span className="text-gray-600">Profession:</span>{' '}
-                <span className="font-medium capitalize">{formData.profession.replace(/-/g, ' ')}</span>
-              </div>
-            </div>
-          </div>
+      <div className="grid lg:grid-cols-12 gap-12">
+        {/* Order Details Column */}
+        <div className="lg:col-span-12 xl:col-span-7 space-y-8">
+          {/* Section: Identity */}
+          <div className="glass-card border border-white/5 rounded-[2.5rem] p-10 group hover:border-white/10 transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-wizard-accent/5 blur-[100px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
 
-          {/* Template Selection */}
-          <div className="bg-white border rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Website Template
-              </h3>
-              <button
-                onClick={() => handleEdit(4)}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-              >
-                Edit
-              </button>
+            <div className="flex items-center justify-between mb-10 relative z-10">
+              <div className="flex items-center gap-4">
+                <div className="w-1.5 h-6 bg-wizard-accent rounded-full shadow-[0_0_15px_rgba(196,240,66,0.5)]" />
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Neural Identity</h3>
+              </div>
+              <button onClick={() => handleEdit(1)} className="text-[9px] font-black uppercase tracking-[0.2em] text-wizard-accent/60 hover:text-wizard-accent transition-colors">Reconfigure</button>
             </div>
-            <div className="flex items-center gap-4">
-              {formData.selectedColorScheme && (
-                <div className="flex gap-2">
-                  <div
-                    className="w-8 h-8 rounded"
-                    style={{ backgroundColor: formData.selectedColorScheme.primary }}
-                  />
-                  <div
-                    className="w-8 h-8 rounded"
-                    style={{ backgroundColor: formData.selectedColorScheme.secondary }}
-                  />
-                  <div
-                    className="w-8 h-8 rounded"
-                    style={{ backgroundColor: formData.selectedColorScheme.accent }}
-                  />
+
+            <div className="grid gap-10 relative z-10">
+              <div className="flex items-center gap-8">
+                <div className="w-24 h-24 rounded-3xl bg-white/[0.03] border border-white/5 p-1 relative group/photo">
+                  <div className="absolute inset-0 bg-wizard-accent/10 blur-xl opacity-0 group-hover/photo:opacity-100 transition-opacity" />
+                  <div className="relative w-full h-full rounded-2xl overflow-hidden border border-white/5 bg-black">
+                    {formData.profilePhotoUrl ? (
+                      <img src={formData.profilePhotoUrl} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-wizard-accent/20">
+                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
-              <span className="text-sm font-medium">
-                {formData.selectedColorScheme?.name} Color Scheme
-              </span>
-            </div>
-          </div>
-
-          {/* Domain */}
-          <div className="bg-white border rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Domain Name</h3>
-              <button
-                onClick={() => handleEdit(5)}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-              >
-                Edit
-              </button>
-            </div>
-            <div className="flex items-center gap-2">
-              <svg
-                className="w-5 h-5 text-green-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="font-semibold text-lg">{formData.domain}</span>
-            </div>
-          </div>
-
-          {/* Hosting Plan */}
-          <div className="bg-white border rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Hosting Plan
-              </h3>
-              <button
-                onClick={() => handleEdit(6)}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-              >
-                Edit
-              </button>
-            </div>
-            {selectedPlan && (
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-semibold text-lg">{selectedPlan.name}</span>
-                  <span className="text-lg font-bold text-blue-600">
-                    ${selectedPlan.price.toFixed(2)}/mo
-                  </span>
+                <div>
+                  <p className="text-3xl font-black text-white tracking-tighter uppercase">{formData.name}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent mt-2">{formData.profession.replace(/-/g, ' ')}</p>
                 </div>
-                <ul className="space-y-1 text-sm text-gray-600">
-                  {selectedPlan.features.slice(0, 4).map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                {formData.emailHosting && (
-                  <div className="mt-3 pt-3 border-t">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-700">+ Professional Email Hosting</span>
-                      <span className="font-medium">$5.99/mo</span>
-                    </div>
+              </div>
+
+              <div className="pt-10 border-t border-white/5 grid md:grid-cols-2 gap-10">
+                <div className="space-y-2">
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">Communication Node</p>
+                  <p className="text-sm text-gray-300 font-bold">{formData.email}</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">Direct Uplink</p>
+                  <p className="text-sm text-gray-300 font-bold">{formData.phone}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Design */}
+          <div className="glass-card border border-white/5 rounded-[2.5rem] p-10 group hover:border-white/10 transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-wizard-accent/5 blur-[100px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
+
+            <div className="flex items-center justify-between mb-10 relative z-10">
+              <div className="flex items-center gap-4">
+                <div className="w-1.5 h-6 bg-wizard-accent rounded-full shadow-[0_0_15px_rgba(196,240,66,0.5)]" />
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Visual Matrix</h3>
+              </div>
+              <button onClick={() => handleEdit(4)} className="text-[9px] font-black uppercase tracking-[0.2em] text-wizard-accent/60 hover:text-wizard-accent transition-colors">Recalibrate</button>
+            </div>
+
+            <div className="flex flex-col md:flex-row items-center justify-between gap-10 p-8 bg-white/[0.02] rounded-3xl border border-white/5 relative z-10">
+              <div className="flex items-center gap-8">
+                {formData.selectedColorScheme && (
+                  <div className="flex -space-x-4">
+                    <div className="w-14 h-14 rounded-2xl border-2 border-black rotate-[-12deg] shadow-xl" style={{ backgroundColor: formData.selectedColorScheme.primary }} />
+                    <div className="w-14 h-14 rounded-2xl border-2 border-black rotate-0 shadow-xl" style={{ backgroundColor: formData.selectedColorScheme.secondary }} />
+                    <div className="w-14 h-14 rounded-2xl border-2 border-black rotate-[12deg] shadow-xl" style={{ backgroundColor: formData.selectedColorScheme.accent }} />
                   </div>
                 )}
+                <div className="ml-4">
+                  <p className="text-lg text-white font-black tracking-tighter uppercase">{formData.selectedColorScheme?.name} PALETTE</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent mt-1">Chromatic Harmony Locked</p>
+                </div>
               </div>
-            )}
+              <div className="text-center md:text-right">
+                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-gray-700 mb-2">Base Archetype</p>
+                <p className="text-sm text-gray-300 font-bold uppercase tracking-widest bg-white/[0.05] px-4 py-2 rounded-xl border border-white/10 inline-block">Active Engine v1.02</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Technicals */}
+          <div className="glass-card border border-white/5 rounded-[2.5rem] p-10 group hover:border-white/10 transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-wizard-accent/5 blur-[100px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
+
+            <div className="flex items-center justify-between mb-10 relative z-10">
+              <div className="flex items-center gap-4">
+                <div className="w-1.5 h-6 bg-wizard-accent rounded-full shadow-[0_0_15px_rgba(196,240,66,0.5)]" />
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Neural Core Detail</h3>
+              </div>
+              <button onClick={() => handleEdit(5)} className="text-[9px] font-black uppercase tracking-[0.2em] text-wizard-accent/60 hover:text-wizard-accent transition-colors">Sync</button>
+            </div>
+
+            <div className="space-y-8 relative z-10">
+              <div className="flex items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-3xl group/item hover:bg-wizard-accent/[0.02] hover:border-wizard-accent/20 transition-all">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 rounded-2xl bg-wizard-accent/10 border border-wizard-accent/20 flex items-center justify-center shadow-[0_0_30px_rgba(196,240,66,0.1)] group-hover/item:scale-110 transition-transform">
+                    <svg className="w-8 h-8 text-wizard-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-1.343 3-3s-1.343-3-3-3m0 6c-1.657 0-3-1.343-3-3s1.343-3-3-3m6 0H9" /></svg>
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-white tracking-tighter uppercase">{formData.domain}</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent mt-1">Digital Domain Registry</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-black text-white tracking-tighter">${formData.domainPrice?.toFixed(2)}</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">/ CYCLE</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-3xl group/item hover:bg-wizard-accent/[0.02] hover:border-wizard-accent/20 transition-all">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover/item:scale-110 transition-transform">
+                    <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-white tracking-tighter uppercase">{selectedPlan?.name} NODE</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 mt-1">Processor Performance</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-black text-white tracking-tighter">${selectedPlan?.price.toFixed(2)}</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">/ CYCLE</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Order Total */}
-        <div className="md:col-span-1">
-          <div className="bg-white border rounded-lg p-6 sticky top-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Order Summary
-            </h3>
+        {/* Totals Column */}
+        <div className="lg:col-span-12 xl:col-span-5 relative">
+          <div className="sticky top-0">
+            <div className="absolute -inset-1 bg-gradient-to-b from-wizard-accent/10 to-transparent blur-3xl opacity-30" />
+            <div className="relative glass-card border border-wizard-accent/20 rounded-[3rem] p-12 overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.4)]">
+              {/* Receipt Aesthetic */}
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-wizard-accent/40 to-transparent" />
 
-            <div className="space-y-3 mb-4">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Domain ({formData.domain})</span>
-                <span className="font-medium">
-                  ${formData.domainPrice?.toFixed(2) || '0.00'}/yr
-                </span>
-              </div>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-wizard-accent mb-12 text-center opacity-80">Configuration Receipt</h3>
 
-              {selectedPlan && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">
-                    Hosting ({selectedPlan.name})
-                  </span>
-                  <span className="font-medium">
-                    ${selectedPlan.price.toFixed(2)}/mo
-                  </span>
+              <div className="space-y-8 mb-12">
+                <div className="flex justify-between items-center group/line">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 group-hover/line:text-gray-400 transition-colors">Domain Registry</span>
+                  <div className="h-px flex-1 border-t border-dashed border-white/10 mx-4" />
+                  <span className="text-sm font-black text-white tracking-tighter font-mono">${formData.domainPrice?.toFixed(2)}</span>
                 </div>
-              )}
-
-              {formData.emailHosting && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Email Hosting</span>
-                  <span className="font-medium">$5.99/mo</span>
+                <div className="flex justify-between items-center group/line">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 group-hover/line:text-gray-400 transition-colors">Hosting Engine</span>
+                  <div className="h-px flex-1 border-t border-dashed border-white/10 mx-4" />
+                  <span className="text-sm font-black text-white tracking-tighter font-mono">${selectedPlan?.price.toFixed(2)}</span>
                 </div>
-              )}
-            </div>
-
-            <div className="border-t pt-3 mb-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">
-                  ${calculateSubtotal().toFixed(2)}
-                </span>
+                {formData.emailHosting && (
+                  <div className="flex justify-between items-center group/line">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 group-hover/line:text-gray-400 transition-colors">Neural Email</span>
+                    <div className="h-px flex-1 border-t border-dashed border-white/10 mx-4" />
+                    <span className="text-sm font-black text-white tracking-tighter font-mono">$5.99</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center pt-8 border-t border-white/5 opacity-60">
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-700 italic">Processing Tax / Protocol</span>
+                  <div className="h-px flex-1 border-t border-dashed border-white/5 mx-4" />
+                  <span className="text-xs font-black text-gray-500 font-mono">${calculatePaystackFee(calculateSubtotal()).toFixed(2)}</span>
+                </div>
               </div>
-              <div className="flex justify-between text-sm mt-2">
-                <span className="text-gray-600 flex items-center gap-1">
-                  Payment Processing Fee
-                  <span className="text-xs text-gray-400">(M-Pesa/Cards)</span>
-                </span>
-                <span className="font-medium text-gray-700">
-                  ${calculatePaystackFee(calculateSubtotal()).toFixed(2)}
-                </span>
+
+              <div className="mb-12 p-8 bg-white/[0.03] border border-white/5 rounded-[2rem] relative overflow-hidden group/total">
+                <div className="absolute -inset-1 bg-gradient-to-r from-wizard-accent/5 via-transparent to-transparent opacity-0 group-hover/total:opacity-100 transition-opacity duration-1000" />
+                <div className="relative z-10">
+                  <div className="flex justify-between items-baseline mb-2">
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">Total Credits</span>
+                    <div className="h-px flex-1 border-t border-dashed border-white/10 mx-6 opacity-30" />
+                    <span className="text-wizard-accent text-[9px] font-black uppercase tracking-[0.2em]">Ready</span>
+                  </div>
+                  <div className="text-center mt-6">
+                    <p className="text-7xl font-black text-white tracking-tighter leading-none font-mono relative">
+                      <span className="text-2xl align-top mr-1 opacity-40 text-wizard-accent">$</span>{calculateTotal().toFixed(2)}
+                      <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-32 h-1 bg-wizard-accent/20 blur-md rounded-full" />
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div className="border-t pt-4 mb-6">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold">Total Due Today</span>
-                <span className="text-2xl font-bold text-blue-600">
-                  ${calculateTotal().toFixed(2)}
-                </span>
+              <div className="space-y-6">
+                <button
+                  onClick={handleProceedToPayment}
+                  disabled={processing}
+                  className="w-full relative group/btn overflow-hidden bg-wizard-accent hover:bg-white text-black font-black uppercase text-[11px] tracking-[0.4em] py-7 rounded-[1.5rem] transition-all shadow-[0_30px_60px_rgba(196,240,66,0.2)] disabled:opacity-50"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
+                  <div className="relative z-10 flex items-center justify-center gap-4">
+                    {processing ? (
+                      <div className="w-6 h-6 border-3 border-black border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <span>Initiate Deployment</span>
+                        <svg className="w-5 h-5 group-hover/btn:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                      </>
+                    )}
+                  </div>
+                </button>
+
+                <div className="text-center">
+                  <p className="text-[9px] text-gray-700 font-black uppercase tracking-[0.4em] leading-relaxed animate-pulse">
+                    Awaiting Manual Authorization Sequence
+                  </p>
+                </div>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Domain billed annually. Hosting billed monthly. Payment processing fee included.
-              </p>
-            </div>
 
-            <button
-              onClick={handleProceedToPayment}
-              disabled={processing}
-              className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors mb-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {processing ? (
-                <>
-                  <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Processing...</span>
-                </>
-              ) : (
-                'Proceed to Payment'
-              )}
-            </button>
-
-            <button
-              onClick={() => setCurrentStep(6)}
-              className="w-full py-2 text-gray-600 hover:text-gray-900 text-sm font-medium"
-            >
-              ← Go Back
-            </button>
-
-            <div className="mt-6 pt-6 border-t">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                </svg>
-                <span>Secure payment powered by Paystack</span>
-              </div>
-              <div className="mt-2 text-xs text-gray-500">
-                <span>💳 Cards • 📱 M-Pesa • 🏦 Bank Transfer</span>
+              <div className="mt-14 pt-10 border-t border-white/5">
+                <div className="flex flex-col items-center gap-8">
+                  <div className="flex items-center gap-3 px-6 py-3 bg-white/[0.03] rounded-full border border-white/5 group/secure hover:border-wizard-accent/30 transition-colors">
+                    <svg className="w-5 h-5 text-wizard-accent opacity-60 group-hover/secure:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 group-hover/secure:text-gray-300 transition-colors">Encoded by Paystack Secure-Link</span>
+                  </div>
+                  <div className="flex gap-6 opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" className="h-6" alt="M-Pesa" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" className="h-4 self-center" alt="Visa" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" className="h-6" alt="MasterCard" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -381,3 +348,4 @@ export const OrderSummary = () => {
     </div>
   );
 };
+
