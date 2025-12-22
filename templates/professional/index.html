@@ -41,10 +41,10 @@
         <canvas id="particles-canvas"></canvas>
         <div class="container" style="position: relative; z-index: 1;">
             <div class="hero-content">
-                <h1 class="hero-headline animate-slide-up">{{homepage.headline}}</h1>
-                <p class="hero-subheadline animate-slide-up delay-100">{{homepage.subheadline}}</p>
-                <p class="hero-introduction animate-slide-up delay-200">{{homepage.introduction}}</p>
-                <div class="hero-cta animate-slide-up delay-300">
+                <h1 class="hero-headline {{anim.hero_headline}}">{{homepage.headline}}</h1>
+                <p class="hero-subheadline {{anim.hero_text}} delay-100">{{homepage.subheadline}}</p>
+                <p class="hero-introduction {{anim.hero_text}} delay-200">{{homepage.introduction}}</p>
+                <div class="hero-cta {{anim.hero_cta}} delay-300">
                     <a href="#contact" class="btn btn-primary">Get Started</a>
                     <a href="#services" class="btn btn-secondary">Learn More</a>
                 </div>

@@ -130,20 +130,19 @@ export const PersonalInfoStep = () => {
               className={`w-full bg-[#141414] border px-6 py-5 rounded-2xl text-white appearance-none focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all cursor-pointer ${errors.profession ? 'border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-white/5 hover:border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.2)]'}`}
             >
               <option value="" className="bg-[#141414]">IDENTIFY SECTOR</option>
-              <optgroup label="PROFESSIONAL" className="bg-[#141414] text-wizard-accent font-black text-[10px] tracking-widest">
-                {PROFESSIONS.filter((p) => p.category === 'professional').map((prof) => (
-                  <option key={prof.value} value={prof.value} className="bg-[#141414] text-white">
-                    {prof.label.toUpperCase()}
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label="HEALTHCARE" className="bg-[#141414] text-wizard-accent font-black text-[10px] tracking-widest">
-                {PROFESSIONS.filter((p) => p.category === 'healthcare').map((prof) => (
-                  <option key={prof.value} value={prof.value} className="bg-[#141414] text-white">
-                    {prof.label.toUpperCase()}
-                  </option>
-                ))}
-              </optgroup>
+              {Array.from(new Set(PROFESSIONS.map(p => p.category))).map(category => (
+                <optgroup
+                  key={category}
+                  label={category.toUpperCase().replace('-', ' & ')}
+                  className="bg-[#141414] text-wizard-accent font-black text-[10px] tracking-widest"
+                >
+                  {PROFESSIONS.filter(p => p.category === category).map((prof) => (
+                    <option key={prof.value} value={prof.value} className="bg-[#141414] text-white">
+                      {prof.label.toUpperCase()}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
             </select>
             <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 group-hover:text-wizard-accent transition-colors">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

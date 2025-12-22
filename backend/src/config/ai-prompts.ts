@@ -4,20 +4,20 @@
  */
 
 export interface PromptContext {
-    name: string;
-    profession: string;
-    bio?: string;
-    services?: string[];
-    phone?: string;
-    email?: string;
-    location?: string;
+  name: string;
+  profession: string;
+  bio?: string;
+  services?: string[];
+  phone?: string;
+  email?: string;
+  location?: string;
 }
 
 /**
  * Homepage Hero Section Prompt
  */
 export const getHomepageHeroPrompt = (context: PromptContext): string => {
-    return `You are a professional copywriter creating website content for a ${context.profession}.
+  return `You are a professional copywriter creating website content for a ${context.profession}.
 
 Name: ${context.name}
 Profession: ${context.profession}
@@ -48,7 +48,7 @@ Return ONLY a JSON object with this structure:
  * About Page Prompt
  */
 export const getAboutPagePrompt = (context: PromptContext): string => {
-    return `You are a professional copywriter creating an "About" page for a ${context.profession}.
+  return `You are a professional copywriter creating an "About" page for a ${context.profession}.
 
 Name: ${context.name}
 Profession: ${context.profession}
@@ -78,11 +78,11 @@ Return ONLY a JSON object with this structure:
  * Services Page Prompt
  */
 export const getServicesPagePrompt = (context: PromptContext): string => {
-    const servicesText = context.services && context.services.length > 0
-        ? context.services.join(', ')
-        : 'their professional services';
+  const servicesText = context.services && context.services.length > 0
+    ? context.services.join(', ')
+    : 'their professional services';
 
-    return `You are a professional copywriter creating a "Services" page for a ${context.profession}.
+  return `You are a professional copywriter creating a "Services" page for a ${context.profession}.
 
 Name: ${context.name}
 Profession: ${context.profession}
@@ -119,7 +119,7 @@ Return ONLY a JSON object with this structure:
  * Contact Page Prompt
  */
 export const getContactPagePrompt = (context: PromptContext): string => {
-    return `You are a professional copywriter creating a "Contact" page for a ${context.profession}.
+  return `You are a professional copywriter creating a "Contact" page for a ${context.profession}.
 
 Name: ${context.name}
 Profession: ${context.profession}
@@ -150,7 +150,7 @@ Return ONLY a JSON object with this structure:
  * SEO Metadata Prompt
  */
 export const getSEOMetadataPrompt = (context: PromptContext): string => {
-    return `You are an SEO specialist creating metadata for a ${context.profession}'s website.
+  return `You are an SEO specialist creating metadata for a ${context.profession}'s website.
 
 Name: ${context.name}
 Profession: ${context.profession}
@@ -180,33 +180,83 @@ Return ONLY a JSON object with this structure:
  * Profession-specific prompt modifiers
  */
 export const professionModifiers: Record<string, string> = {
-    lawyer: 'Emphasize expertise, trustworthiness, and results. Use professional, authoritative tone.',
-    doctor: 'Focus on patient care, expertise, and compassionate service. Use reassuring, professional tone.',
-    dentist: 'Highlight patient comfort, modern technology, and quality care. Use friendly, professional tone.',
-    therapist: 'Emphasize empathy, confidentiality, and healing. Use warm, supportive tone.',
-    consultant: 'Focus on results, expertise, and problem-solving. Use confident, professional tone.',
-    designer: 'Showcase creativity, innovation, and unique style. Use creative, inspiring tone.',
-    photographer: 'Highlight artistic vision, experience, and portfolio. Use creative, engaging tone.',
-    developer: 'Emphasize technical expertise, problem-solving, and innovation. Use clear, professional tone.',
-    accountant: 'Focus on accuracy, reliability, and financial expertise. Use trustworthy, professional tone.',
-    realtor: 'Highlight market knowledge, client service, and results. Use friendly, professional tone.',
+  lawyer: 'Emphasize expertise, trustworthiness, and results. Use professional, authoritative tone.',
+  doctor: 'Focus on patient care, expertise, and compassionate service. Use reassuring, professional tone.',
+  dentist: 'Highlight patient comfort, modern technology, and quality care. Use friendly, professional tone.',
+  therapist: 'Emphasize empathy, confidentiality, and healing. Use warm, supportive tone.',
+  consultant: 'Focus on results, expertise, and problem-solving. Use confident, professional tone.',
+  designer: 'Showcase creativity, innovation, and unique style. Use creative, inspiring tone.',
+  photographer: 'Highlight artistic vision, experience, and portfolio. Use creative, engaging tone.',
+  developer: 'Emphasize technical expertise, problem-solving, and innovation. Use clear, professional tone.',
+  accountant: 'Focus on accuracy, reliability, and financial expertise. Use trustworthy, professional tone.',
+  realtor: 'Highlight market knowledge, client service, and results. Use friendly, professional tone.',
+  // New Category Fallbacks
+  creative: 'Showcase portfolio, vision, and unique aesthetic. Use innovative and expressive tone.',
+  media: 'Highlight storytelling, engagement, and audience reach. Use compelling and articulate tone.',
+  arts: 'Emphasize artistic expression, talent, and experience. Use expressive and passionate tone.',
+  education: 'Focus on knowledge sharing, growth, and empowerment. Use instructional and encouraging tone.',
+  technology: 'Highlight innovation, efficiency, and cutting-edge solutions. Use modern and knowledgeable tone.',
+  healthcare: 'Emphasize care, wellbeing, and professional expertise. Use compassionate and trustworthy tone.',
+  trades: 'Focus on reliability, craftsmanship, and quality service. Use practical and dependable tone.',
+  marketing: 'Highlight growth, strategy, and ROI. Use persuasive and dynamic tone.',
 };
 
 /**
  * Get profession-specific modifier
  */
 export const getProfessionModifier = (profession: string): string => {
-    const normalizedProfession = profession.toLowerCase();
-    return professionModifiers[normalizedProfession] || 'Use professional, engaging tone appropriate for the industry.';
+  const normalizedProfession = profession.toLowerCase();
+
+  // Direct match
+  if (professionModifiers[normalizedProfession]) {
+    return professionModifiers[normalizedProfession];
+  }
+
+  // Keyword/Category matching
+  const keywords: Record<string, string> = {
+    'design': 'creative',
+    'art': 'arts',
+    'music': 'arts',
+    'dance': 'arts',
+    'write': 'media',
+    'edit': 'media',
+    'coach': 'professional',
+    'tutor': 'education',
+    'teach': 'education', // Changed 'teacher' to 'teach' for broader match
+    'develop': 'technology',
+    'program': 'technology',
+    'data': 'technology',
+    'cyber': 'technology',
+    'health': 'healthcare',
+    'medic': 'healthcare',
+    'therap': 'healthcare',
+    'plumb': 'trades',
+    'electr': 'trades',
+    'construct': 'trades',
+    'landscap': 'trades',
+    'chef': 'trades',
+    'bak': 'trades',
+    'market': 'marketing',
+    'social': 'marketing',
+    'seo': 'marketing'
+  };
+
+  for (const [keyword, category] of Object.entries(keywords)) {
+    if (normalizedProfession.includes(keyword)) {
+      return professionModifiers[category];
+    }
+  }
+
+  return 'Use professional, engaging tone appropriate for the industry.';
 };
 
 /**
  * Complete website content generation prompt
  */
 export const getCompleteWebsitePrompt = (context: PromptContext): string => {
-    const modifier = getProfessionModifier(context.profession);
+  const modifier = getProfessionModifier(context.profession);
 
-    return `You are a professional web copywriter creating complete website content for a ${context.profession}.
+  return `You are a professional web copywriter creating complete website content for a ${context.profession}.
 
 Client Information:
 - Name: ${context.name}

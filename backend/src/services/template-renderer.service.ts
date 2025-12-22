@@ -31,6 +31,7 @@ export interface RenderOptions {
     colorScheme: string;
     profileData: {
         name: string;
+        profession: string;
         email?: string;
         phone?: string;
         logoUrl?: string;
@@ -93,11 +94,11 @@ export class TemplateRendererService {
             // Get color scheme
             const colors = template.colorSchemes[options.colorScheme] || template.colorSchemes['default'];
 
-            // Apply color scheme to CSS
-            const styledCSS = this.applyColorScheme(template.cssStyles, colors);
+            // Apply theme (colors + animations + images)
+            const { css: styledCSS, html: styledHTML } = this.applyTheme(template.cssStyles, template.htmlStructure, colors, options.profileData.profession);
 
             // Inject content into HTML
-            let html = this.injectContent(template.htmlStructure, options.content, options.profileData);
+            let html = this.injectContent(styledHTML, options.content, options.profileData);
 
             // Inject CSS
             html = html.replace('</head>', `<style>${styledCSS}</style>\n</head>`);
@@ -113,10 +114,39 @@ export class TemplateRendererService {
     }
 
     /**
-     * Apply color scheme to CSS
+     * Apply theme (colors, images, animations) to CSS and HTML
      */
-    private applyColorScheme(css: string, colors: ColorScheme): string {
-        // Create a :root block to override the default variables
+    private applyTheme(css: string, html: string, colors: ColorScheme, profession: string): { css: string, html: string } {
+        // 1. Generate Stock Image URL
+        const stockImage = `url('https://loremflickr.com/1200/800/${encodeURIComponent(profession)},business')`;
+
+        // 2. Select Animation Scheme
+        const animationSchemes = [
+            {
+                name: 'Classic',
+                hero_headline: 'animate-slide-up',
+                hero_text: 'animate-slide-up',
+                hero_cta: 'animate-slide-up'
+            },
+            {
+                name: 'Modern',
+                hero_headline: 'animate-blur-reveal',
+                hero_text: 'animate-blur-reveal',
+                hero_cta: 'animate-blur-reveal'
+            },
+            {
+                name: 'Bold',
+                hero_headline: 'animate-zoom-in',
+                hero_text: 'animate-slide-up', // Mix for readability
+                hero_cta: 'animate-scale-in'
+            }
+        ];
+
+        // Randomly select one
+        const scheme = animationSchemes[Math.floor(Math.random() * animationSchemes.length)];
+        console.log(`Selected Animation Scheme: ${scheme.name}`);
+
+        // 3. CSS Overrides
         const rootOverride = `
 :root {
     --color-primary: ${colors.primary};
@@ -125,10 +155,21 @@ export class TemplateRendererService {
     --color-background: ${colors.background};
     --color-text: ${colors.text};
     --color-text-light: ${colors.textLight};
+    --hero-bg: ${stockImage};
 }
 `;
-        // Prepend the override to the CSS
-        return rootOverride + css;
+        const styledCSS = rootOverride + css;
+
+        // 4. Inject Animations into HTML
+        let styledHTML = html;
+        styledHTML = styledHTML.replace(/\{\{anim\.hero_headline\}\}/g, scheme.hero_headline);
+        styledHTML = styledHTML.replace(/\{\{anim\.hero_text\}\}/g, scheme.hero_text);
+        styledHTML = styledHTML.replace(/\{\{anim\.hero_cta\}\}/g, scheme.hero_cta);
+
+        // Default fallbacks for other placeholders if added later
+        styledHTML = styledHTML.replace(/\{\{anim\.[^}]+\}\}/g, 'animate-fade-in');
+
+        return { css: styledCSS, html: styledHTML };
     }
 
     /**

@@ -27,6 +27,7 @@ async function testRender() {
             colorScheme: 'navy',
             profileData: {
                 name: profile.name,
+                profession: profile.profession,
                 email: profile.email,
                 phone: profile.phone,
             },
