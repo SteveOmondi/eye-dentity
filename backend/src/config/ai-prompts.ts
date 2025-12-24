@@ -318,3 +318,93 @@ Return ONLY a valid JSON object with this structure:
   }
 }`;
 };
+
+/**
+ * Design System Generation Prompt
+ */
+export const getDesignSystemPrompt = (context: PromptContext): string => {
+  return `You are an award-winning Brand Strategist and UI/UX Designer crafting a unique visual identity.
+
+CLIENT PROFILE:
+Name: ${context.name}
+Profession: ${context.profession}
+
+YOUR MISSION:
+Create a design system that is UNMISTAKABLY different from generic templates. Think about:
+1. The emotional response this profession should evoke (trust? excitement? creativity? sophistication?)
+2. The client's likely audience and what appeals to them
+3. Current design trends in this industry while adding unexpected twists
+
+STRATEGIC CONSTRAINTS (Choose from available options):
+Themes: 'classic', 'gradient', 'flat', 'minimal', 'tech'
+Layouts: 'standard', 'split', 'asymmetric'
+Shapes: 'sharp', 'soft', 'pill', 'glass', 'brutalist', 'circle'
+
+CREATIVITY GUIDELINES:
+
+COLOR STRATEGY - Go beyond obvious:
+- Lawyers don't always need navy/gold - consider deep burgundy + cream for a distinguished look
+- DJs don't always need neon - perhaps deep purples with electric cyan accents
+- Bakeries can use rich terracotta + sage green instead of pink pastels
+- Think about UNEXPECTED but premium color combinations
+- Ensure WCAG AAA contrast (7:1 for text, 4.5:1 for large text)
+
+TYPOGRAPHY - Be specific and intentional:
+- Choose real Google Fonts that match the vibe (not just "serif" or "sans-serif")
+- Pair contrasting weights/styles (e.g., bold geometric heading + elegant body)
+- Examples: Playfair Display + Work Sans, Space Grotesk + Inter, Cormorant Garamond + Montserrat
+
+SHAPE LANGUAGE - Create consistency:
+- Match shapes to the profession's personality
+- Financial services → Sharp & trustworthy
+- Creative fields → Soft & approachable  
+- Tech startups → Glass & modern
+- Established brands → Classic or minimal
+
+THEME SELECTION - Break patterns:
+- "Classic" isn't just for lawyers - could work for luxury bakeries
+- "Tech" isn't just for IT - could elevate a modern law firm
+- "Gradient" adds energy to any profession
+- Think about what makes THIS client different from competitors
+
+OUTPUT REQUIREMENTS:
+Return ONLY valid JSON (no markdown, no comments):
+{
+  "theme": "<selected theme>",
+  "layout": "<selected layout>",
+  "colors": {
+    "primary": "#hexcode",
+    "secondary": "#hexcode",
+    "accent": "#hexcode",
+    "background": "#hexcode",
+    "text": "#hexcode"
+  },
+  "fonts": {
+    "heading": "Actual Google Font Name",
+    "body": "Actual Google Font Name",
+    "url": "https://fonts.googleapis.com/css2?family=FontName1:wght@400;700&family=FontName2:wght@300;600&display=swap"
+  },
+  "shapes": {
+    "style": "<selected shape>",
+    "radius": "<CSS value like '0px', '8px', '24px', '50%'>"
+  },
+  "rationale": "One sentence explaining the unique angle for this design"
+}
+
+CONTRAST SAFETY RULES (CRITICAL):
+1. IF background is LIGHT (hex > #888888):
+   - Text color MUST be DARK (e.g., #1a1a1a, #0f172a).
+   - Primary/Accent colors must be dark enough to read against white.
+   - NEVER use white, yellow, or pale cyan text on a light background.
+
+2. IF background is DARK (hex < #888888):
+   - Text color MUST be LIGHT (e.g., #f3f4f6, #e5e5e5).
+   - Primary/Accent colors must be bright enough to pop against dark.
+   - NEVER use black, navy, or dark grey text on a dark background.
+
+3. VISUAL CHECK:
+   - Before outputting, imagine the text color written on top of the background color. Is it instantly readable?
+   - If in doubt, default to strict Black (#000000) on White, or White (#FFFFFF) on Dark.
+
+REMEMBER: Your goal is to surprise with sophistication, not shock with randomness. Every choice should feel intentional and elevated. Visibility is paramount.`;
+};

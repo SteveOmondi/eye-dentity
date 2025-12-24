@@ -14,35 +14,39 @@ async function testRender() {
         for (const profile of profilesToTest) {
             if (!profile) continue;
 
-            console.log(`\n\n--------------------------------------------------`);
-            console.log(`👤 Using Profile: ${profile.name} (${profile.profession})`);
+            // Generate 5 variations per profile
+            for (let i = 0; i < 5; i++) {
 
-            // 2. Generate Content
-            console.log('🤖 Generating Content...');
+                console.log(`\n\n--------------------------------------------------`);
+                console.log(`👤 Using Profile: ${profile.name} (${profile.profession})`);
 
-            const content = await contentGeneratorService.generateWebsiteContent(profile, 'gemini');
+                // 2. Generate Content
+                console.log('🤖 Generating Content...');
 
-            // 3. Render Template
-            console.log('🎨 Rendering Template (Check logs for Design System choices)...');
-            const html = await templateRendererService.renderWebsite({
-                templateId: 'professional',
-                content,
-                colorScheme: 'navy',
-                profileData: {
-                    name: profile.name,
-                    profession: profile.profession,
-                    email: profile.email,
-                    phone: profile.phone,
-                },
-            });
+                const content = await contentGeneratorService.generateWebsiteContent(profile, 'gemini');
 
-            // 4. Save Output
-            const outputDir = path.join(__dirname, '../test-output');
-            await fs.mkdir(outputDir, { recursive: true });
-            const filename = `e2e-render-${profile.profession.toLowerCase().replace(' ', '-')}-${Date.now()}.html`;
-            const filepath = path.join(outputDir, filename);
-            await fs.writeFile(filepath, html, 'utf-8');
-            console.log(`💾 Website saved: ${filename}`);
+                // 3. Render Template
+                console.log('🎨 Rendering Template (Check logs for Design System choices)...');
+                const html = await templateRendererService.renderWebsite({
+                    templateId: 'professional',
+                    content,
+                    colorScheme: 'navy',
+                    profileData: {
+                        name: profile.name,
+                        profession: profile.profession,
+                        email: profile.email,
+                        phone: profile.phone,
+                    },
+                });
+
+                // 4. Save Output
+                const outputDir = path.join(__dirname, '../test-output');
+                await fs.mkdir(outputDir, { recursive: true });
+                const filename = `e2e-render-${profile.profession.toLowerCase().replace(' ', '-')}-${Date.now()}.html`;
+                const filepath = path.join(outputDir, filename);
+                await fs.writeFile(filepath, html, 'utf-8');
+                console.log(`💾 Website saved: ${filename}`);
+            }
         }
 
     } catch (error) {

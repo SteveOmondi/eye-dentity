@@ -132,7 +132,7 @@
 
 body {
     font-family: var(--font-body);
-    container: var(--color-text);
+    color: #1a1a1a;
     background-color: var(--color-background);
     line-height: 1.6;
     font-size: 16px;
@@ -414,8 +414,9 @@ textarea {
     width: 100%;
     max-width: 400px;
     height: auto;
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
 }
 
 /* Buttons */
@@ -736,5 +737,326 @@ section {
 
     .services-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================
+   Modern Theme Engines
+   ========================================= */
+
+/* --- Gradient Theme --- */
+body.theme-gradient {
+    /* Fallback and Mesh Gradient */
+    background-color: var(--color-background);
+    background-image:
+        radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 0.1) 0, transparent 50%),
+        radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 0.1) 0, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 0.1) 0, transparent 50%);
+    background-size: 100% 100%;
+}
+
+/* Stronger mesh for dark gradient theme */
+body.theme-gradient.theme-dark {
+    background: #0f172a;
+    background-image:
+        radial-gradient(at 0% 0%, var(--color-primary) 0, transparent 50%),
+        radial-gradient(at 100% 100%, var(--color-secondary) 0, transparent 50%);
+    background-size: cover;
+}
+
+/* Ensure text contrast on gradient backgrounds */
+body.theme-gradient .service-card {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+body.theme-gradient.theme-dark .service-card {
+    background: rgba(17, 24, 39, 0.8);
+}
+
+/* --- Flat / Pop Theme --- */
+body.theme-flat {
+    --shadow-offset: 4px;
+}
+
+body.theme-flat .btn,
+body.theme-flat .service-card,
+body.theme-flat .hero-image img,
+body.theme-flat .contact-form-wrapper {
+    border: 2px solid var(--color-text);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--color-text);
+    border-radius: 0 !important;
+    /* Force brutalist if missed */
+    transform: translate(calc(var(--shadow-offset) * -0.5), calc(var(--shadow-offset) * -0.5));
+    transition: all 0.2s ease;
+}
+
+body.theme-flat .btn:hover,
+body.theme-flat .service-card:hover {
+    box-shadow: 2px 2px 0px var(--color-text);
+    transform: translate(0, 0);
+}
+
+body.theme-flat .section-title {
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+/* --- Tech / Cyber Theme --- */
+body.theme-tech {
+    background-color: var(--color-background);
+    /* Subtle grid overlay only, no heavy color overrides */
+    background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(56, 189, 248, 0.05) 1px, rgba(56, 189, 248, 0.05) 2px);
+    background-size: 20px 20px;
+}
+
+body.theme-tech .hero-headline,
+body.theme-tech h2,
+body.theme-tech .brand-name {
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.5), 0 0 20px rgba(56, 189, 248, 0.3);
+    color: var(--color-text);
+}
+
+body.theme-tech .btn-primary {
+    background: transparent;
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+body.theme-tech .btn-primary:hover {
+    background: var(--color-primary);
+    color: #000;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+}
+
+/* --- Minimal Theme --- */
+body.theme-minimal .hero {
+    border-bottom: 1px solid var(--color-text-light);
+}
+
+body.theme-minimal .service-card {
+    border: 1px solid #e5e7eb;
+    background: transparent;
+    box-shadow: none;
+}
+
+body.theme-minimal .btn,
+body.theme-minimal .nav-link {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   Shape Engines
+   ========================================= */
+
+/* --- Glassmorphism --- */
+.shape-glass .navbar,
+.shape-glass .service-card,
+.shape-glass .contact-form-wrapper,
+.shape-glass .hero-cta {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+/* Dark mode glass adjustments */
+body.theme-tech.shape-glass .service-card {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(56, 189, 248, 0.2);
+    color: var(--color-text);
+}
+
+/* --- Brutalist / Sharp --- */
+.shape-brutalist .btn,
+.shape-brutalist .card,
+.shape-brutalist img,
+.shape-brutalist .service-card {
+    border-radius: 0px !important;
+}
+
+.shape-brutalist .section-title {
+    letter-spacing: -1px;
+}
+
+/* =========================================
+   AGGRESSIVE LAYOUT RESTRUCTURING
+   ========================================= */
+
+@media (min-width: 900px) {
+
+    /* --- 1. Sidebar Layout (Flat Theme) --- */
+    body.theme-flat {
+        padding-left: 280px;
+        /* Space for sidebar */
+    }
+
+    body.theme-flat .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 4rem 2rem;
+        background: var(--color-background);
+        border-right: 4px solid var(--color-text);
+        z-index: 1000;
+        background-color: var(--color-background);
+        /* Ensure opacity */
+    }
+
+    body.theme-flat .brand-name {
+        margin-bottom: 4rem;
+        font-size: 2rem;
+        border-bottom: 4px solid var(--color-text);
+        width: 100%;
+        padding-bottom: 1rem;
+    }
+
+    body.theme-flat .nav-menu {
+        flex-direction: column;
+        width: 100%;
+        gap: 1.5rem;
+        align-items: flex-start;
+    }
+
+    body.theme-flat .nav-link {
+        font-size: 1.25rem;
+        text-transform: uppercase;
+        font-weight: 800;
+    }
+
+    body.theme-flat .hero {
+        padding: 8rem 4rem;
+        border-bottom: 4px solid var(--color-text);
+    }
+
+    body.theme-flat .footer {
+        padding-left: 2rem;
+    }
+
+    /* --- 2. Z-Pattern Layout (Tech Theme) --- */
+    body.theme-tech .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    body.theme-tech .hero::after {
+        /* Decorative grid line */
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 10%;
+        width: 1px;
+        height: 100%;
+        background: rgba(56, 189, 248, 0.2);
+    }
+
+    body.theme-tech .container {
+        max-width: 1400px;
+        /* Wider for widescreen feel */
+    }
+
+    body.theme-tech .hero-headline {
+        font-size: 4.5rem;
+        line-height: 1;
+        max-width: 800px;
+    }
+
+    /* --- 3. Split-Screen Hero (Minimal Theme) --- */
+    body.theme-minimal .hero .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: end;
+        /* Bottom align text */
+        gap: 4rem;
+        min-height: 80vh;
+        border-bottom: 1px solid var(--color-text);
+        padding-bottom: 4rem;
+        margin-top: 4rem;
+        /* Clear fixed/absolute header if any */
+    }
+
+    body.theme-minimal .hero-content {
+        order: 1;
+        text-align: left;
+    }
+
+    body.theme-minimal .hero-headline {
+        font-size: 5rem;
+        /* Massive typography */
+        line-height: 0.9;
+        margin-bottom: 2rem;
+        font-weight: 300;
+        /* Elegant thin */
+    }
+
+    body.theme-minimal .hero-subheadline {
+        font-size: 1rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 2rem;
+    }
+
+    body.theme-minimal .hero-image {
+        order: 2;
+        height: 80%;
+    }
+
+    body.theme-minimal .navbar {
+        position: absolute;
+        /* Float over hero */
+        width: 100%;
+        background: transparent;
+        padding-top: 1rem;
+    }
+
+    /* --- 4. Card Overlay Layout (Gradient Theme) --- */
+    body.theme-gradient {
+        /* Center content in valid reading area */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    body.theme-gradient .navbar {
+        max-width: 800px;
+        width: 90%;
+        margin: 2rem auto;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        padding: 0.75rem 3rem;
+        justify-content: space-between;
+    }
+
+    body.theme-gradient .hero {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    body.theme-gradient .hero .container {
+        max-width: 1000px;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 4rem;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
     }
 }

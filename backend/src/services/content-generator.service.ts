@@ -9,6 +9,7 @@ import {
     getServicesPagePrompt,
     getContactPagePrompt,
     getSEOMetadataPrompt,
+    getDesignSystemPrompt,
     type PromptContext
 } from '../config/ai-prompts';
 import { sendMessage } from './llm-provider.service';
@@ -108,6 +109,35 @@ export class ContentGeneratorService {
             console.error('Error generating website content:', error);
             // Fallback is handled by the caller or we can throw
             throw new Error('Failed to generate website content');
+        }
+    }
+
+    /**
+     * Generate visual design system using AI
+     */
+    async generateDesignSystem(
+        profileData: ProfileData,
+        provider: 'claude' | 'openai' | 'gemini' = 'gemini',
+        apiKey?: string
+    ): Promise<any> {
+        try {
+            console.log(`🎨 Start AI Design Generation for ${profileData.profession} using ${provider}`);
+            const context: PromptContext = {
+                name: profileData.name,
+                profession: profileData.profession,
+                bio: profileData.bio,
+            };
+
+            const prompt = getDesignSystemPrompt(context);
+
+            // Re-use the generateSection logic which handles parsing
+            const designSystem = await this.generateSection(provider, prompt, apiKey, 'design-system');
+
+            return designSystem;
+        } catch (error) {
+            console.error('Error generating design system:', error);
+            // Return null or undefined, caller should fallback to random
+            return null;
         }
     }
 
