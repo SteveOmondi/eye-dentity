@@ -1,6 +1,6 @@
 import { prisma } from '../lib/prisma';
-import { generateWebsiteContent, ProfileData } from './ai.service';
-import { renderWebsite, ColorScheme } from './template.service';
+import ContentGenerator, { ProfileData } from './content-generator.service';
+import TemplateRenderer from './template-renderer.service';
 import { deployWebsite } from './deployment.service';
 import { sendWebsiteLiveEmail } from './email.service';
 import { sendWebsiteLiveNotification } from './telegram.service';
@@ -50,11 +50,25 @@ export const generateWebsite = async (
     try {
       // 2. Generate content using AI
       console.log('Step 1: Generating AI content...');
-      const generatedContent = await generateWebsiteContent(profileData, 'claude');
+      // Use the profile data directly
+      const extendedProfileData = {
+        ...profileData,
+        logoUrl: profileData.logoUrl,
+        profilePhotoUrl: profileData.profilePhotoUrl
+      };
+
+      const generatedContent = await ContentGenerator.generateWebsiteContent(extendedProfileData, 'claude');
       console.log('AI content generated successfully');
 
-      // 3. Fetch template from database
-      console.log('Step 2: Fetching template...');
+      // 2.5 Generate Design System
+      console.log('Step 1.5: Generating Design System...');
+      const designSystem = await ContentGenerator.generateDesignSystem(extendedProfileData, 'claude');
+      console.log('Design System generated:', designSystem?.rationale);
+
+      // 3. (Template selection is handled via ID, but we use Renderer Service now)
+      // We don't need to fetch from DB for structure if Renderer loads from FS.
+      // But we still check if it exists in DB for validation?
+      // For now, let's trust the ID or the Renderer. But let's verify existence.
       const template = await prisma.template.findUnique({
         where: { id: templateId },
       });
@@ -64,14 +78,14 @@ export const generateWebsite = async (
       }
 
       // 4. Render website by merging content with template
-      console.log('Step 3: Rendering website...');
-      const renderedWebsite = renderWebsite(
-        template.htmlStructure,
-        template.cssStyles,
-        generatedContent,
-        colorScheme,
-        profileData
-      );
+      console.log('Step 3: Rendering website with design system...');
+      const renderedWebsite = await TemplateRenderer.renderWebsite({
+        templateId,
+        content: generatedContent,
+        colorScheme: typeof colorScheme === 'string' ? colorScheme : 'default', // Map logic
+        profileData: extendedProfileData,
+        designSystem: designSystem || undefined
+      });
 
       // 5. Save website files to disk
       console.log('Step 4: Saving website files...');
@@ -192,13 +206,11 @@ async function saveWebsiteFiles(
   );
 
   // Create assets directory if there are assets
-  if (renderedWebsite.assets && (renderedWebsite.assets.logo || renderedWebsite.assets.profilePhoto)) {
-    const assetsDir = path.join(websiteDir, 'assets');
-    await fs.mkdir(assetsDir, { recursive: true });
-
-    // Note: In production, you would copy actual image files here
-    // For now, we're using URLs from the uploads directory
-  }
+  // Note: RenderedWebsite from TemplateRenderer doesn't currently return assets object like the old one,
+  // but we can assume we might need to handle logo/photo copying if we were doing that.
+  // The old code checked renderedWebsite.assets.
+  const assetsDir = path.join(websiteDir, 'assets');
+  await fs.mkdir(assetsDir, { recursive: true });
 
   console.log(`Website files saved to: ${websiteDir}`);
   return websiteDir;

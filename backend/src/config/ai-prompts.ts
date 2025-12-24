@@ -11,6 +11,8 @@ export interface PromptContext {
   phone?: string;
   email?: string;
   location?: string;
+  logoUrl?: string; // [NEW] Context for design
+  profilePhotoUrl?: string; // [NEW] Context for design
 }
 
 /**
@@ -328,6 +330,8 @@ export const getDesignSystemPrompt = (context: PromptContext): string => {
 CLIENT PROFILE:
 Name: ${context.name}
 Profession: ${context.profession}
+${context.logoUrl ? 'Has Logo: Yes (Consider matching brand colors if implied)' : 'Has Logo: No'}
+${context.profilePhotoUrl ? 'Has Profile Photo: Yes (Consider a layout that showcases the personal brand)' : 'Has Profile Photo: No'}
 
 YOUR MISSION:
 Create a design system that is UNMISTAKABLY different from generic templates. Think about:

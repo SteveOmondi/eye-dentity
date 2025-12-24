@@ -54,6 +54,8 @@ export interface ProfileData {
     phone?: string;
     email?: string;
     location?: string;
+    logoUrl?: string; // [NEW]
+    profilePhotoUrl?: string; // [NEW]
 }
 
 export class ContentGeneratorService {
@@ -126,6 +128,8 @@ export class ContentGeneratorService {
                 name: profileData.name,
                 profession: profileData.profession,
                 bio: profileData.bio,
+                logoUrl: profileData.logoUrl,
+                profilePhotoUrl: profileData.profilePhotoUrl,
             };
 
             const prompt = getDesignSystemPrompt(context);

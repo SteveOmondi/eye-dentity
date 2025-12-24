@@ -109,7 +109,10 @@ export class TemplateRendererService {
     /**
      * Render complete website from template and content
      */
-    async renderWebsite(options: RenderOptions): Promise<string> {
+    /**
+     * Render complete website from template and content
+     */
+    async renderWebsite(options: RenderOptions): Promise<{ html: string, css: string }> {
         try {
             // Load template
             const template = await this.loadTemplate(options.templateId);
@@ -137,13 +140,10 @@ export class TemplateRendererService {
             // Inject content into HTML
             let html = this.injectContent(styledHTML, options.content, options.profileData);
 
-            // Inject CSS
-            html = html.replace('</head>', `<style>${styledCSS}</style>\n</head>`);
-
             // Inject SEO metadata
             html = this.injectSEO(html, options.content.seo);
 
-            return html;
+            return { html, css: styledCSS };
         } catch (error) {
             console.error('Error rendering website:', error);
             throw new Error('Failed to render website');
@@ -348,7 +348,7 @@ export class TemplateRendererService {
         // Captures: 1=key, 2=trueContent, 3=elseBlock (optional), 4=falseContent (optional)
         const regex = /\{\{#if\s+(\w+)\}\}([\s\S]*?)(\{\{else\}\}([\s\S]*?))?\{\{\/if\}\}/g;
 
-        processed = processed.replace(regex, (match, key, trueContent, elseBlock, falseContent) => {
+        processed = processed.replace(regex, (_match, key, trueContent, _elseBlock, falseContent) => {
             const value = data[key];
 
             if (value) {
@@ -449,7 +449,7 @@ export class TemplateRendererService {
     /**
      * Generate a random Design System configuration
      */
-    private generateDesignSystem(profession: string): DesignSystem {
+    private generateDesignSystem(_profession: string): DesignSystem {
         const layouts: DesignSystem['layout'][] = ['standard', 'split', 'asymmetric'];
         const themes: DesignSystem['theme'][] = ['classic', 'gradient', 'flat', 'minimal', 'tech'];
 
