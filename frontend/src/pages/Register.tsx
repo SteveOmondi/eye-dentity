@@ -1,10 +1,16 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '../api/auth';
+import { chatApi } from '../api/chat';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { useAuthStore } from '../store/authStore';
+import { useFormStore } from '../store/formStore';
 
 export const Register = () => {
     const navigate = useNavigate();
+    const setAuth = useAuthStore(state => state.setAuth);
+    const { sessionId } = useFormStore();
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -32,14 +38,26 @@ export const Register = () => {
                 password: formData.password,
             });
 
-            // Store token
-            localStorage.setItem('token', response.token);
-            if (response.user) {
-                localStorage.setItem('user', JSON.stringify(response.user));
+            // Store in auth store
+            setAuth(response.user, response.token);
+
+            // Claim chat session if exists
+            if (sessionId) {
+                try {
+                    await chatApi.claimChatSession(sessionId);
+                } catch (chatErr) {
+                    console.error('Failed to claim session:', chatErr);
+                }
             }
 
-            // Redirect to admin dashboard
-            navigate('/admin');
+            // Redirect back to builder or admin
+            const fromBuilder = localStorage.getItem('was_in_builder');
+            if (fromBuilder === 'true') {
+                localStorage.removeItem('was_in_builder');
+                navigate('/builder');
+            } else {
+                navigate('/admin');
+            }
         } catch (err: any) {
             setError(err.response?.data?.error || 'Registration failed. Please try again.');
             console.error('Registration error:', err);
@@ -81,10 +99,10 @@ export const Register = () => {
                             </svg>
                         </div>
                         <h2 className="text-4xl font-black tracking-tighter text-white mb-3 uppercase">
-                            Birth <span className="text-wizard-purple">Identity</span>
+                            Create <span className="text-wizard-purple">Account</span>
                         </h2>
                         <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600 animate-pulse">
-                            Initializing Evolution Protocol
+                            Join the identity forge
                         </p>
                     </div>
 
@@ -102,7 +120,7 @@ export const Register = () => {
                             {/* Full Name */}
                             <div className="space-y-2">
                                 <label htmlFor="name" className="block text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 ml-2">
-                                    Operational Alias (Name)
+                                    Full Name
                                 </label>
                                 <div className="relative group/input">
                                     <div className="absolute inset-0 bg-wizard-purple/5 rounded-2xl blur-lg opacity-0 group-focus-within/input:opacity-100 transition-opacity" />
@@ -114,7 +132,7 @@ export const Register = () => {
                                         value={formData.name}
                                         onChange={handleChange}
                                         className="relative block w-full px-7 py-4 bg-white/[0.02] border border-white/5 rounded-2xl text-white placeholder-white/10 focus:outline-none focus:border-wizard-purple/40 focus:ring-0 transition-all font-black uppercase text-xs tracking-widest shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:bg-white/[0.04]"
-                                        placeholder="JOHN DOE"
+                                        placeholder="Enter your name..."
                                     />
                                 </div>
                             </div>
@@ -122,7 +140,7 @@ export const Register = () => {
                             {/* Email */}
                             <div className="space-y-2">
                                 <label htmlFor="email" className="block text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 ml-2">
-                                    Primary Uplink (Email)
+                                    Email Address
                                 </label>
                                 <div className="relative group/input">
                                     <div className="absolute inset-0 bg-wizard-purple/5 rounded-2xl blur-lg opacity-0 group-focus-within/input:opacity-100 transition-opacity" />
@@ -135,7 +153,7 @@ export const Register = () => {
                                         value={formData.email}
                                         onChange={handleChange}
                                         className="relative block w-full px-7 py-4 bg-white/[0.02] border border-white/5 rounded-2xl text-white placeholder-white/10 focus:outline-none focus:border-wizard-purple/40 focus:ring-0 transition-all font-black uppercase text-xs tracking-widest shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:bg-white/[0.04]"
-                                        placeholder="NAME@LEGACY.COM"
+                                        placeholder="Enter your email..."
                                     />
                                 </div>
                             </div>
@@ -143,7 +161,7 @@ export const Register = () => {
                             {/* Password */}
                             <div className="space-y-2">
                                 <label htmlFor="password" className="block text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 ml-2">
-                                    Encrypt Key (Password)
+                                    Password
                                 </label>
                                 <div className="relative group/input">
                                     <div className="absolute inset-0 bg-wizard-purple/5 rounded-2xl blur-lg opacity-0 group-focus-within/input:opacity-100 transition-opacity" />
@@ -163,7 +181,7 @@ export const Register = () => {
                             {/* Confirm Password */}
                             <div className="space-y-2">
                                 <label htmlFor="confirmPassword" className="block text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 ml-2">
-                                    Verify Encryption
+                                    Confirm Password
                                 </label>
                                 <div className="relative group/input">
                                     <div className="absolute inset-0 bg-wizard-purple/5 rounded-2xl blur-lg opacity-0 group-focus-within/input:opacity-100 transition-opacity" />

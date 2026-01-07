@@ -1,11 +1,7 @@
-/**
- * Template Renderer Service
- * Handles template loading, content injection, and HTML generation
- */
-
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import type { WebsiteContent } from './content-generator.service';
+import type { DesignTokens, SemanticLayoutGraph } from './design-engine.service';
 
 export interface ColorScheme {
     primary: string;
@@ -29,7 +25,9 @@ export interface RenderOptions {
     templateId: string;
     content: WebsiteContent;
     colorScheme: string;
-    designSystem?: DesignSystem; // Optional AI-generated design
+    designSystem?: DesignSystem; // Keep legacy support for now
+    designTokens?: DesignTokens; // [NEW]
+    layoutGraph?: SemanticLayoutGraph; // [NEW]
     profileData: {
         name: string;
         profession: string;
@@ -131,7 +129,9 @@ export class TemplateRendererService {
                 template.htmlStructure,
                 colors,
                 options.profileData.profession,
-                options.designSystem // Pass it here
+                options.designSystem,
+                options.designTokens,
+                options.layoutGraph
             );
 
             // Update profile data with design choices
@@ -158,7 +158,9 @@ export class TemplateRendererService {
         html: string,
         colors: ColorScheme,
         profession: string,
-        injectedDesign?: DesignSystem // New param
+        injectedDesign?: DesignSystem,
+        designTokens?: DesignTokens,
+        layoutGraph?: SemanticLayoutGraph
     ): { css: string, html: string, showParticles: boolean } {
         // 1. Generate Stock Image URL with Cache Buster
         const stockImage = `url('https://loremflickr.com/1200/800/${encodeURIComponent(profession).replace(/%20/g, ',')},business?lock=${Math.floor(Math.random() * 1000)}')`;
@@ -213,13 +215,22 @@ export class TemplateRendererService {
     --color-text: ${effectiveColors.text};
     --color-text-light: ${effectiveColors.textLight || effectiveColors.text};
     --hero-bg: ${stockImage};
-    --font-heading: ${design.fonts.heading};
-    --font-body: ${design.fonts.body};
-    --radius-card: ${design.shapes.radius};
-    --radius-btn: ${design.shapes.style === 'pill' ? '999px' : design.shapes.style === 'circle' ? '50%' : design.shapes.radius};
+    --font-heading: ${designTokens?.typography.headingFont || design.fonts.heading};
+    --font-body: ${designTokens?.typography.bodyFont || design.fonts.body};
+    --radius-card: ${designTokens?.borderRadius || design.shapes.radius};
+    --radius-btn: ${design.shapes.style === 'pill' ? '999px' : design.shapes.style === 'circle' ? '50%' : designTokens?.borderRadius || design.shapes.radius};
     
+    /* Design Tokens Overrides */
+    ${designTokens ? `
+    --color-primary: ${designTokens.colors.primary};
+    --color-secondary: ${designTokens.colors.secondary};
+    --color-accent: ${designTokens.colors.accent};
+    --color-background: ${designTokens.colors.background};
+    --color-text: ${designTokens.colors.text};
+    ` : ''}
+
     /* Theme Specific Overrides - Only apply if NO AI colors were provided */
-    ${design.colors ? '' : this.getThemeVariables(design.theme, effectiveColors)}
+    ${(design.colors || designTokens) ? '' : this.getThemeVariables(design.theme, effectiveColors)}
 }
 `;
         // FIX: Inject overrides AFTER the original CSS so they take precedence
@@ -239,7 +250,16 @@ export class TemplateRendererService {
         // Default fallbacks for other placeholders if added later
         styledHTML = styledHTML.replace(/\{\{anim\.[^}]+\}\}/g, 'animate-fade-in');
 
-        // 6. Handle Particles (Only show for standard layout, OR tech layout for "cyber" feel)
+        // 6. Handle Layout Graph (Influence section priorities)
+        if (layoutGraph) {
+            console.log(`Applying layout graph for ${layoutGraph.page}. Sections: ${layoutGraph.sections.length}`);
+            // In a real implementation, we would reorder HTML segments based on layoutGraph.sections
+            // For now, we'll inject a data attribute to the body for section CSS hooks
+            const layoutAttr = `data-layout="${layoutGraph.page.toLowerCase()}"`;
+            styledHTML = styledHTML.replace('<body', `<body ${layoutAttr}`);
+        }
+
+        // 7. Handle Particles (Only show for standard layout, OR tech layout for "cyber" feel)
         const showParticles = design.layout === 'standard' || design.theme === 'tech';
 
         return { css: styledCSS, html: styledHTML, showParticles };

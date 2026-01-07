@@ -96,9 +96,9 @@ export const BrandingStep = () => {
   return (
     <div className="p-0 animate-fade-up">
       <div className="mb-12">
-        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Visual <span className="text-wizard-accent">Architecture</span></h2>
+        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Your <span className="text-wizard-accent">Brand</span></h2>
         <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed">
-          Initialize your visual identity by uploading core assets. High-resolution imagery is recommended.
+          Upload your images and logo to give your site a professional look.
         </p>
       </div>
 
@@ -106,9 +106,9 @@ export const BrandingStep = () => {
         {/* Business Logo Section */}
         <div className="space-y-8">
           <div className="px-1">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 mb-2">Corporate Insignia</h3>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 mb-2">Your Logo</h3>
             <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest">
-              Projected logo for the digital interface
+              This logo will appear in your website header
             </p>
           </div>
 
@@ -123,7 +123,7 @@ export const BrandingStep = () => {
                     </svg>
                   </div>
                   <label htmlFor="logo-upload" className="cursor-pointer inline-flex items-center px-8 py-4 bg-wizard-accent text-black font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-white hover:scale-105 transition-all shadow-[0_0_20px_rgba(196,240,66,0.1)]">
-                    <span>Initiate Upload</span>
+                    <span>Upload Logo</span>
                     <input id="logo-upload" name="logo-upload" type="file" className="sr-only" ref={logoInputRef} accept="image/*" onChange={handleLogoSelect} />
                   </label>
                   <p className="mt-6 text-[8px] uppercase tracking-[0.3em] text-gray-600 font-black">SUPPORTED: PNG, JPG, WEBP (MAX 5MB)</p>
@@ -141,7 +141,7 @@ export const BrandingStep = () => {
                   </div>
                   <div className="text-center">
                     <button onClick={handleRemoveLogo} className="text-gray-500 hover:text-red-500 text-[10px] font-black uppercase tracking-[0.2em] transition-colors">
-                      Eject Asset
+                      Remove Logo
                     </button>
                   </div>
                 </div>
@@ -170,9 +170,9 @@ export const BrandingStep = () => {
         {/* Profile Photo Section */}
         <div className="space-y-8">
           <div className="px-1">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 mb-2">Biometric Data (Photo)</h3>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 mb-2">Your Photo</h3>
             <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest">
-              Professional portrait for neural rendering
+              A professional photo for your about section
             </p>
           </div>
 
@@ -205,7 +205,7 @@ export const BrandingStep = () => {
                   </div>
                   <div className="text-center">
                     <button onClick={handleRemovePhoto} className="text-gray-500 hover:text-red-500 text-[10px] font-black uppercase tracking-[0.2em] transition-colors">
-                      Eject Portrait
+                      Remove Photo
                     </button>
                   </div>
                 </div>
@@ -234,9 +234,9 @@ export const BrandingStep = () => {
         {/* Color Palette Section */}
         <div className="md:col-span-2 space-y-8 pt-8 border-t border-white/5">
           <div className="px-1">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 mb-2">Chromatic Signature</h3>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 mb-2">Color Palette</h3>
             <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest">
-              Select the primary spectral frequency for your interface
+              Select the primary colors for your website
             </p>
           </div>
 

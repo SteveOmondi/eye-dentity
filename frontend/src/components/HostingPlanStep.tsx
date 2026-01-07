@@ -42,15 +42,15 @@ export const HostingPlanStep = () => {
   return (
     <div className="p-0 animate-fade-up">
       <div className="mb-12">
-        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Power <span className="text-wizard-accent">Engines</span></h2>
+        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Hosting <span className="text-wizard-accent">Plans</span></h2>
         <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed">
-          Select a neural engine to power your digital existence. Guaranteed uptime and atmospheric performance.
+          Choose the best plan to keep your website fast, secure, and always online.
         </p>
       </div>
 
       {error && (
         <div className="mb-10 bg-red-500/10 border border-red-500/20 text-red-500 px-6 py-5 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] animate-pulse">
-          Engine Failure: {error}
+          Error: {error}
         </div>
       )}
 
@@ -73,7 +73,7 @@ export const HostingPlanStep = () => {
               {isPopular && (
                 <div className="absolute top-0 right-0">
                   <span className="bg-wizard-accent text-black px-6 py-2 rounded-bl-3xl text-[9px] font-black uppercase tracking-widest">
-                    OPTIMAL
+                    BEST VALUE
                   </span>
                 </div>
               )}
@@ -84,11 +84,11 @@ export const HostingPlanStep = () => {
               <div className="flex flex-col h-full relative z-10">
                 <div className="mb-10">
                   <h3 className={`text-[10px] font-black uppercase tracking-[0.3em] mb-4 transition-colors ${isSelected ? 'text-wizard-accent' : 'text-gray-500'}`}>
-                    {plan.name} CORE
+                    {plan.name}
                   </h3>
                   <div className="flex items-baseline gap-2">
                     <span className="text-5xl font-black text-white tracking-tighter font-mono">${plan.price.toFixed(0)}</span>
-                    <span className="text-gray-600 text-[10px] font-black uppercase tracking-widest">/ CYC</span>
+                    <span className="text-gray-600 text-[10px] font-black uppercase tracking-widest">/ MONTH</span>
                   </div>
                 </div>
 
@@ -105,19 +105,19 @@ export const HostingPlanStep = () => {
                 <div className="pt-8 border-t border-white/5 mb-8">
                   <div className="grid grid-cols-2 gap-y-6">
                     <div className="flex flex-col">
-                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-600 mb-1">DATA MASS</span>
+                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-600 mb-1">STORAGE</span>
                       <span className="text-xs font-black text-white uppercase">{plan.resources.storage}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-600 mb-1">LINK SPEED</span>
+                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-600 mb-1">BANDWIDTH</span>
                       <span className="text-xs font-black text-white uppercase">{plan.resources.bandwidth}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-600 mb-1">CPU MATRIX</span>
+                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-600 mb-1">PROCESSOR</span>
                       <span className="text-xs font-black text-white uppercase">{plan.resources.cpu.split(' ')[0]}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-600 mb-1">V-MEM</span>
+                      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-600 mb-1">MEMORY</span>
                       <span className="text-xs font-black text-white uppercase">{plan.resources.ram}</span>
                     </div>
                   </div>
@@ -133,7 +133,7 @@ export const HostingPlanStep = () => {
                     : 'bg-white/[0.03] text-gray-400 border border-white/5 hover:bg-white hover:text-black hover:border-white'
                     }`}
                 >
-                  {isSelected ? 'ENGINE ACTIVE' : 'ENGAGE CORE'}
+                  {isSelected ? 'SELECTED' : 'CHOOSE PLAN'}
                 </button>
               </div>
             </div>
@@ -158,8 +158,8 @@ export const HostingPlanStep = () => {
                 <div className="absolute left-1.5 w-5 h-5 bg-gray-600 rounded-full transition-all peer-checked:left-9 peer-checked:bg-wizard-accent peer-checked:shadow-[0_0_15px_rgba(196,240,66,0.8)]" />
               </div>
               <div className="flex-1">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-wizard-accent block mb-2">Neural Messaging (Email)</span>
-                <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest leading-relaxed">Establish encrypted communication channels matching your primary node identifier.</p>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-wizard-accent block mb-2">Business Email</span>
+                <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest leading-relaxed">Get a professional email address that matches your domain name (e.g. hello@yourname.com).</p>
               </div>
             </label>
           </div>

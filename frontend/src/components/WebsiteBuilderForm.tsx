@@ -15,6 +15,8 @@ import { ApiKeySettings } from './ApiKeySettings';
 import { ThemeToggle } from './ThemeToggle';
 import { STEPS } from '../utils/constants';
 
+import { PreviewStep } from './PreviewStep';
+
 export const WebsiteBuilderForm = () => {
   const navigate = useNavigate();
   const { currentStep, setCurrentStep } = useFormStore();
@@ -30,7 +32,7 @@ export const WebsiteBuilderForm = () => {
   if (builderMode === 'chat' && currentStep <= 2) {
     return (
       <div className="min-h-screen bg-mesh-gradient flex flex-col relative overflow-hidden font-sans">
-        {/* Background Atmosphere */}
+        {/* ... (existing backgrounds) */}
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(196,240,66,0.03)_0%,transparent_50%)] pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-wizard-accent/5 blur-[150px] pointer-events-none" />
 
@@ -82,13 +84,14 @@ export const WebsiteBuilderForm = () => {
       case 4: return <TemplateSelectionStep />;
       case 5: return <DomainSearchStep />;
       case 6: return <HostingPlanStep />;
-      case 7: return <OrderSummary />;
+      case 7: return <PreviewStep onSuggestChanges={(f) => console.log(f)} />;
+      case 8: return <OrderSummary />;
       default: return <PersonalInfoStep />;
     }
   };
 
   const handleNext = () => {
-    if (currentStep < 7) {
+    if (currentStep < 8) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -112,7 +115,7 @@ export const WebsiteBuilderForm = () => {
           </div>
           <div>
             <h1 className="text-3xl font-black tracking-tighter text-text-primary uppercase group-hover:text-wizard-accent transition-colors">EYE-DENTITY</h1>
-            <p className="text-wizard-accent text-[8px] uppercase tracking-[0.4em] font-black opacity-80">NEURAL ARCHITECTURE</p>
+            <p className="text-wizard-accent text-[8px] uppercase tracking-[0.4em] font-black opacity-80">BUILD YOUR BRAND</p>
           </div>
         </div>
 
@@ -132,12 +135,12 @@ export const WebsiteBuilderForm = () => {
               ))}
             </div>
             <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-              2,048+ Identities Forged
+              2,048+ Websites Built
             </p>
           </div>
           <p className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.3em] leading-relaxed">
-            System status: <span className="text-wizard-accent">OPTIMAL</span><br />
-            Latency: <span className="text-white">12MS</span>
+            Build status: <span className="text-wizard-accent">READY</span><br />
+            Mode: <span className="text-white">TURBO</span>
           </p>
         </div>
 
@@ -153,8 +156,13 @@ export const WebsiteBuilderForm = () => {
         {/* Header with Mode Switch */}
         <header className="px-10 md:px-16 py-8 flex items-center justify-between relative z-20">
           <div className="flex items-center gap-6">
-            <div className="px-4 py-2 bg-white/[0.03] border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-wizard-accent shadow-[0_0_20px_rgba(196,240,66,0.05)]">
-              {builderMode === 'chat' ? 'Neural Link Active' : 'Manual Override'}
+            <div className="flex items-center gap-3 px-4 py-2 bg-white/[0.03] border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-wizard-accent shadow-[0_0_20px_rgba(196,240,66,0.05)]">
+              {builderMode === 'chat' && (
+                <div className="w-4 h-4 rounded-md overflow-hidden bg-wizard-accent/20 border border-wizard-accent/30">
+                  <img src="/donald.png" alt="" className="w-full h-full object-cover" />
+                </div>
+              )}
+              {builderMode === 'chat' ? 'Chat with Donald' : 'Manual Setup'}
             </div>
           </div>
 
@@ -164,7 +172,7 @@ export const WebsiteBuilderForm = () => {
                 onClick={() => setBuilderMode(builderMode === 'chat' ? 'form' : 'chat')}
                 className="px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-text-primary border border-white/5 hover:border-wizard-accent/30 rounded-xl transition-all hover:bg-wizard-accent/5"
               >
-                Switch to {builderMode === 'chat' ? 'Grid' : 'Forge'}
+                Switch to {builderMode === 'chat' ? 'Grid' : 'Donald'}
               </button>
             )}
             <ThemeToggle />
@@ -197,7 +205,7 @@ export const WebsiteBuilderForm = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </div>
-            <span className="hidden sm:inline">Initialize Backstep</span>
+            <span className="hidden sm:inline">Go Back</span>
           </button>
 
           <div className="flex items-center gap-3">
@@ -213,10 +221,10 @@ export const WebsiteBuilderForm = () => {
 
           <button
             onClick={handleNext}
-            disabled={currentStep === 7}
+            disabled={currentStep === 8}
             className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent hover:text-white disabled:opacity-0 transition-all group"
           >
-            <span className="hidden sm:inline">Advancing Sequence</span>
+            <span className="hidden sm:inline">Next Step</span>
             <div className="w-14 h-14 rounded-2xl bg-wizard-accent/10 border border-wizard-accent/20 flex items-center justify-center group-hover:bg-wizard-accent group-hover:text-black transition-all shadow-[0_0_20px_rgba(196,240,66,0.1)] group-hover:shadow-[0_0_30px_rgba(196,240,66,0.3)]">
               <svg className="w-6 h-6 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />

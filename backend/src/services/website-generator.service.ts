@@ -1,6 +1,7 @@
 import { prisma } from '../lib/prisma';
 import ContentGenerator, { ProfileData } from './content-generator.service';
-import TemplateRenderer from './template-renderer.service';
+import TemplateRenderer, { ColorScheme } from './template-renderer.service';
+import DesignEngine from './design-engine.service';
 import { deployWebsite } from './deployment.service';
 import { sendWebsiteLiveEmail } from './email.service';
 import { sendWebsiteLiveNotification } from './telegram.service';
@@ -11,7 +12,8 @@ export interface WebsiteGenerationRequest {
   userId: string;
   orderId: string;
   profileData: ProfileData;
-  templateId: string;
+  templateId?: string;
+  useAIDesign?: boolean;
   colorScheme: ColorScheme;
   domain: string;
 }
@@ -30,14 +32,14 @@ export interface WebsiteGenerationResult {
 export const generateWebsite = async (
   request: WebsiteGenerationRequest
 ): Promise<WebsiteGenerationResult> => {
-  const { userId, orderId, profileData, templateId, colorScheme, domain } = request;
+  const { userId, orderId, profileData, templateId, colorScheme, domain, useAIDesign } = request;
 
   try {
     // 1. Create website record in database with GENERATING status
     const website = await prisma.website.create({
       data: {
         userId,
-        templateId,
+        templateId: templateId || undefined,
         domain,
         colorScheme: colorScheme as any,
         status: 'GENERATING',
@@ -60,31 +62,33 @@ export const generateWebsite = async (
       const generatedContent = await ContentGenerator.generateWebsiteContent(extendedProfileData, 'claude');
       console.log('AI content generated successfully');
 
-      // 2.5 Generate Design System
-      console.log('Step 1.5: Generating Design System...');
-      const designSystem = await ContentGenerator.generateDesignSystem(extendedProfileData, 'claude');
-      console.log('Design System generated:', designSystem?.rationale);
+      // 2.5 Generate Intent and Design Genome
+      console.log('Step 1.5: Generating Design Intent and Genome...');
+      const intentInput = `${profileData.profession}. ${profileData.bio || ''}`;
+      const intent = await DesignEngine.understandIntent(intentInput);
+      const genomeSeed = `${userId}-${domain}-${Date.now()}`;
+      const genome = DesignEngine.initializeGenome(genomeSeed);
+      const tokens = await DesignEngine.generateTokens(intent, genome);
+      const layoutGraph = await DesignEngine.generateLayoutGraph(intent);
 
-      // 3. (Template selection is handled via ID, but we use Renderer Service now)
-      // We don't need to fetch from DB for structure if Renderer loads from FS.
-      // But we still check if it exists in DB for validation?
-      // For now, let's trust the ID or the Renderer. But let's verify existence.
-      const template = await prisma.template.findUnique({
-        where: { id: templateId },
-      });
+      console.log('Design Genome and Tokens generated');
 
-      if (!template) {
-        throw new Error(`Template not found: ${templateId}`);
+      // 3. Resolve template (use default for AI Forge if none selected)
+      const effectiveTemplateId = templateId || (useAIDesign ? 'modern-geometric' : undefined);
+
+      if (!effectiveTemplateId) {
+        throw new Error('Template ID is required when AI Forge is not active');
       }
 
       // 4. Render website by merging content with template
       console.log('Step 3: Rendering website with design system...');
       const renderedWebsite = await TemplateRenderer.renderWebsite({
-        templateId,
+        templateId: effectiveTemplateId,
         content: generatedContent,
-        colorScheme: typeof colorScheme === 'string' ? colorScheme : 'default', // Map logic
+        colorScheme: typeof colorScheme === 'string' ? colorScheme : (colorScheme as any).name || 'default',
         profileData: extendedProfileData,
-        designSystem: designSystem || undefined
+        designTokens: tokens,
+        layoutGraph: layoutGraph
       });
 
       // 5. Save website files to disk
@@ -96,9 +100,14 @@ export const generateWebsite = async (
         where: { id: website.id },
         data: {
           content: generatedContent as any,
+          intent: intent as any,
+          genome: genome as any,
+          tokens: tokens as any,
+          layoutGraph: layoutGraph as any,
+          genomeSeed,
           status: 'GENERATED',
           updatedAt: new Date(),
-        },
+        } as any,
       });
 
       console.log(`Website generation completed for ${domain}`);
@@ -295,7 +304,7 @@ export const regenerateWebsite = async (websiteId: string): Promise<WebsiteGener
     orderId: '', // No order for regeneration
     profileData,
     templateId: website.templateId,
-    colorScheme: website.colorScheme as ColorScheme,
+    colorScheme: website.colorScheme as unknown as ColorScheme,
     domain: website.domain,
   });
 };
@@ -325,4 +334,93 @@ export const deleteWebsite = async (websiteId: string): Promise<void> => {
   await prisma.website.delete({
     where: { id: websiteId },
   });
+};
+
+/**
+ * Iterate on website design based on user feedback
+ */
+export const iterateWebsite = async (
+  websiteId: string,
+  feedback: string
+): Promise<WebsiteGenerationResult> => {
+  const website = await prisma.website.findUnique({
+    where: { id: websiteId },
+    include: {
+      user: {
+        include: {
+          profile: true,
+        },
+      },
+    },
+  });
+
+  if (!website) {
+    throw new Error('Website not found');
+  }
+
+  // Update status to GENERATING
+  await prisma.website.update({
+    where: { id: websiteId },
+    data: { status: 'GENERATING' },
+  });
+
+  console.log(`Iterating on website ${website.domain} with feedback: ${feedback}`);
+
+  // 1. Load existing state
+  const intent = website.intent as any;
+  const genome = website.genome as any;
+  const profileData: ProfileData = {
+    name: website.user.name || '',
+    email: website.user.email,
+    profession: website.user.profile?.profession || 'Professional',
+    bio: website.user.profile?.bio || undefined,
+    logoUrl: website.user.profile?.logoUrl || undefined,
+    profilePhotoUrl: website.user.profile?.profilePhotoUrl || undefined,
+  };
+
+  // 2. Mutate Genome based on feedback
+  // In a full implementation, we'd use AI to determine the delta.
+  // For now, we'll suggest common mutations or use AI to get the delta.
+  const prompt = `Based on this feedback: "${feedback}", what attributes of the design genome should change?
+  Current Genome: ${JSON.stringify(genome)}
+  Available attributes: contrastBias, roundness, whitespacePreference, fontModernity, motionTolerance.
+  Return ONLY a JSON delta (e.g., {"contrastBias": 0.8}).`;
+
+  const deltaResponse = await DesignEngine.understandIntent(prompt); // Reusing intent logic for simplicity
+  const delta = typeof deltaResponse === 'object' ? deltaResponse : {};
+
+  const updatedGenome = DesignEngine.mutateGenome(genome, delta);
+
+  // 3. Regenerate tokens and layout
+  const tokens = await DesignEngine.generateTokens(intent, updatedGenome);
+  const layoutGraph = await DesignEngine.generateLayoutGraph(intent);
+
+  // 4. Render and Save
+  const renderedWebsite = await TemplateRenderer.renderWebsite({
+    templateId: website.templateId,
+    content: website.content as any,
+    colorScheme: typeof website.colorScheme === 'string' ? website.colorScheme : 'default',
+    profileData,
+    designTokens: tokens,
+    layoutGraph
+  });
+
+  await saveWebsiteFiles(website.id, renderedWebsite, website.domain);
+
+  // 5. Update DB
+  await prisma.website.update({
+    where: { id: website.id },
+    data: {
+      genome: updatedGenome as any,
+      tokens: tokens as any,
+      layoutGraph: layoutGraph as any,
+      status: 'GENERATED',
+      updatedAt: new Date(),
+    } as any,
+  });
+
+  return {
+    websiteId: website.id,
+    status: 'GENERATED',
+  };
 };

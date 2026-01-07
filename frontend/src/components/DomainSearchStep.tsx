@@ -75,15 +75,15 @@ export const DomainSearchStep = () => {
   return (
     <div className="p-0 animate-fade-up">
       <div className="mb-12">
-        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Nexus <span className="text-wizard-accent">Address</span></h2>
+        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Choose your <span className="text-wizard-accent">domain name</span></h2>
         <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed">
-          Acquire your unique digital identifier. This node will serve as the primary link to your digital entity.
+          Find a catchy and unique name for your new website. This will be your address on the web.
         </p>
       </div>
 
       {error && (
         <div className="mb-10 bg-red-500/10 border border-red-500/20 text-red-500 px-6 py-5 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] animate-pulse">
-          Signal Interruption: {error}
+          Issue found: {error}
         </div>
       )}
 
@@ -96,7 +96,7 @@ export const DomainSearchStep = () => {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleCheck()}
-            placeholder="ENTER IDENTITY NAME..."
+            placeholder="Enter your website name..."
             className="flex-1 bg-transparent px-8 py-5 text-white text-lg font-black tracking-tight placeholder:text-white/10 focus:outline-none uppercase"
           />
           <button
@@ -107,19 +107,19 @@ export const DomainSearchStep = () => {
             {checking ? (
               <div className="flex items-center gap-3">
                 <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                <span>Scanning</span>
+                <span>Checking...</span>
               </div>
             ) : (
-              'Verify Node'
+              'Check Availability'
             )}
           </button>
         </div>
         <div className="mt-4 px-2 flex items-center justify-between">
           <p className="text-[9px] text-gray-600 font-bold uppercase tracking-[0.2em] flex items-center gap-3">
-            <span className="w-1 h-1 bg-wizard-accent rounded-full animate-pulse" /> Protocol: High-Fidelity Domain Retrieval
+            <span className="w-1 h-1 bg-wizard-accent rounded-full animate-pulse" /> Domain Finder v1.0
           </p>
           <p className="text-[9px] text-gray-700 font-black uppercase tracking-[0.2em]">
-            GLOBAL AVAILABILITY CHECKER
+            REAL-TIME CHECKER
           </p>
         </div>
       </div>
@@ -139,14 +139,14 @@ export const DomainSearchStep = () => {
               <div>
                 <h3 className="text-3xl font-black text-white tracking-tighter uppercase">{formData.domain}</h3>
                 <p className="text-wizard-accent text-[10px] font-black uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-wizard-accent rounded-full animate-ping" /> NODE SECURED & READY
+                  <span className="w-1.5 h-1.5 bg-wizard-accent rounded-full animate-ping" /> Domain is available!
                 </p>
               </div>
             </div>
             {formData.domainPrice && (
               <div className="text-center md:text-right mt-8 md:mt-0 relative z-10 p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
                 <p className="text-4xl font-black text-white tracking-tighter">${formData.domainPrice.toFixed(2)}</p>
-                <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.3em] mt-1">CREDITS / CYCLE</p>
+                <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.3em] mt-1">PER YEAR</p>
               </div>
             )}
           </div>
@@ -162,7 +162,7 @@ export const DomainSearchStep = () => {
             </div>
             <div>
               <h3 className="text-3xl font-black text-white/30 tracking-tighter uppercase line-through">{formData.domain}</h3>
-              <p className="text-red-500/60 text-[10px] font-black uppercase tracking-[0.3em] mt-2">LINKAGE UNAVAILABLE: NODE OCCUPIED</p>
+              <p className="text-red-500/60 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Domain already taken</p>
             </div>
           </div>
         )}

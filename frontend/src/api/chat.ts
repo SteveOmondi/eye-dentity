@@ -64,10 +64,19 @@ export const deleteChatSession = async (sessionId: string): Promise<void> => {
     await apiClient.delete(`/chat/session/${sessionId}`);
 };
 
+/**
+ * Claim an anonymous chat session
+ */
+export const claimChatSession = async (sessionId: string): Promise<ChatSession> => {
+    const response = await apiClient.post('/chat/claim', { sessionId });
+    return response.data.session;
+};
+
 export const chatApi = {
     startChatSession,
     sendChatMessage,
     getChatSession,
     getUserChatSessions,
     deleteChatSession,
+    claimChatSession,
 };

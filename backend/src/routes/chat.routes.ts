@@ -6,6 +6,7 @@ import {
     getChatSession,
     deleteChatSession,
     getUserChatSessions,
+    claimChatSession,
 } from '../services/chat.service';
 import { authenticate } from '../middleware/auth';
 import type { LLMProvider } from '../services/llm-provider.service';
@@ -23,7 +24,7 @@ router.post('/start', async (req: Request, res: Response) => {
 
         const session = await startChatSession(provider as LLMProvider, userId);
 
-        res.json({
+        return res.json({
             success: true,
             session: {
                 id: session.id,
@@ -34,7 +35,7 @@ router.post('/start', async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Start chat error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             error: error.message || 'Failed to start chat session',
         });
@@ -58,7 +59,7 @@ router.post('/message', async (req: Request, res: Response) => {
 
         const session = await processMessage(sessionId, message);
 
-        res.json({
+        return res.json({
             success: true,
             session: {
                 id: session.id,
@@ -70,7 +71,7 @@ router.post('/message', async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Process message error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             error: error.message || 'Failed to process message',
         });
@@ -94,7 +95,7 @@ router.get('/session/:id', async (req: Request, res: Response) => {
             });
         }
 
-        res.json({
+        return res.json({
             success: true,
             session: {
                 id: session.id,
@@ -106,7 +107,7 @@ router.get('/session/:id', async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Get session error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             error: error.message || 'Failed to get chat session',
         });
@@ -123,7 +124,7 @@ router.get('/sessions', authenticate, async (req: Request, res: Response) => {
 
         const sessions = await getUserChatSessions(userId);
 
-        res.json({
+        return res.json({
             success: true,
             sessions: sessions.map((s) => ({
                 id: s.id,
@@ -134,13 +135,12 @@ router.get('/sessions', authenticate, async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Get sessions error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             error: error.message || 'Failed to get chat sessions',
         });
     }
 });
-
 /**
  * DELETE /api/chat/session/:id
  * Delete a chat session
@@ -151,15 +151,52 @@ router.delete('/session/:id', async (req: Request, res: Response) => {
 
         await deleteChatSession(id);
 
-        res.json({
+        return res.json({
             success: true,
             message: 'Chat session deleted',
         });
     } catch (error: any) {
         console.error('Delete session error:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             error: error.message || 'Failed to delete chat session',
+        });
+    }
+});
+
+/**
+ * POST /api/chat/claim
+ * Claim an anonymous chat session (requires authentication)
+ */
+router.post('/claim', authenticate, async (req: Request, res: Response) => {
+    try {
+        const { sessionId } = req.body;
+        const userId = (req as any).user.id;
+
+        if (!sessionId) {
+            return res.status(400).json({
+                success: false,
+                error: 'Session ID is required',
+            });
+        }
+
+        const session = await claimChatSession(sessionId, userId);
+
+        return res.json({
+            success: true,
+            session: {
+                id: session.id,
+                messages: session.messages,
+                collectedData: session.collectedData,
+                progress: session.completionProgress,
+                isComplete: session.isComplete,
+            },
+        });
+    } catch (error: any) {
+        console.error('Claim session error:', error);
+        return res.status(500).json({
+            success: false,
+            error: error.message || 'Failed to claim chat session',
         });
     }
 });

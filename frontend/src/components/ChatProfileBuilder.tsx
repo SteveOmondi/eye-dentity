@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { chatApi, type Message } from '../api/chat';
 import { ChatMessage, TypingIndicator } from './ChatMessage';
 import { useFormStore } from '../store/formStore';
+import { ProfileUplinkButton } from './ProfileUplinkButton';
 
 interface ChatProfileBuilderProps {
     onComplete?: () => void;
@@ -12,8 +13,7 @@ export const ChatProfileBuilder = ({
     onComplete,
     onSwitchToForm,
 }: ChatProfileBuilderProps) => {
-    const { updateFormData } = useFormStore();
-    const [sessionId, setSessionId] = useState<string | null>(null);
+    const { updateFormData, sessionId, setSessionId } = useFormStore();
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputMessage, setInputMessage] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -23,19 +23,26 @@ export const ChatProfileBuilder = ({
     const [error, setError] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // Auto-scroll to bottom when new messages arrive
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+    // ... (scrollToBottom and effect unchanged)
 
+    // Load or start chat session on mount
     useEffect(() => {
-        scrollToBottom();
-    }, [messages, isTyping]);
-
-    // Start chat session on mount
-    useEffect(() => {
-        const startChat = async () => {
+        const initChat = async () => {
             try {
+                if (sessionId) {
+                    // Try to resume existing session
+                    try {
+                        const session = await chatApi.getChatSession(sessionId);
+                        setMessages(session.messages);
+                        setProgress(session.progress);
+                        setCollectedData(session.collectedData);
+                        setIsComplete(session.isComplete);
+                        return;
+                    } catch (e) {
+                        console.log('Failed to resume session, starting new one');
+                    }
+                }
+
                 const session = await chatApi.startChatSession('gemini');
                 setSessionId(session.id);
                 setMessages(session.messages);
@@ -45,7 +52,7 @@ export const ChatProfileBuilder = ({
             }
         };
 
-        startChat();
+        initChat();
     }, []);
 
     const handleSendMessage = async () => {
@@ -105,12 +112,12 @@ export const ChatProfileBuilder = ({
             <div className="relative z-10 px-10 py-8 border-b border-white/5 flex flex-col gap-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-5">
-                        <div className="w-12 h-12 bg-wizard-accent/10 border border-wizard-accent/20 rounded-2xl flex items-center justify-center text-wizard-accent shadow-[0_0_20px_rgba(196,240,66,0.1)]">
-                            <span className="text-xl font-black">E</span>
+                        <div className="w-14 h-14 bg-wizard-accent/10 border border-wizard-accent/20 rounded-2xl flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(196,240,66,0.1)] group-hover:scale-110 transition-transform duration-500">
+                            <img src="/donald.png" alt="Donald" className="w-full h-full object-cover" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-black text-white uppercase tracking-tighter">Neural <span className="text-wizard-accent">Forge</span></h2>
-                            <p className="text-[8px] font-black text-gray-500 uppercase tracking-[0.4em]">Initialize Configuration Protocol</p>
+                            <h2 className="text-xl font-black text-white uppercase tracking-tighter">BUILD WITH <span className="text-wizard-accent">DONALD</span></h2>
+                            <p className="text-[8px] font-black text-gray-500 uppercase tracking-[0.4em]">Your Personal Branding Architect</p>
                         </div>
                     </div>
                     {onSwitchToForm && (
@@ -218,32 +225,44 @@ export const ChatProfileBuilder = ({
 
             {/* Input Area */}
             <div className="px-8 py-8 border-t border-white/5 bg-[#0d0d0d]/40 backdrop-blur-2xl relative z-10">
-                <div className="relative">
-                    <textarea
-                        value={inputMessage}
-                        onChange={(e) => setInputMessage(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Uplink transmission content..."
-                        disabled={isTyping || isComplete}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] px-8 py-6 text-[13px] text-white placeholder:text-gray-600 focus:outline-none focus:border-wizard-accent/40 focus:bg-wizard-accent/[0.02] transition-all resize-none disabled:opacity-50 disabled:cursor-not-allowed custom-scrollbar"
-                        rows={1}
-                    />
-                    <div className="absolute right-4 bottom-4 flex items-center gap-3">
-                        <p className="hidden sm:block text-[8px] font-black text-gray-700 uppercase tracking-[0.2em]">SHIFT+ENTER FOR LINE</p>
-                        <button
-                            onClick={handleSendMessage}
-                            disabled={!inputMessage.trim() || isTyping || isComplete}
-                            className="w-12 h-12 bg-wizard-accent/10 border border-wizard-accent/20 rounded-2xl flex items-center justify-center text-wizard-accent hover:bg-wizard-accent hover:text-black transition-all disabled:opacity-20 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(196,240,66,0.05)]"
-                        >
-                            {isTyping ? (
-                                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                                </svg>
-                            )}
-                        </button>
+                <div className="flex items-end gap-4">
+                    <div className="flex-1 relative">
+                        <textarea
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            placeholder="Uplink transmission content..."
+                            disabled={isTyping || isComplete}
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] px-8 py-6 text-[13px] text-white placeholder:text-gray-600 focus:outline-none focus:border-wizard-accent/40 focus:bg-wizard-accent/[0.02] transition-all resize-none disabled:opacity-50 disabled:cursor-not-allowed custom-scrollbar"
+                            rows={1}
+                        />
+                        <div className="absolute right-4 bottom-4 flex items-center gap-3">
+                            <p className="hidden sm:block text-[8px] font-black text-gray-700 uppercase tracking-[0.2em]">SHIFT+ENTER FOR LINE</p>
+                            <button
+                                onClick={handleSendMessage}
+                                disabled={!inputMessage.trim() || isTyping || isComplete}
+                                className="w-12 h-12 bg-wizard-accent/10 border border-wizard-accent/20 rounded-2xl flex items-center justify-center text-wizard-accent hover:bg-wizard-accent hover:text-black transition-all disabled:opacity-20 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(196,240,66,0.05)]"
+                            >
+                                {isTyping ? (
+                                    <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                                    </svg>
+                                )}
+                            </button>
+                        </div>
                     </div>
+                    <ProfileUplinkButton compact onSuccess={(data) => {
+                        // After uplink in chat, we might want to refresh messages or progress
+                        // For now we just update collectedData (done in Button) and maybe send a system message
+                        setCollectedData((prev) => ({ ...prev, ...data }));
+                        setMessages((prev) => [...prev, {
+                            role: 'assistant',
+                            content: "I've got it! I've just finished reading through your resume and I've updated your profile with everything I found. Your story is looking great so far—should we keep going and refine the details together?",
+                            timestamp: new Date()
+                        }]);
+                    }} />
                 </div>
             </div>
         </div>

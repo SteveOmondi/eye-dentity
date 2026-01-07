@@ -25,14 +25,12 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
                 {/* Protocol Header for Assistant */}
                 {!isUser && (
                     <div className="flex items-center gap-3 mb-3 ml-2">
-                        <div className="w-8 h-8 bg-wizard-accent/10 border border-wizard-accent/20 rounded-xl flex items-center justify-center text-wizard-accent shadow-[0_0_20px_rgba(196,240,66,0.1)] group-hover:scale-110 transition-transform duration-500">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
+                        <div className="w-10 h-10 bg-wizard-accent/10 border border-wizard-accent/20 rounded-xl flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(196,240,66,0.1)] group-hover:scale-110 transition-transform duration-500">
+                            <img src="/donald.png" alt="Donald" className="w-full h-full object-cover" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">NEURAL_ASST</span>
-                            <span className="text-[7px] font-bold text-gray-600 uppercase tracking-widest animate-pulse">Data Uplink Active</span>
+                            <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">DONALD</span>
+                            <span className="text-[7px] font-bold text-gray-600 uppercase tracking-widest animate-pulse">Neural Handshake Active</span>
                         </div>
                     </div>
                 )}
@@ -86,8 +84,8 @@ export const TypingIndicator = ({ show }: TypingIndicatorProps) => {
         <div className="flex justify-start mb-8 animate-fade-in">
             <div className="flex flex-col items-start gap-3 ml-2">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-wizard-accent/5 border border-wizard-accent/20 rounded-xl flex items-center justify-center">
-                        <div className="w-1.5 h-1.5 bg-wizard-accent rounded-full animate-ping" />
+                    <div className="w-8 h-8 bg-wizard-accent/5 border border-wizard-accent/20 rounded-xl flex items-center justify-center overflow-hidden">
+                        <img src="/donald.png" alt="Donald" className="w-full h-full object-cover opacity-60" />
                     </div>
                     <div className="flex gap-1.5 px-5 py-3 bg-white/[0.02] border border-white/5 rounded-2xl rounded-tl-sm">
                         <div className="w-1 h-1 bg-wizard-accent rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>

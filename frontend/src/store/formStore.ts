@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+// ... (interfaces remain same)
 
 export interface Education {
   degree: string;
@@ -68,6 +71,13 @@ export interface FormData {
   // Step 7: Template Selection
   selectedTemplate: string | null;
   colorScheme: string;
+  selectedColorScheme: {
+    name: string;
+    primary: string;
+    secondary: string;
+    accent: string;
+  } | null;
+  useAIDesign: boolean;
 
   // Step 8: Domain Selection
   domain: string;
@@ -81,14 +91,16 @@ export interface FormData {
 
 interface FormState {
   currentStep: number;
+  sessionId: string | null;
   formData: FormData;
   setCurrentStep: (step: number) => void;
+  setSessionId: (id: string | null) => void;
   updateFormData: (data: Partial<FormData>) => void;
   resetForm: () => void;
 }
 
 const initialFormData: FormData = {
-  // Personal Info
+  // ... (unchanged)
   name: '',
   email: '',
   profession: '',
@@ -98,54 +110,58 @@ const initialFormData: FormData = {
   yearsOfExperience: null,
   location: '',
   languages: [],
-
-  // Bio & Services
   bio: '',
   services: [],
   specializations: [],
   missionStatement: '',
   serviceAreas: [],
-
-  // Credentials
   education: [],
   certifications: [],
   awards: [],
   professionalMemberships: [],
-
-  // Social Links
   socialLinks: {},
-
-  // Portfolio
   portfolioItems: [],
   testimonials: [],
-
-  // Branding
   logoFile: null,
   logoUrl: '',
   profilePhotoFile: null,
   profilePhotoUrl: '',
-
-  // Template
   selectedTemplate: null,
   colorScheme: 'default',
-
-  // Domain
+  selectedColorScheme: null,
+  useAIDesign: false,
   domain: '',
   domainAvailable: false,
   domainPrice: null,
-
-  // Hosting
   selectedPlan: null,
   emailHosting: false,
 };
 
-export const useFormStore = create<FormState>((set) => ({
-  currentStep: 1,
-  formData: initialFormData,
-  setCurrentStep: (step) => set({ currentStep: step }),
-  updateFormData: (data) =>
-    set((state) => ({
-      formData: { ...state.formData, ...data },
-    })),
-  resetForm: () => set({ currentStep: 1, formData: initialFormData }),
-}));
+export const useFormStore = create<FormState>()(
+  persist(
+    (set) => ({
+      currentStep: 1,
+      sessionId: null,
+      formData: initialFormData,
+      setCurrentStep: (step) => set({ currentStep: step }),
+      setSessionId: (sessionId) => set({ sessionId }),
+      updateFormData: (data) =>
+        set((state) => ({
+          formData: { ...state.formData, ...data },
+        })),
+      resetForm: () => set({ currentStep: 1, sessionId: null, formData: initialFormData }),
+    }),
+    {
+      name: 'eye-dentity-form-storage',
+      // skip serialization for File objects
+      partialize: (state) => ({
+        ...state,
+        formData: {
+          ...state.formData,
+          logoFile: null,
+          profilePhotoFile: null,
+        },
+      }),
+    }
+  )
+);

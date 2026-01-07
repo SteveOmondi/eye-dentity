@@ -10,20 +10,27 @@ interface TemplateCardProps {
   onSelect: () => void;
 }
 
+import { API_BASE_URL } from '../api/client';
+
 export const TemplateCard = ({ template, isSelected, onSelect }: TemplateCardProps) => {
+  const getImageUrl = (url: string) => {
+    if (url.startsWith('http')) return url;
+    return `${API_BASE_URL}${url}`;
+  };
+
   return (
     <div
       onClick={onSelect}
       className={`group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 bg-white/5 border backdrop-blur-xl ${isSelected
-          ? 'border-wizard-accent shadow-[0_0_30px_rgba(196,240,66,0.15)] scale-[1.02]'
-          : 'border-white/10 hover:border-white/30 hover:scale-[1.01]'
+        ? 'border-wizard-accent shadow-[0_0_30px_rgba(196,240,66,0.15)] scale-[1.02]'
+        : 'border-white/10 hover:border-white/30 hover:scale-[1.01]'
         }`}
     >
       {/* Preview Image Container */}
       <div className="aspect-[16/10] bg-white/5 relative overflow-hidden">
         {template.previewUrl ? (
           <img
-            src={template.previewUrl}
+            src={getImageUrl(template.previewUrl)}
             alt={template.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />

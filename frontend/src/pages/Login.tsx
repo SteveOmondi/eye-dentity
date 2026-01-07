@@ -1,10 +1,16 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '../api/auth';
+import { chatApi } from '../api/chat';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { useAuthStore } from '../store/authStore';
+import { useFormStore } from '../store/formStore';
 
 export const Login = () => {
     const navigate = useNavigate();
+    const setAuth = useAuthStore(state => state.setAuth);
+    const { sessionId } = useFormStore();
+
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -24,14 +30,26 @@ export const Login = () => {
                 password: formData.password,
             });
 
-            // Store token
-            localStorage.setItem('token', response.token);
-            if (response.user) {
-                localStorage.setItem('user', JSON.stringify(response.user));
+            // Store in auth store
+            setAuth(response.user, response.token);
+
+            // Claim chat session if exists
+            if (sessionId) {
+                try {
+                    await chatApi.claimChatSession(sessionId);
+                } catch (chatErr) {
+                    console.error('Failed to claim session:', chatErr);
+                }
             }
 
-            // Redirect to admin dashboard
-            navigate('/admin');
+            // Redirect back to builder or admin
+            const fromBuilder = localStorage.getItem('was_in_builder');
+            if (fromBuilder === 'true') {
+                localStorage.removeItem('was_in_builder');
+                navigate('/builder');
+            } else {
+                navigate('/admin');
+            }
         } catch (err: any) {
             setError(err.response?.data?.error || 'Login failed. Please try again.');
             console.error('Login error:', err);
@@ -74,10 +92,10 @@ export const Login = () => {
                             </svg>
                         </div>
                         <h2 className="text-4xl font-black tracking-tighter text-white mb-3 uppercase">
-                            Secure <span className="text-wizard-accent">Link</span>
+                            Welcome <span className="text-wizard-accent">Back</span>
                         </h2>
                         <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600 animate-pulse">
-                            Awaiting Authorization Sequence
+                            Please enter your account details
                         </p>
                     </div>
 
@@ -95,7 +113,7 @@ export const Login = () => {
                             {/* Email */}
                             <div className="space-y-3">
                                 <label htmlFor="email" className="block text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 ml-2">
-                                    Identity Identifier (Email)
+                                    Email Address
                                 </label>
                                 <div className="relative group/input">
                                     <div className="absolute inset-0 bg-wizard-accent/5 rounded-2xl blur-lg opacity-0 group-focus-within/input:opacity-100 transition-opacity" />
@@ -108,7 +126,7 @@ export const Login = () => {
                                         value={formData.email}
                                         onChange={handleChange}
                                         className="relative block w-full px-7 py-5 bg-white/[0.02] border border-white/5 rounded-2xl text-white placeholder-white/10 focus:outline-none focus:border-wizard-accent/40 focus:ring-0 transition-all font-black uppercase text-xs tracking-widest shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] hover:bg-white/[0.04]"
-                                        placeholder="ENTER EMAIL ADDRESS..."
+                                        placeholder="Enter your email..."
                                     />
                                 </div>
                             </div>
@@ -117,10 +135,10 @@ export const Login = () => {
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center ml-2">
                                     <label htmlFor="password" className="block text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">
-                                        Access Key (Password)
+                                        Password
                                     </label>
                                     <a href="#" className="text-[9px] font-black uppercase tracking-[0.2em] text-wizard-accent/40 hover:text-wizard-accent transition-colors">
-                                        Lost Key?
+                                        Forgot Password?
                                     </a>
                                 </div>
                                 <div className="relative group/input">

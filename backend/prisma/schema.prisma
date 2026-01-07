@@ -118,10 +118,15 @@ model Template {
 model Website {
   id           String        @id @default(cuid())
   userId       String
-  templateId   String
+  templateId   String?
   domain       String        @unique
   subdomain    String?
   colorScheme  Json // Color palette
+  intent       Json? // [NEW] IntentSchema
+  genome       Json? // [NEW] DesignGenome
+  tokens       Json? // [NEW] DesignTokens
+  layoutGraph  Json? // [NEW] SemanticLayoutGraph
+  genomeSeed   String? // [NEW] Seed for deterministic generation
   content      Json? // Generated website content
   status       WebsiteStatus @default(PENDING)
   deploymentUrl String?
@@ -135,7 +140,7 @@ model Website {
 
   // Relations
   user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  template       Template          @relation(fields: [templateId], references: [id])
+  template       Template?         @relation(fields: [templateId], references: [id])
   marketingCampaigns MarketingCampaign[]
 
   @@index([userId])

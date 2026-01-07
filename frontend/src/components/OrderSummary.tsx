@@ -72,7 +72,8 @@ export const OrderSummary = () => {
         emailHostingPrice: formData.emailHosting ? 5.99 : 0,
         metadata: {
           templateId: formData.selectedTemplate || undefined,
-          colorScheme: formData.selectedColorScheme,
+          colorScheme: formData.colorScheme,
+          useAIDesign: formData.useAIDesign,
           profileData: {
             name: formData.name,
             email: formData.email,
@@ -107,15 +108,15 @@ export const OrderSummary = () => {
   return (
     <div className="p-0 animate-fade-up">
       <div className="mb-12">
-        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Final <span className="text-wizard-accent">Calibration</span></h2>
+        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Review your <span className="text-wizard-accent">Summary</span></h2>
         <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed">
-          Review your digital configuration before initiating the final deployment sequence.
+          Please review your website details before proceeding to payment.
         </p>
       </div>
 
       {error && (
         <div className="mb-10 bg-red-500/10 border border-red-500/20 text-red-500 px-6 py-5 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] animate-pulse">
-          Deployment Error: {error}
+          Error: {error}
         </div>
       )}
 
@@ -129,9 +130,9 @@ export const OrderSummary = () => {
             <div className="flex items-center justify-between mb-10 relative z-10">
               <div className="flex items-center gap-4">
                 <div className="w-1.5 h-6 bg-wizard-accent rounded-full shadow-[0_0_15px_rgba(196,240,66,0.5)]" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Neural Identity</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Your Profile</h3>
               </div>
-              <button onClick={() => handleEdit(1)} className="text-[9px] font-black uppercase tracking-[0.2em] text-wizard-accent/60 hover:text-wizard-accent transition-colors">Reconfigure</button>
+              <button onClick={() => handleEdit(1)} className="text-[9px] font-black uppercase tracking-[0.2em] text-wizard-accent/60 hover:text-wizard-accent transition-colors">Edit Profile</button>
             </div>
 
             <div className="grid gap-10 relative z-10">
@@ -158,11 +159,11 @@ export const OrderSummary = () => {
 
               <div className="pt-10 border-t border-white/5 grid md:grid-cols-2 gap-10">
                 <div className="space-y-2">
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">Communication Node</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">Contact Email</p>
                   <p className="text-sm text-gray-300 font-bold">{formData.email}</p>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">Direct Uplink</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">Phone Number</p>
                   <p className="text-sm text-gray-300 font-bold">{formData.phone}</p>
                 </div>
               </div>
@@ -176,28 +177,30 @@ export const OrderSummary = () => {
             <div className="flex items-center justify-between mb-10 relative z-10">
               <div className="flex items-center gap-4">
                 <div className="w-1.5 h-6 bg-wizard-accent rounded-full shadow-[0_0_15px_rgba(196,240,66,0.5)]" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Visual Matrix</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Website Design</h3>
               </div>
-              <button onClick={() => handleEdit(4)} className="text-[9px] font-black uppercase tracking-[0.2em] text-wizard-accent/60 hover:text-wizard-accent transition-colors">Recalibrate</button>
+              <button onClick={() => handleEdit(4)} className="text-[9px] font-black uppercase tracking-[0.2em] text-wizard-accent/60 hover:text-wizard-accent transition-colors">Edit Design</button>
             </div>
 
             <div className="flex flex-col md:flex-row items-center justify-between gap-10 p-8 bg-white/[0.02] rounded-3xl border border-white/5 relative z-10">
               <div className="flex items-center gap-8">
-                {formData.selectedColorScheme && (
+                {formData.colorScheme && (
                   <div className="flex -space-x-4">
-                    <div className="w-14 h-14 rounded-2xl border-2 border-black rotate-[-12deg] shadow-xl" style={{ backgroundColor: formData.selectedColorScheme.primary }} />
-                    <div className="w-14 h-14 rounded-2xl border-2 border-black rotate-0 shadow-xl" style={{ backgroundColor: formData.selectedColorScheme.secondary }} />
-                    <div className="w-14 h-14 rounded-2xl border-2 border-black rotate-[12deg] shadow-xl" style={{ backgroundColor: formData.selectedColorScheme.accent }} />
+                    <div className="w-14 h-14 rounded-2xl border-2 border-black rotate-[-12deg] shadow-xl bg-wizard-accent" />
+                    <div className="w-14 h-14 rounded-2xl border-2 border-black rotate-0 shadow-xl bg-wizard-purple" />
+                    <div className="w-14 h-14 rounded-2xl border-2 border-black rotate-[12deg] shadow-xl bg-white" />
                   </div>
                 )}
                 <div className="ml-4">
-                  <p className="text-lg text-white font-black tracking-tighter uppercase">{formData.selectedColorScheme?.name} PALETTE</p>
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent mt-1">Chromatic Harmony Locked</p>
+                  <p className="text-lg text-white font-black tracking-tighter uppercase">{formData.selectedColorScheme?.name || formData.colorScheme} PALETTE</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent mt-1">Design Theme Selected</p>
                 </div>
               </div>
               <div className="text-center md:text-right">
-                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-gray-700 mb-2">Base Archetype</p>
-                <p className="text-sm text-gray-300 font-bold uppercase tracking-widest bg-white/[0.05] px-4 py-2 rounded-xl border border-white/10 inline-block">Active Engine v1.02</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-gray-700 mb-2">Base Template</p>
+                <p className={`text-sm font-bold uppercase tracking-widest px-4 py-2 rounded-xl border inline-block ${formData.useAIDesign ? 'bg-wizard-accent/10 border-wizard-accent text-wizard-accent shadow-[0_0_20px_rgba(196,240,66,0.1)]' : 'bg-white/[0.05] border-white/10 text-gray-300'}`}>
+                  {formData.useAIDesign ? 'AI DYNAMIC FORGE' : 'Professional Architype'}
+                </p>
               </div>
             </div>
           </div>
@@ -209,9 +212,9 @@ export const OrderSummary = () => {
             <div className="flex items-center justify-between mb-10 relative z-10">
               <div className="flex items-center gap-4">
                 <div className="w-1.5 h-6 bg-wizard-accent rounded-full shadow-[0_0_15px_rgba(196,240,66,0.5)]" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Neural Core Detail</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Domain & Hosting</h3>
               </div>
-              <button onClick={() => handleEdit(5)} className="text-[9px] font-black uppercase tracking-[0.2em] text-wizard-accent/60 hover:text-wizard-accent transition-colors">Sync</button>
+              <button onClick={() => handleEdit(5)} className="text-[9px] font-black uppercase tracking-[0.2em] text-wizard-accent/60 hover:text-wizard-accent transition-colors">Edit</button>
             </div>
 
             <div className="space-y-8 relative z-10">
@@ -222,12 +225,12 @@ export const OrderSummary = () => {
                   </div>
                   <div>
                     <p className="text-xl font-black text-white tracking-tighter uppercase">{formData.domain}</p>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent mt-1">Digital Domain Registry</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent mt-1">Your Website Domain</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-black text-white tracking-tighter">${formData.domainPrice?.toFixed(2)}</p>
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">/ CYCLE</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">/ YEAR</p>
                 </div>
               </div>
 
@@ -237,13 +240,13 @@ export const OrderSummary = () => {
                     <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                   </div>
                   <div>
-                    <p className="text-xl font-black text-white tracking-tighter uppercase">{selectedPlan?.name} NODE</p>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 mt-1">Processor Performance</p>
+                    <p className="text-xl font-black text-white tracking-tighter uppercase">{selectedPlan?.name} PLAN</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 mt-1">Hosting Services</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-black text-white tracking-tighter">${selectedPlan?.price.toFixed(2)}</p>
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">/ CYCLE</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-700">/ MONTH</p>
                 </div>
               </div>
             </div>

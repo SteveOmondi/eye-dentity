@@ -49,20 +49,16 @@ export async function sendMessage(
         throw new Error(`No API key available for provider: ${provider}`);
     }
 
-    if (provider !== 'gemini') {
-        throw new Error(`Provider ${provider} is currently disabled. Only 'gemini' is allowed.`);
+    switch (provider) {
+        case 'claude':
+            return await sendMessageToClaude(messages, systemPrompt, apiKey);
+        case 'openai':
+            return await sendMessageToOpenAI(messages, systemPrompt, apiKey);
+        case 'gemini':
+            return await sendMessageToGemini(messages, systemPrompt, apiKey);
+        default:
+            throw new Error(`Unsupported provider: ${provider}`);
     }
-
-    // switch (provider) {
-    //     case 'claude':
-    //         return await sendMessageToClaude(messages, systemPrompt, apiKey);
-    //     case 'openai':
-    //         return await sendMessageToOpenAI(messages, systemPrompt, apiKey);
-    //     case 'gemini':
-    return await sendMessageToGemini(messages, systemPrompt, apiKey);
-    //     default:
-    //         throw new Error(`Unsupported provider: ${provider}`);
-    // }
 }
 
 /**

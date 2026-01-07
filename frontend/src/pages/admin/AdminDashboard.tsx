@@ -29,7 +29,7 @@ export const AdminDashboard = () => {
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-wizard-accent"></div>
-          <p className="mt-4 text-xs font-black uppercase tracking-widest text-gray-500">Syncing System Data...</p>
+          <p className="mt-4 text-xs font-black uppercase tracking-widest text-gray-500">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -140,7 +140,7 @@ export const AdminDashboard = () => {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-xl font-black text-white tracking-tight uppercase">RECENT USERS</h2>
-              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Latest system entries</p>
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Recently joined users</p>
             </div>
             <Link
               to="/admin/users"

@@ -55,9 +55,9 @@ export const BioServicesStep = () => {
   return (
     <div className="p-0 animate-fade-up">
       <div className="mb-12">
-        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Narrative <span className="text-wizard-accent">& Assets</span></h2>
+        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Your <span className="text-wizard-accent">Story</span></h2>
         <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed">
-          Construct your professional narrative and define the core services of your digital entity.
+          Tell the world what you do and what you're passionate about.
         </p>
       </div>
 
@@ -65,7 +65,7 @@ export const BioServicesStep = () => {
         {/* Bio Textarea */}
         <div className="space-y-4">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 ml-1">
-            Professional Chronicle
+            Professional Bio
           </label>
           <div className="relative group">
             <textarea
@@ -73,7 +73,7 @@ export const BioServicesStep = () => {
               onChange={(e) => updateFormData({ bio: e.target.value })}
               rows={6}
               className="w-full bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all resize-none font-medium leading-relaxed shadow-[0_0_30px_rgba(0,0,0,0.2)] hover:border-white/10"
-              placeholder="Initialize biography stream..."
+              placeholder="Write a short and sweet bio about yourself..."
             />
             <div className="absolute top-4 right-6 pointer-events-none opacity-20">
               <svg className="w-5 h-5 text-wizard-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@ export const BioServicesStep = () => {
         {/* Mission Statement */}
         <div className="space-y-4">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 ml-1">
-            Prime Directive
+            Your Mission
           </label>
           <div className="relative">
             <textarea
@@ -102,18 +102,18 @@ export const BioServicesStep = () => {
               onChange={(e) => updateFormData({ missionStatement: e.target.value })}
               rows={3}
               className="w-full bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all resize-none font-medium shadow-[0_0_30px_rgba(0,0,0,0.2)] hover:border-white/10"
-              placeholder="Declare your core mission..."
+              placeholder="What's your main professional goal or philosophy?"
             />
           </div>
           <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest ml-1">
-            Structural philosophy of your enterprise
+            A short sentence about why you do what you do
           </p>
         </div>
 
         {/* Services Section */}
         <div className="space-y-6">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 ml-1">
-            Service Protocols
+            Services you offer
           </label>
           <div className="flex gap-4">
             <input
@@ -122,14 +122,14 @@ export const BioServicesStep = () => {
               onChange={(e) => setNewService(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addService())}
               className="flex-1 bg-white/[0.02] border border-white/5 px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all shadow-[0_0_30px_rgba(0,0,0,0.2)] hover:border-white/10"
-              placeholder="e.g. STRATEGIC CONSULTATION"
+              placeholder="e.g. GRAPHIC DESIGN, WEB DEVELOPMENT"
             />
             <button
               onClick={addService}
               type="button"
               className="px-10 py-5 bg-wizard-accent text-black font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-white hover:scale-105 transition-all shadow-[0_0_20px_rgba(196,240,66,0.2)]"
             >
-              Link
+              Add
             </button>
           </div>
 
@@ -158,7 +158,7 @@ export const BioServicesStep = () => {
         {/* Specializations */}
         <div className="space-y-6">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 ml-1">
-            Neural Specializations
+            Your Skills & Specialties
           </label>
           <div className="flex gap-4">
             <input
@@ -174,7 +174,7 @@ export const BioServicesStep = () => {
               type="button"
               className="px-10 py-5 bg-wizard-accent/10 border border-wizard-accent/30 text-wizard-accent font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-wizard-accent hover:text-black transition-all"
             >
-              Inject
+              Add
             </button>
           </div>
 
@@ -203,7 +203,7 @@ export const BioServicesStep = () => {
         {/* Service Areas */}
         <div className="space-y-6">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 ml-1">
-            Deployment Nodes (Location)
+            Where you're based
           </label>
           <div className="flex gap-4">
             <input
@@ -219,7 +219,7 @@ export const BioServicesStep = () => {
               type="button"
               className="px-10 py-5 border border-white/10 text-white font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-white hover:text-black transition-all"
             >
-              Deploy
+              Add
             </button>
           </div>
 

@@ -44,7 +44,13 @@ export const TemplateSelectionStep = () => {
   };
 
   const selectedTemplate = templates.find((t) => t.id === formData.selectedTemplate);
-  const colorSchemes = selectedTemplate?.cssStyles?.colorPalettes || [];
+  const defaultAIPalettes = [
+    { name: 'Cyber Neon', primary: '#c4f042', secondary: '#9d50bb', accent: '#6e48aa' },
+    { name: 'Deep Space', primary: '#00d2ff', secondary: '#3a7bd5', accent: '#004e92' },
+    { name: 'Solar Flare', primary: '#f8ff00', secondary: '#f8ff00', accent: '#f8ff00' },
+    { name: 'Crimson Peak', primary: '#ff0000', secondary: '#000000', accent: '#ff0000' },
+  ];
+  const colorSchemes = formData.useAIDesign ? defaultAIPalettes : (selectedTemplate?.cssStyles?.colorPalettes || []);
 
   const filteredTemplates =
     selectedFilter === 'all'
@@ -59,11 +65,11 @@ export const TemplateSelectionStep = () => {
   ];
 
   const handleTemplateSelect = (templateId: string) => {
-    updateFormData({ selectedTemplate: templateId, selectedColorScheme: null });
+    updateFormData({ selectedTemplate: templateId, selectedColorScheme: null, colorScheme: 'default' });
   };
 
   const handleColorSchemeSelect = (scheme: any) => {
-    updateFormData({ selectedColorScheme: scheme });
+    updateFormData({ selectedColorScheme: scheme, colorScheme: scheme.name });
   };
 
   if (loading) {
@@ -116,18 +122,57 @@ export const TemplateSelectionStep = () => {
             <div className="h-px flex-1 bg-white/5" />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-10">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {/* AI Dynamic Design Option */}
+            <div
+              onClick={() => updateFormData({ useAIDesign: true, selectedTemplate: null })}
+              className={`group relative rounded-[2.5rem] overflow-hidden cursor-pointer transition-all duration-700 backdrop-blur-3xl border-2 ${formData.useAIDesign
+                ? 'border-wizard-accent bg-wizard-accent/5 scale-105 shadow-[0_0_100px_rgba(196,240,66,0.1)]'
+                : 'border-white/10 bg-white/[0.02] hover:border-wizard-accent/30 hover:bg-white/[0.04]'
+                }`}
+            >
+              <div className="aspect-[16/10] relative flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 bg-mesh-gradient opacity-20 group-hover:opacity-40 transition-opacity animate-pulse-slow" />
+                <div className="relative z-10 flex flex-col items-center gap-6">
+                  <div className="w-24 h-24 rounded-[2rem] bg-wizard-accent/10 border border-wizard-accent/20 flex items-center justify-center shadow-[0_0_50px_rgba(196,240,66,0.1)] group-hover:scale-110 transition-transform duration-700">
+                    <svg className="w-12 h-12 text-wizard-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-wizard-accent text-[10px] font-black uppercase tracking-[0.4em] mb-1">PROMPT-TO-DESIGN</p>
+                    <h3 className="text-white text-2xl font-black tracking-tighter uppercase">Forge AI Design</h3>
+                  </div>
+                </div>
+              </div>
+              <div className="p-8 border-t border-white/5">
+                <p className="text-gray-400 text-sm font-medium leading-relaxed">
+                  Bypass templates. Our AI engine will craft a unique, path-dependent design genome based on your identity profile.
+                </p>
+              </div>
+              {formData.useAIDesign && (
+                <div className="absolute top-6 left-6">
+                  <span className="bg-wizard-accent text-black text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-xl shadow-2xl">
+                    ACTIVE FORGE
+                  </span>
+                </div>
+              )}
+            </div>
+
             {filteredTemplates.map((template) => (
               <TemplateCard
                 key={template.id}
                 template={template}
                 isSelected={formData.selectedTemplate === template.id}
-                onSelect={() => handleTemplateSelect(template.id)}
+                onSelect={() => {
+                  handleTemplateSelect(template.id);
+                  updateFormData({ useAIDesign: false });
+                }}
               />
             ))}
           </div>
 
-          {filteredTemplates.length === 0 && (
+          {filteredTemplates.length === 0 && !formData.useAIDesign && (
             <div className="text-center py-24 glass-card border border-dashed border-white/10 rounded-[2rem]">
               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-700">No archetypes detected in this sector</p>
             </div>
@@ -135,7 +180,7 @@ export const TemplateSelectionStep = () => {
         </div>
 
         {/* Color Scheme Picker */}
-        {selectedTemplate && colorSchemes.length > 0 && (
+        {(selectedTemplate || formData.useAIDesign) && colorSchemes.length > 0 && (
           <div className="animate-fade-up">
             <div className="flex items-center gap-6 mb-10">
               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80 whitespace-nowrap">Chromatic Calibration</h3>
@@ -155,7 +200,7 @@ export const TemplateSelectionStep = () => {
         )}
 
         {/* Selection Success Feedback */}
-        {formData.selectedTemplate && formData.selectedColorScheme && (
+        {(formData.selectedTemplate || formData.useAIDesign) && formData.selectedColorScheme && (
           <div className="glass-card border border-wizard-accent/20 rounded-[2rem] p-10 flex flex-col md:flex-row items-center gap-8 animate-fade-in relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-wizard-accent/5 blur-[100px] pointer-events-none group-hover:bg-wizard-accent/10 transition-colors" />
 
@@ -167,7 +212,7 @@ export const TemplateSelectionStep = () => {
             <div className="flex-1 text-center md:text-left">
               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-wizard-accent mb-2">Configuration Locked</p>
               <p className="text-xl text-white font-black tracking-tight uppercase">
-                Archetype: <span className="text-wizard-accent">{selectedTemplate?.name}</span><br />
+                Archetype: <span className="text-wizard-accent">{formData.useAIDesign ? 'AI FORGE' : selectedTemplate?.name}</span><br />
                 Palette: <span className="text-wizard-accent">{formData.selectedColorScheme.name}</span>
               </p>
             </div>

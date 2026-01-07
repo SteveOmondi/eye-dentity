@@ -4,11 +4,20 @@ import {
   getWebsite,
   getUserWebsites,
   regenerateWebsiteHandler,
+  iterateWebsiteHandler,
   deleteWebsiteHandler,
 } from '../controllers/website.controller';
 import { authenticate } from '../middleware/auth';
 
 const router = Router();
+
+/**
+ * @route   POST /api/websites/preview
+ * @desc    Generate a preview of the website
+ * @access  Public
+ */
+import { generatePreview } from '../controllers/website.controller';
+router.post('/preview', generatePreview);
 
 /**
  * @route   POST /api/websites/generate
@@ -31,12 +40,14 @@ router.get('/:websiteId', authenticate, getWebsite);
  */
 router.get('/', authenticate, getUserWebsites);
 
+router.post('/:websiteId/regenerate', authenticate, regenerateWebsiteHandler);
+
 /**
- * @route   POST /api/websites/:websiteId/regenerate
- * @desc    Regenerate website
+ * @route   POST /api/websites/:websiteId/iterate
+ * @desc    Iterate on website design based on feedback
  * @access  Private
  */
-router.post('/:websiteId/regenerate', authenticate, regenerateWebsiteHandler);
+router.post('/:websiteId/iterate', authenticate, iterateWebsiteHandler);
 
 /**
  * @route   DELETE /api/websites/:websiteId

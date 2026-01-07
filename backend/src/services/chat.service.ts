@@ -1,7 +1,6 @@
-import { prisma } from '../config/database';
+import { prisma } from '../lib/prisma';
 import {
     sendMessage,
-    extractDataFromResponse,
     calculateProgress,
     type LLMProvider,
     type Message,
@@ -18,18 +17,21 @@ export interface ChatSession {
     currentTopic: string | null;
 }
 
-/**
- * System prompt for the conversational profile builder
- */
-const SYSTEM_PROMPT = `You are a friendly and professional AI assistant helping users build their professional website. Your goal is to collect comprehensive information through natural conversation.
+const SYSTEM_PROMPT = `You are DONALD, a high-fidelity AI architect and personal branding specialist. You are helping users build their professional website. Your goal is to collect comprehensive information through a natural, engaging conversation.
+
+PERSONALITY & TONE:
+- Name: Donald
+- Tone: Extremely friendly, welcoming, professional, and slightly futuristic. You should sound like a devoted partner in the user's success.
+- Value Proposition: You aren't just a bot; you are their dedicated architect here to help them build a stunning professional profile that truly represents their career journey.
+- Proactivity: You should mention that you can automatically build their profile if they upload a resume using the "Import from Resume" button (the one with your icon) next to the message input. If they do this, you will instantly "read" their CV and populate their details.
 
 CONVERSATION GUIDELINES:
-1. Ask ONE question at a time
-2. Be conversational, warm, and encouraging
-3. Extract information from natural responses
-4. Ask clarifying follow-up questions when needed
-5. Adapt questions based on the user's profession
-6. Confirm collected data before moving to next topic
+1. START with a warm, personal greeting: "Hello! My name is Donald. I'm your personal architect, and I'm here to help you build a professional website that makes a lasting impression."
+2. Explain clearly that you are their partner in this journey, dedicated to making their brand stand out.
+3. Show excitement about the collaboration.
+4. Ask ONE question at a time.
+5. Extract information from natural responses.
+6. Confirm collected data before moving to next topic.
 
 REQUIRED DATA TO COLLECT:
 - Name, Email, Company Name, Professional Tagline
@@ -50,10 +52,11 @@ Always respond with a JSON object containing:
 }
 
 IMPORTANT:
-- Be natural and conversational in your "message"
-- Only extract data that the user explicitly provided
-- Don't make assumptions
-- When you have all required data, set "isComplete": true`;
+- Always stay in character as Donald.
+- Be natural and conversational in your "message".
+- Only extract data that the user explicitly provided.
+- Don't make assumptions.
+- When you have all required data, set "isComplete": true.`;
 
 /**
  * Start a new chat session
@@ -77,7 +80,7 @@ export async function startChatSession(
     const initialMessage = await sendMessage(
         provider,
         [],
-        SYSTEM_PROMPT + '\n\nStart the conversation by greeting the user and asking for their profession.',
+        SYSTEM_PROMPT + '\n\nStart the conversation. Introduce yourself as Donald exactly as instructed in the guidelines and ask for their profession.',
         userId
     );
 
@@ -94,7 +97,7 @@ export async function startChatSession(
     await prisma.chatSession.update({
         where: { id: session.id },
         data: {
-            messages: JSON.stringify(messages),
+            messages: messages as any,
             currentTopic: parsedResponse.nextTopic || 'profession',
         },
     });
@@ -118,10 +121,6 @@ export async function processMessage(
     sessionId: string,
     userMessage: string
 ): Promise<ChatSession> {
-    console.log('--- processMessage START ---');
-    console.log('SessionID:', sessionId);
-    console.log('UserMessage:', userMessage);
-
     const session = await prisma.chatSession.findUnique({
         where: { id: sessionId },
     });
@@ -130,10 +129,8 @@ export async function processMessage(
         throw new Error('Chat session not found');
     }
 
-    console.log('Session found, parsing messages...');
-    const messages: Message[] = JSON.parse(session.messages as string);
-    const collectedData: Record<string, any> = JSON.parse(session.collectedData as string);
-    console.log('Messages parsed. Count:', messages.length);
+    const messages: Message[] = session.messages as any;
+    const collectedData: Record<string, any> = session.collectedData as any;
 
     // Add user message
     messages.push({
@@ -150,14 +147,12 @@ Current topic: ${session.currentTopic || 'unknown'}
 Continue the conversation naturally. Extract any new information from the user's response and ask the next relevant question.
 `;
 
-    console.log('Calling sendMessage...');
     const aiResponse = await sendMessage(
         session.provider as LLMProvider,
         messages,
         SYSTEM_PROMPT + '\n\n' + contextPrompt,
         session.userId || undefined
     );
-    console.log('sendMessage returned. Response length:', aiResponse?.length || 0);
 
     const parsedResponse = parseAIResponse(aiResponse);
 
@@ -182,8 +177,8 @@ Continue the conversation naturally. Extract any new information from the user's
     await prisma.chatSession.update({
         where: { id: sessionId },
         data: {
-            messages: JSON.stringify(messages),
-            collectedData: JSON.stringify(updatedData),
+            messages: messages as any,
+            collectedData: updatedData as any,
             currentTopic: parsedResponse.nextTopic,
             completionProgress: progress,
             isComplete,
@@ -225,8 +220,8 @@ export async function getChatSession(
     return {
         id: session.id,
         sessionToken: session.sessionToken,
-        messages: JSON.parse(session.messages as string),
-        collectedData: JSON.parse(session.collectedData as string),
+        messages: session.messages as any,
+        collectedData: session.collectedData as any,
         provider: session.provider as LLMProvider,
         isComplete: session.isComplete,
         completionProgress: session.completionProgress,
@@ -277,6 +272,27 @@ export async function deleteChatSession(sessionId: string): Promise<void> {
 }
 
 /**
+ * Claim an anonymous chat session for a user
+ */
+export async function claimChatSession(sessionId: string, userId: string): Promise<ChatSession> {
+    const session = await prisma.chatSession.update({
+        where: { id: sessionId },
+        data: { userId },
+    });
+
+    return {
+        id: session.id,
+        sessionToken: session.sessionToken,
+        messages: session.messages as any,
+        collectedData: session.collectedData as any,
+        provider: session.provider as LLMProvider,
+        isComplete: session.isComplete,
+        completionProgress: session.completionProgress,
+        currentTopic: session.currentTopic,
+    };
+}
+
+/**
  * Get user's chat sessions
  */
 export async function getUserChatSessions(userId: string): Promise<ChatSession[]> {
@@ -289,8 +305,8 @@ export async function getUserChatSessions(userId: string): Promise<ChatSession[]
     return sessions.map((session) => ({
         id: session.id,
         sessionToken: session.sessionToken,
-        messages: JSON.parse(session.messages as string),
-        collectedData: JSON.parse(session.collectedData as string),
+        messages: session.messages as any,
+        collectedData: session.collectedData as any,
         provider: session.provider as LLMProvider,
         isComplete: session.isComplete,
         completionProgress: session.completionProgress,

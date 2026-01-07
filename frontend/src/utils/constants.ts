@@ -94,6 +94,7 @@ export const STEPS = [
   { number: 4, title: 'Template', description: 'Website design' },
   { number: 5, title: 'Domain', description: 'Your web address' },
   { number: 6, title: 'Hosting', description: 'Select a plan' },
-  { number: 7, title: 'Review', description: 'Final summary' },
+  { number: 7, title: 'Preview', description: 'Visual Matrix' },
+  { number: 8, title: 'Review', description: 'Final summary' },
 ];
 

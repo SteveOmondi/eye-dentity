@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useFormStore } from '../store/formStore';
 import { PROFESSIONS } from '../utils/constants';
+import { ProfileUplinkButton } from './ProfileUplinkButton';
 
 export const PersonalInfoStep = () => {
   const { formData, updateFormData } = useFormStore();
@@ -24,18 +25,23 @@ export const PersonalInfoStep = () => {
 
   return (
     <div className="p-0 animate-fade-up">
-      <div className="mb-12">
-        <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">Identity <span className="text-wizard-accent">Parameters</span></h2>
-        <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed">
-          Calibrate your core professional data to establish a high-fidelity digital presence.
-        </p>
+      <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div>
+          <h2 className="text-4xl font-black text-white mb-4 tracking-tighter uppercase">About <span className="text-wizard-accent">You</span></h2>
+          <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed">
+            Let's start with the basics to build your professional profile.
+          </p>
+        </div>
+        <div className="w-full md:w-auto md:min-w-[400px]">
+          <ProfileUplinkButton />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {/* Name Input */}
         <div className="space-y-3">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
-            Full Identity *
+            Full Name *
           </label>
           <input
             type="text"
@@ -53,13 +59,13 @@ export const PersonalInfoStep = () => {
         {/* Company Name */}
         <div className="space-y-3">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
-            Organization *
+            Company Name
           </label>
           <input
             type="text"
             value={formData.companyName}
             onChange={(e) => updateFormData({ companyName: e.target.value })}
-            className={`w-full bg-white/[0.02] border px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all ${errors.companyName ? 'border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-white/5 hover:border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.2)]'
+            className={`w-full bg-white/[0.02] border px-6 py-5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all ${errors.companyName ? 'border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-white/5 hover:border-white/10 shadow-[0_0_30_rgba(0,0,0,0.2)]'
               }`}
             placeholder="e.g. STOIC SOLUTIONS"
           />
@@ -71,7 +77,7 @@ export const PersonalInfoStep = () => {
         {/* Professional Tagline */}
         <div className="md:col-span-2 space-y-3">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
-            Core Proposition *
+            Your Tagline *
           </label>
           <input
             type="text"
@@ -83,7 +89,7 @@ export const PersonalInfoStep = () => {
           />
           <div className="flex justify-between items-center px-1">
             <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest">
-              Brief mission statement of your expertise
+              A short sentence that sums up what you do
             </p>
             {errors.tagline && <span className="text-red-500 text-[9px] font-black uppercase tracking-widest">{errors.tagline}</span>}
           </div>
@@ -92,7 +98,7 @@ export const PersonalInfoStep = () => {
         {/* Email Input */}
         <div className="space-y-3">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
-            Comm Link *
+            Email Address *
           </label>
           <input
             type="email"
@@ -121,7 +127,7 @@ export const PersonalInfoStep = () => {
         {/* Profession Dropdown */}
         <div className="space-y-3">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
-            Sector *
+            Profession *
           </label>
           <div className="relative group">
             <select
@@ -129,7 +135,7 @@ export const PersonalInfoStep = () => {
               onChange={(e) => updateFormData({ profession: e.target.value })}
               className={`w-full bg-[#141414] border px-6 py-5 rounded-2xl text-white appearance-none focus:outline-none focus:ring-2 focus:ring-wizard-accent/30 transition-all cursor-pointer ${errors.profession ? 'border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.1)]' : 'border-white/5 hover:border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.2)]'}`}
             >
-              <option value="" className="bg-[#141414]">IDENTIFY SECTOR</option>
+              <option value="" className="bg-[#141414]">CHOOSE YOUR PROFESSION</option>
               {Array.from(new Set(PROFESSIONS.map(p => p.category))).map(category => (
                 <optgroup
                   key={category}
@@ -155,7 +161,7 @@ export const PersonalInfoStep = () => {
         {/* Years of Experience */}
         <div className="space-y-3">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
-            Runtime (Years)
+            Experience (Years)
           </label>
           <input
             type="number"
@@ -171,7 +177,7 @@ export const PersonalInfoStep = () => {
         {/* Location */}
         <div className="space-y-3">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
-            Node Location
+            Location
           </label>
           <input
             type="text"
@@ -185,7 +191,7 @@ export const PersonalInfoStep = () => {
         {/* Languages */}
         <div className="space-y-3">
           <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-wizard-accent/80">
-            Syntax / Languages
+            Languages
           </label>
           <div className="flex gap-4">
             <input
@@ -206,7 +212,7 @@ export const PersonalInfoStep = () => {
               type="button"
               className="px-10 py-5 bg-wizard-accent text-black font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-white hover:scale-105 transition-all shadow-[0_0_20px_rgba(196,240,66,0.3)]"
             >
-              Sync
+              Add
             </button>
           </div>
 
